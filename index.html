@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>HoverRush: Fully Optimized for Mobile & Desktop</title>
+  <title>HoverRush: Mobile Optimized (vBeta3 - Final Branding)</title>
   <style>
     html, body {
       margin: 0;
@@ -437,7 +437,7 @@
     const gameOverBranding = document.getElementById('game-over-branding');
 
 
-    // Game State (unchanged)
+    // Game State
     let carX = 80, carY = 300, prevCarX = 80, prevCarY = 300;
     let carColor = 'white', carShake = 0;
     let battery = 100, score = 0;
@@ -461,11 +461,15 @@
     const SIDEWALK_HEIGHT = 40;
     const PROJECTILE_SPEED_MULTIPLIER = 1.1, BONUS_SPEED_MULTIPLIER = 0.9, PEDESTRIAN_SPEED_MULTIPLIER = 0.4;
     const CHARGING_TRIGGER_SPAWN_CHANCE = 0.0015, BIRD_SPEED_MULTIPLIER = 1.3;
-    const BASE_BIRD_SPAWN_CHANCE = 0.018, BASE_PEDESTRIAN_SPAWN_CHANCE = 0.015, BASE_PROJECTILE_THROW_CHANCE = 0.01;
+    // Fix: Reduce base spawn rates
+    const BASE_BIRD_SPAWN_CHANCE = 0.012;
+    const BASE_PEDESTRIAN_SPAWN_CHANCE = 0.010;
+    const BASE_PROJECTILE_THROW_CHANCE = 0.01;
     const VERTIPORT_SPAWN_CHANCE = 0.01;
     let buildings = [], pedestrians = [], projectiles = [], bonuses = [], birds = [], clouds = [], swarmVehicles = [];
     let cityHeight = 450, playableHeight = 450;
-    const PROJECTILE_GRAVITY = 0.15; // Define gravity constant
+    const PROJECTILE_GRAVITY = 0.15; 
+    let difficultyMultiplier = 1.0; 
 
     // --- Audio Engine (unchanged) ---
     let audioCtx;
@@ -477,16 +481,12 @@
              console.log("AudioContext state changed to:", audioCtx.state);
              if (audioCtx.state !== 'running') {
                 audioInitialized = false;
-                stopAllSounds(); // Stop sounds if context is suspended/closed
+                stopAllSounds(); 
                 console.warn("AudioContext state changed to non-running. Audio features may be disabled until next interaction.");
              } else if (audioCtx.state === 'running' && !audioInitialized) {
-                // If context resumes automatically (less likely on iOS, but possible)
-                // We might need to re-initialize nodes. Handle this in interaction/visibility checks.
                 console.log("AudioContext resumed automatically. Re-initialization might be needed.");
-                // Attempt re-init on resume
                 if (initAudio()) {
                     console.log("Audio re-initialized automatically on state change to running.");
-                    // Check if we should restart music loop checker
                     if (gameRunning && musicShouldBePlaying && !musicLoopIntervalId) {
                         console.log("Restarting music loop checker due to automatic context resume.");
                         startMusicLoopChecker();
@@ -667,19 +667,19 @@
     // --- Screen Shake (unchanged) ---
     function triggerShake(duration = 5) { carShake = duration; }
 
-    // --- Game Dimensions & Calculations (unchanged) ---
+    // --- Game Dimensions & Calculations ---
     function calculateDimensions() { playableHeight = gameCanvas.height - SIDEWALK_HEIGHT; cityHeight = playableHeight; MAX_CAR_X = gameCanvas.width * 0.4; }
-    function getDifficultyMultiplier() { const baseScore = 1000; const maxScaleScore = 4000; if (score < baseScore) return 1.0; const progress = Math.min(1, (score - baseScore) / (maxScaleScore - baseScore)); return 1.0 + progress * 0.5; }
+    // Fix: Removed getDifficultyMultiplier function, logic moved to updateGameState
 
-    // --- Entity Management (projectile physics updated) ---
+    // --- Entity Management (projectile physics & spawn rates updated) ---
     function spawnBuilding(forceX = null) { const isVertiport = Math.random() < VERTIPORT_SPAWN_CHANCE && !buildings.some(b => b.isVertiport); const minWidth = isVertiport ? 100 : 60; const maxWidth = isVertiport ? 150 : 180; const minHeight = isVertiport ? playableHeight * 0.7 : 100; const maxHeight = isVertiport ? playableHeight * 0.85 : playableHeight * 0.65; const gap = 40 + Math.random() * 60; const lastBuilding = buildings[buildings.length - 1]; let nextX = forceX !== null ? forceX : (lastBuilding ? lastBuilding.x + lastBuilding.width + gap : gameCanvas.width + 50); const height = minHeight + Math.random() * (maxHeight - minHeight); buildings.push({ x: nextX, y: gameCanvas.height - height, width: minWidth + Math.random() * (maxWidth - minWidth), height: height, color: isVertiport ? '#607D8B' : `hsl(${190 + Math.random()*50}, 25%, ${15 + Math.random()*15}%)`, isVertiport: isVertiport, wavePhase: Math.random() * Math.PI * 2 }); }
     function updateBuildings() { for (let i = buildings.length - 1; i >= 0; i--) { const b = buildings[i]; b.x -= currentScrollSpeed; if (b.isVertiport) b.wavePhase += 0.1; if (b.x + b.width < 0) buildings.splice(i, 1); } const lastBuilding = buildings[buildings.length - 1]; if (!lastBuilding || lastBuilding.x + lastBuilding.width < gameCanvas.width + 100) { spawnBuilding(); } }
     function drawBuildings() { buildings.forEach(b => { ctx.fillStyle = b.color; ctx.fillRect(b.x, b.y, b.width, b.height); if (b.isVertiport) { const platformY = b.y - 15; ctx.fillStyle = '#455A64'; ctx.fillRect(b.x - 10, platformY, b.width + 20, 15); ctx.fillStyle = '#B0BEC5'; ctx.beginPath(); ctx.arc(b.x + b.width / 2, platformY + 7.5, b.width * 0.3, 0, Math.PI * 2); ctx.fill(); const lightColor = (Math.sin(b.wavePhase * 2) > 0) ? '#0ff' : '#ff0'; ctx.fillStyle = lightColor; ctx.fillRect(b.x, platformY + 5, 10, 5); ctx.fillRect(b.x + b.width - 10, platformY + 5, 10, 5); const waveWidth = b.width * 0.6; const waveX = b.x + (b.width - waveWidth) / 2; const waveSegmentHeight = 20; const numSegments = Math.ceil(platformY / waveSegmentHeight); for(let i=0; i<numSegments; i++) { const segmentY = platformY - (i + 1) * waveSegmentHeight; const alpha = 0.1 + Math.abs(Math.sin(b.wavePhase + i * 0.5)) * 0.2; const hue = 180 + Math.sin(b.wavePhase + i*0.3) * 20; ctx.fillStyle = `hsla(${hue}, 100%, 70%, ${alpha})`; ctx.fillRect(waveX, segmentY, waveWidth, waveSegmentHeight - 2); } } else { ctx.fillStyle = 'rgba(255, 255, 180, 0.2)'; for(let wy = b.y + 10; wy < b.y + b.height - 10; wy += 25) { for(let wx = b.x + 10; wx < b.x + b.width - 10; wx += 25) { if(Math.random() > 0.4) { ctx.fillRect(wx, wy, 10, 15); } } } } }); }
     function spawnPedestrian() { const type = Math.random() > 0.4 ? 'OldLady' : 'BalloonPerson'; pedestrians.push({ x: gameCanvas.width + 50 + Math.random() * 100, y: gameCanvas.height - SIDEWALK_HEIGHT + 5 + Math.random() * (SIDEWALK_HEIGHT - 20), type: type, size: type === 'OldLady' ? {w: 8, h: 16} : {w: 10, h: 18}, color: type === 'OldLady' ? 'pink' : `hsl(${Math.random()*360}, 60%, 70%)`, throwCooldown: 60 + Math.random() * 120, speed: currentScrollSpeed * PEDESTRIAN_SPEED_MULTIPLIER * (0.8 + Math.random() * 0.4), lastActionFrame: 0 }); }
     function updatePedestriansAndProjectiles() {
-        const difficulty = getDifficultyMultiplier();
-        const currentPedestrianSpawnChance = BASE_PEDESTRIAN_SPAWN_CHANCE * difficulty;
-        const currentProjectileThrowChance = BASE_PROJECTILE_THROW_CHANCE * difficulty;
+        // Fix: Use difficultyMultiplier here
+        const currentPedestrianSpawnChance = BASE_PEDESTRIAN_SPAWN_CHANCE * difficultyMultiplier;
+        const currentProjectileThrowChance = BASE_PROJECTILE_THROW_CHANCE * difficultyMultiplier; // Spawn chance also scaled
 
         for (let i = pedestrians.length - 1; i >= 0; i--) {
             const p = pedestrians[i];
@@ -693,8 +693,8 @@
                     const itemType = Math.random() < 0.5 ? 'ChickenLeg' : 'CornCob';
 
                     // Fix 1: Calculate arc height based on a percentage of playableHeight
-                    const minSkyHeight = playableHeight * 0.35; // Min arc height as % of playable area
-                    const maxSkyHeight = playableHeight * 0.65; // Max arc height as % of playable area
+                    const minSkyHeight = playableHeight * 0.35; // Target 35% of playable height minimum arc
+                    const maxSkyHeight = playableHeight * 0.65; // Target 65% of playable height maximum arc
                     const arcHeight = minSkyHeight + Math.random() * (maxSkyHeight - minSkyHeight);
 
                     // Calculate initial vy needed to reach this height with current gravity
@@ -712,7 +712,7 @@
                     projectiles.push({
                         type: itemType,
                         x: p.x,
-                        y: Math.min(p.y - 10, playableHeight * 0.9), // Fix 1: Spawn slightly higher, capped
+                        y: Math.min(p.y - 25, playableHeight * 0.85), // Fix 1: Spawn higher, capped below very top
                         vx: initialVx,
                         vy: initialVy,
                         size: {w: 4, h: (itemType === 'CornCob' ? 8 : 6)},
@@ -722,13 +722,14 @@
                         color: itemType === 'ChickenLeg' ? 'orange' : '#FFC107',
                         rotation: 0,
                         rotationSpeed: (Math.random() - 0.5) * 0.8,
-                        stuckFrames: 0, // Fix 3: Initialize counter for stuck projectiles
-                        removeAfterFrames: -1 // Fix 3: Initialize counter for ground collision cleanup
+                        stuckFrames: 0, // Fix: Initialize stuckFrames counter
+                        removeAfterFrames: -1 // Fix: Initialize removeAfterFrames counter
                     });
                 } else { // Balloon person - keep original logic
                     projectiles.push({ type: 'Balloon', x: p.x, y: p.y - 15, vx: projectileBaseSpeedX * (0.6 + Math.random() * 0.3), vy: -(1.5 + Math.random() * 1.8), size: {w: 12 + Math.random()*6, h: 16 + Math.random()*8}, color: `hsl(${Math.random()*360}, 80%, 70%)` });
                 }
-                p.throwCooldown = 80 + Math.random() * 130;
+                // Fix: Scale projectile throw frequency
+                p.throwCooldown = (80 + Math.random() * 130) / difficultyMultiplier;
                 p.lastActionFrame = frameCount;
             }
             if (p.x + p.size.w < 0) {
@@ -736,7 +737,7 @@
             }
         }
 
-        const maxPedestrians = 6 + Math.floor(difficulty * 3);
+        const maxPedestrians = 3 + Math.floor(difficultyMultiplier * 4); // Scale max pedestrians too
         if (pedestrians.length < maxPedestrians && Math.random() < currentPedestrianSpawnChance) {
             spawnPedestrian();
         }
@@ -756,34 +757,32 @@
                     proj.size.h = proj.currentSize * (proj.type === 'CornCob' ? 1.2 : 1.5);
                 }
 
-                // Fix 3 & 4: Cleanup logic for projectiles stuck at ground level
-                const groundLevel = playableHeight - proj.size.h;
-                if (proj.y >= groundLevel - 5) { // Near or at ground level
-                    if (Math.abs(proj.vy) < 1) { // Check if velocity is low (stuck)
+                // Fix 3 & 4: Improved Cleanup logic for projectiles stuck at ground level
+                const groundLevel = playableHeight - proj.size.h; // Ground level specific to this projectile's height
+                if (proj.y >= groundLevel - 5) { // If near or potentially touching the ground
+                    if (Math.abs(proj.vy) < 0.5) { // Check if velocity is very low (stuck or rolling)
                          if (proj.stuckFrames !== undefined) {
                             proj.stuckFrames++;
                          }
                     } else {
-                        // Reset stuck count if it moved significantly
-                        proj.stuckFrames = 0;
+                        proj.stuckFrames = 0; // Reset stuck count if it's bouncing noticeably
                     }
-                     // If it hits the ground with downward velocity, schedule removal
-                     if (proj.y >= groundLevel && proj.vy > 0 && proj.removeAfterFrames === -1) {
-                         proj.removeAfterFrames = 3; // Remove after 3 frames
+                     // If it's actually on or below ground level, start the removal timer
+                     if (proj.y >= groundLevel && proj.removeAfterFrames === -1) {
+                         proj.removeAfterFrames = 3; // Start 3-frame countdown to removal
                      }
-                     // Clamp Y to ground to prevent sinking
+                     // Ensure it visually stays on the ground, not below
                      proj.y = Math.min(proj.y, groundLevel);
-
                 } else {
-                    proj.stuckFrames = 0; // Reset if it's clearly in the air
+                    proj.stuckFrames = 0; // Reset stuck count if clearly airborne
                 }
 
-                // Decrement remove counter if set
+                // Decrement remove counter if active
                 if (proj.removeAfterFrames !== undefined && proj.removeAfterFrames > 0) {
                      proj.removeAfterFrames--;
                 }
 
-                // Remove if stuck too long or scheduled for removal
+                // Remove if stuck for too long OR if removal countdown finished
                 if ((proj.stuckFrames !== undefined && proj.stuckFrames > 50) || (proj.removeAfterFrames !== undefined && proj.removeAfterFrames === 0)) {
                     projectiles.splice(i, 1);
                     continue; // Skip rest of the checks for this projectile
@@ -794,8 +793,8 @@
                 proj.vx = Math.max(-1.2, Math.min(1.2, proj.vx));
             }
 
-            // Standard off-screen check
-            if (proj.x + proj.size.w < 0 || proj.y > gameCanvas.height + 50 || proj.y + proj.size.h < -50) { // Added buffer for y > height
+            // Standard off-screen check (top, left, far bottom)
+            if (proj.x + proj.size.w < 0 || proj.y + proj.size.h < -50 || proj.y > gameCanvas.height + 50) {
                 projectiles.splice(i, 1);
             }
         }
@@ -804,8 +803,36 @@
     function spawnBonus() { const isChargingTrigger = Math.random() < CHARGING_TRIGGER_SPAWN_CHANCE && !isChargingSequence; bonuses.push({ type: isChargingTrigger ? 'ChargingTrigger' : 'Battery', x: gameCanvas.width + 100 + Math.random() * 200, y: isChargingTrigger ? playableHeight * 0.1 + Math.random() * playableHeight * 0.3 : Math.random() * (playableHeight * 0.8), size: isChargingTrigger ? 30 : 20, speed: currentScrollSpeed * BONUS_SPEED_MULTIPLIER }); }
     function updateBonuses() { for (let i = bonuses.length - 1; i >= 0; i--) { const b = bonuses[i]; b.x -= b.speed; if (b.x + b.size < 0) bonuses.splice(i, 1); } const batteryCount = bonuses.filter(b => b.type === 'Battery').length; const triggerCount = bonuses.filter(b => b.type === 'ChargingTrigger').length; if (batteryCount < 3 && Math.random() < 0.005) spawnBonus(); if (triggerCount === 0 && Math.random() < CHARGING_TRIGGER_SPAWN_CHANCE) spawnBonus(); }
     function drawBonuses() { bonuses.forEach(b => { if (b.type === 'Battery') { ctx.fillStyle = '#4CAF50'; ctx.fillRect(b.x, b.y, b.size, b.size); ctx.fillStyle = 'white'; ctx.fillRect(b.x + b.size * 0.4, b.y + b.size * 0.2, b.size * 0.2, b.size * 0.6); ctx.fillRect(b.x + b.size * 0.2, b.y + b.size * 0.4, b.size * 0.6, b.size * 0.2); } else if (b.type === 'ChargingTrigger') { ctx.fillStyle = '#0ff'; ctx.beginPath(); ctx.arc(b.x + b.size / 2, b.y + b.size / 2, b.size / 2, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = '#ff0'; ctx.beginPath(); ctx.moveTo(b.x + b.size * 0.6, b.y + b.size * 0.2); ctx.lineTo(b.x + b.size * 0.4, b.y + b.size * 0.5); ctx.lineTo(b.x + b.size * 0.55, b.y + b.size * 0.5); ctx.lineTo(b.x + b.size * 0.35, b.y + b.size * 0.8); ctx.lineTo(b.x + b.size * 0.6, b.y + b.size * 0.45); ctx.lineTo(b.x + b.size * 0.45, b.y + b.size * 0.45); ctx.closePath(); ctx.fill(); } }); }
-    function spawnBird() { const difficulty = getDifficultyMultiplier(); const isLarge = Math.random() < 0.3; const size = isLarge ? 25 + Math.random() * 10 : 12 + Math.random() * 8; const baseY = playableHeight * (isLarge ? 0.3 : 0.15) + Math.random() * playableHeight * (isLarge ? 0.4 : 0.7); let baseSpeed = currentScrollSpeed * BIRD_SPEED_MULTIPLIER * 1.1; if (score > 1000) baseSpeed *= (1 + (difficulty - 1) * 0.6); let ampMultiplier = 1.2; let freqMultiplier = 1.2; if (score > 3000) { ampMultiplier = 1.5 + (difficulty - 1.15) * 1.2; freqMultiplier = 1.5 + (difficulty - 1.15) * 1.0; } birds.push({ x: gameCanvas.width + 50 + Math.random() * 100, y: baseY, baseY: baseY, size: size, type: isLarge ? 'large' : 'small', speed: baseSpeed * (isLarge ? (0.8 + Math.random() * 0.1) : (1.0 + Math.random() * 0.2)), color: `hsl(30, ${15+Math.random()*10}%, ${isLarge ? 40 : 60 + Math.random() * 20}%)`, wingPhase: Math.random() * Math.PI * 2, wingSpeed: (isLarge ? 0.15 : 0.25) + Math.random() * 0.08, wanderAmplitudeY: (25 + Math.random() * 50) * (isLarge ? 1.3 : 1.0) * ampMultiplier, wanderFrequencyY: (0.025 + Math.random() * 0.035) * (isLarge ? 0.8 : 1.0) * freqMultiplier, wanderPhaseOffsetY: Math.random() * Math.PI * 2, wanderAmplitudeX: (40 + Math.random() * 70) * (isLarge ? 0.8 : 1.0) * ampMultiplier, wanderFrequencyX: (0.02 + Math.random() * 0.025) * (isLarge ? 0.9 : 1.0) * freqMultiplier, wanderPhaseOffsetX: Math.random() * Math.PI * 2, baseXOffset: 0 }); }
-    function updateBirds() { const difficulty = getDifficultyMultiplier(); const currentBirdSpawnChance = BASE_BIRD_SPAWN_CHANCE * difficulty * 1.3; const maxBirds = 8 + Math.floor(difficulty * 5); for (let i = birds.length - 1; i >= 0; i--) { const bird = birds[i]; const timeFactorY = frameCount * bird.wanderFrequencyY + bird.wanderPhaseOffsetY; const timeFactorX = frameCount * bird.wanderFrequencyX + bird.wanderPhaseOffsetX; const offsetY = Math.sin(timeFactorY) * bird.wanderAmplitudeY; const offsetX = Math.cos(timeFactorX) * bird.wanderAmplitudeX; bird.baseXOffset -= bird.speed; bird.x = (gameCanvas.width + bird.baseXOffset) + offsetX; bird.y = bird.baseY + offsetY; bird.wingPhase += bird.wingSpeed; bird.y = Math.max(0, Math.min(bird.y, playableHeight - bird.size)); if (bird.x + bird.size < -150) { birds.splice(i, 1); } } if (birds.length < maxBirds && Math.random() < currentBirdSpawnChance) { spawnBird(); } }
+    function spawnBird() {
+      // Fix: Use difficultyMultiplier here
+      const currentBirdSpawnChance = BASE_BIRD_SPAWN_CHANCE * difficultyMultiplier;
+      // Spawn logic remains the same, but uses the scaled chance
+      if (birds.length < (4 + Math.floor(difficultyMultiplier * 6)) && Math.random() < currentBirdSpawnChance) { // Corrected maxBirds logic based on prompt
+        const isLarge = Math.random() < 0.3; const size = isLarge ? 25 + Math.random() * 10 : 12 + Math.random() * 8; const baseY = playableHeight * (isLarge ? 0.3 : 0.15) + Math.random() * playableHeight * (isLarge ? 0.4 : 0.7); let baseSpeed = currentScrollSpeed * BIRD_SPEED_MULTIPLIER * 1.1;
+         let ampMultiplier = 1.2; let freqMultiplier = 1.2; if (score > 3000) { ampMultiplier = 1.5 + (difficultyMultiplier - 1.15) * 1.2; freqMultiplier = 1.5 + (difficultyMultiplier - 1.15) * 1.0; }
+
+         birds.push({ x: gameCanvas.width + 50 + Math.random() * 100, y: baseY, baseY: baseY, size: size, type: isLarge ? 'large' : 'small', speed: baseSpeed * (isLarge ? (0.8 + Math.random() * 0.1) : (1.0 + Math.random() * 0.2)), color: `hsl(30, ${15+Math.random()*10}%, ${isLarge ? 40 : 60 + Math.random() * 20}%)`, wingPhase: Math.random() * Math.PI * 2, wingSpeed: (isLarge ? 0.15 : 0.25) + Math.random() * 0.08, wanderAmplitudeY: (25 + Math.random() * 50) * (isLarge ? 1.3 : 1.0) * ampMultiplier, wanderFrequencyY: (0.025 + Math.random() * 0.035) * (isLarge ? 0.8 : 1.0) * freqMultiplier, wanderPhaseOffsetY: Math.random() * Math.PI * 2, wanderAmplitudeX: (40 + Math.random() * 70) * (isLarge ? 0.8 : 1.0) * ampMultiplier, wanderFrequencyX: (0.02 + Math.random() * 0.025) * (isLarge ? 0.9 : 1.0) * freqMultiplier, wanderPhaseOffsetX: Math.random() * Math.PI * 2, baseXOffset: 0 });
+      }
+    }
+    function updateBirds() {
+       const maxBirds = 4 + Math.floor(difficultyMultiplier * 6); // Corrected maxBirds logic
+        for (let i = birds.length - 1; i >= 0; i--) {
+            const bird = birds[i];
+            const timeFactorY = frameCount * bird.wanderFrequencyY + bird.wanderPhaseOffsetY;
+            const timeFactorX = frameCount * bird.wanderFrequencyX + bird.wanderPhaseOffsetX;
+            const offsetY = Math.sin(timeFactorY) * bird.wanderAmplitudeY;
+            const offsetX = Math.cos(timeFactorX) * bird.wanderAmplitudeX;
+            bird.baseXOffset -= bird.speed;
+            bird.x = (gameCanvas.width + bird.baseXOffset) + offsetX;
+            bird.y = bird.baseY + offsetY;
+            bird.wingPhase += bird.wingSpeed;
+            bird.y = Math.max(0, Math.min(bird.y, playableHeight - bird.size));
+            if (bird.x + bird.size < -150) {
+                birds.splice(i, 1);
+            }
+        }
+         spawnBird();
+    }
     function drawBirds() { birds.forEach(bird => { ctx.save(); ctx.translate(bird.x + bird.size / 2, bird.y + bird.size / 2); ctx.fillStyle = bird.color; ctx.beginPath(); ctx.ellipse(0, 0, bird.size * 0.4, bird.size * 0.25, 0, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.arc(bird.size * 0.35, -bird.size * 0.1, bird.size * 0.15, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.moveTo(bird.size * 0.5, -bird.size * 0.1); ctx.lineTo(bird.size * 0.6, -bird.size * 0.15); ctx.lineTo(bird.size * 0.6, -bird.size * 0.05); ctx.closePath(); ctx.fill(); const wingY = Math.sin(bird.wingPhase) * (bird.size * 0.35); const wingAngle = Math.sin(bird.wingPhase) * 0.8; const wingLength = bird.size * 0.9; const wingWidth = bird.size * 0.4; ctx.save(); ctx.translate(-bird.size * 0.15, 0); ctx.rotate(-wingAngle); ctx.beginPath(); ctx.moveTo(0, 0); ctx.bezierCurveTo(-wingLength * 0.4, -wingY - wingWidth * 0.5, -wingLength * 0.8, -wingY - wingWidth * 0.2, -wingLength, -wingY + wingWidth * 0.1); ctx.bezierCurveTo(-wingLength * 0.9, -wingY + wingWidth * 0.5, -wingLength * 0.5, -wingY + wingWidth * 0.7, 0, 0); ctx.closePath(); ctx.fill(); ctx.restore(); ctx.save(); ctx.translate(bird.size * 0.15, 0); ctx.rotate(wingAngle); ctx.beginPath(); ctx.moveTo(0, 0); ctx.bezierCurveTo(wingLength * 0.4, -wingY - wingWidth * 0.5, wingLength * 0.8, -wingY - wingWidth * 0.2, wingLength, -wingY + wingWidth * 0.1); ctx.bezierCurveTo(wingLength * 0.9, -wingY + wingWidth * 0.5, wingLength * 0.5, -wingY + wingWidth * 0.7, 0, 0); ctx.closePath(); ctx.fill(); ctx.restore(); ctx.restore(); }); }
     function checkCollisions() { if (isChargingSequence || isCaptured) return; const carRect = { x: carX, y: carY, width: CAR_WIDTH, height: CAR_HEIGHT }; buildings.forEach(b => { if (b.isVertiport) { const waveWidth = b.width * 0.6; const waveX = b.x + (b.width - waveWidth) / 2; const waveRect = { x: waveX, y: 0, width: waveWidth, height: b.y - 15 }; if (isColliding(carRect, waveRect)) { startCaptureSequence(b); return; } } if (b.x < carRect.x + carRect.width && b.x + b.width > carRect.x) { if (isColliding(carRect, { x: b.x, y: b.y, width: b.width, height: b.height })) { handleCollision(b); } } }); if (isCaptured) return; for (let i = projectiles.length - 1; i >= 0; i--) { const p = projectiles[i]; if (isColliding(carRect, { x: p.x, y: p.y, width: p.size.w, height: p.size.h })) { handleCollision(p); projectiles.splice(i, 1); } } for (let i = birds.length - 1; i >= 0; i--) { const bird = birds[i]; const birdRect = { x: bird.x, y: bird.y, width: bird.size, height: bird.size }; if (isColliding(carRect, birdRect)) { handleCollision(bird); birds.splice(i, 1); } } for (let i = bonuses.length - 1; i >= 0; i--) { const b = bonuses[i]; if (isColliding(carRect, { x: b.x, y: b.y, width: b.size, height: b.size })) { if (b.type === 'ChargingTrigger') { startChargingSequence(b); } else { handleBonusPickup(b); } bonuses.splice(i, 1); break; } } }
     function isColliding(rect1, rect2) { return rect1.x < rect2.x + rect2.width && rect1.x + rect1.width > rect2.x && rect1.y < rect2.y + rect2.height && rect1.y + rect1.height > rect2.y; }
@@ -873,7 +900,7 @@
         }
     }
 
-    // --- updateGameState, gameLoop (unchanged) ---
+    // --- updateGameState, gameLoop ---
     function updateGameState() {
        if (playerControlEnabled) {
            let vertDelta = 0; let horzDelta = 0;
@@ -892,11 +919,27 @@
        if (playerControlEnabled) checkCollisions();
        if (playerControlEnabled) {
            battery -= BATTERY_DRAIN_RATE; score++;
-           const difficulty = getDifficultyMultiplier();
-           currentScrollSpeed = BASE_SCROLL_SPEED + (MAX_SCROLL_SPEED - BASE_SCROLL_SPEED) * (difficulty - 1) / 0.5;
-           currentMusicTempo = BASE_MUSIC_TEMPO + (MAX_MUSIC_TEMPO - BASE_MUSIC_TEMPO) * (difficulty - 1) / 0.5;
-           currentScrollSpeed = Math.min(MAX_SCROLL_SPEED, currentScrollSpeed);
-           currentMusicTempo = Math.min(MAX_MUSIC_TEMPO, currentMusicTempo);
+
+            // Fix: Update difficultyMultiplier based on score
+            if (score < 1000) {
+              difficultyMultiplier = 0.5;
+            } else if (score < 2000) {
+              difficultyMultiplier = 1.0;
+            } else if (score < 3000) {
+              difficultyMultiplier = 1.2;
+            } else if (score < 4000) {
+              difficultyMultiplier = 1.4;
+            } else {
+              difficultyMultiplier = 1.6;
+            }
+
+            // Fix: Use difficultyMultiplier for speed/tempo scaling
+            const difficultyProgress = Math.min(1, Math.max(0, (score - 1000) / 3000)); // Normalize progress between 1k and 4k score
+            currentScrollSpeed = BASE_SCROLL_SPEED + (MAX_SCROLL_SPEED - BASE_SCROLL_SPEED) * difficultyProgress * difficultyMultiplier; // Scale speed with difficulty multiplier
+            currentMusicTempo = BASE_MUSIC_TEMPO + (MAX_MUSIC_TEMPO - BASE_MUSIC_TEMPO) * difficultyProgress * difficultyMultiplier; // Scale tempo with difficulty multiplier
+
+            currentScrollSpeed = Math.min(MAX_SCROLL_SPEED * 1.2, currentScrollSpeed); // Cap speed slightly higher potentially
+            currentMusicTempo = Math.min(MAX_MUSIC_TEMPO * 1.2, currentMusicTempo); // Cap tempo slightly higher potentially
        }
        if (playerControlEnabled && battery <= 0) gameOver();
     }
@@ -925,6 +968,7 @@
         battery = 100; score = 0; calculateDimensions(); carY = playableHeight / 2; carX = 80; carColor = 'white'; keys = {}; prevKeys = {}; buildings = []; pedestrians = []; projectiles = []; bonuses = []; birds = []; clouds = []; swarmVehicles = []; carShake = 0; frameCount = 0; lowBatteryWarningPlayed = false; isChargingSequence = false; chargingPhase = null; targetChargeStation = null; isCaptured = false; capturePhase = null; captureTargetBuilding = null; playerControlEnabled = true; prevCarX = carX; prevCarY = carY;
         spawnBuilding(gameCanvas.width * 0.6); spawnBuilding(); for(let i=0; i<5; i++) spawnCloud(); for(let i=0; i<20; i++) spawnSwarmVehicle();
         currentScrollSpeed = BASE_SCROLL_SPEED; currentMusicTempo = BASE_MUSIC_TEMPO;
+        difficultyMultiplier = 1.0; // Reset difficulty multiplier
 
         // *** UPDATED UI VISIBILITY ***
         startScreen.style.display = 'none';
