@@ -1076,8 +1076,7 @@
         }
         
         if (buttonId === 'replayButton') {
-            fetch('https://bit.ly/hoverrush-gameover', { mode: 'no-cors' })
-                .catch(err => console.warn('Silent ping to Bitly failed:', err)); 
+            new Image().src = "https://bit.ly/hoverrush-gameover";
         }
 
         // Prepare to start/restart
