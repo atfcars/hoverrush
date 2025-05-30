@@ -56,6 +56,7 @@
       display: block;
       width: 100vw;
       height: 100vh;
+      margin: 0 auto; /* Ensure canvas itself is centered if body text-align doesn't catch it */
     }
 
     #gameCanvas {
@@ -499,9 +500,11 @@
     const PROJECTILE_GRAVITY = 0.15; 
     let difficultyMultiplier = 1.0; 
 
-    // --- Audio Engine (unchanged) ---
+    // --- Audio Engine ---
     let audioCtx;
     let audioInitialized = false;
+    let backgroundFadeGain, engineFadeGain; // Declare global fade gain nodes
+
     try {
          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
          console.log("AudioContext created. Initial state:", audioCtx.state);
@@ -537,6 +540,22 @@
     const musicCheckIntervalMs = 200;
     let currentLoopLengthSeconds = 0;
 
+    function fadeInAudio(gainAudioParam, targetVolume, duration = 2.0) {
+        if (!gainAudioParam || !audioCtx || audioCtx.state !== 'running') {
+            // console.warn("fadeInAudio: GainAudioParam or AudioContext not available/running.");
+            return;
+        }
+        const now = audioCtx.currentTime;
+        try {
+            gainAudioParam.cancelScheduledValues(now);
+            gainAudioParam.setValueAtTime(0.0001, now); // Start from nearly silent
+            gainAudioParam.linearRampToValueAtTime(targetVolume, now + duration);
+        } catch (e) {
+            console.error("Error in fadeInAudio:", e, gainAudioParam);
+        }
+    }
+
+
     function initAudio() {
         if (!audioCtx) { console.warn("initAudio: No AudioContext."); return false; }
         if (audioCtx.state === 'suspended') {
@@ -568,19 +587,46 @@
 
     function setupMasterAudioNodes() {
         if (!audioCtx || audioCtx.state !== 'running') { console.error("setupMasterAudioNodes: Context not ready. State:", audioCtx?.state); return false; }
-        if (!musicGainNode) {
+        if (!musicGainNode) { // Check if primary nodes are set up
             try {
                 musicGainNode = audioCtx.createGain();
                 musicLowPassFilter = audioCtx.createBiquadFilter(); musicLowPassFilter.type = 'lowpass'; musicLowPassFilter.frequency.value = 20000;
-                const reverbDelay = audioCtx.createDelay(0.5); reverbDelay.delayTime.value = 0.15; const reverbFeedback = audioCtx.createGain(); reverbFeedback.gain.value = 0.35; const reverbFilter = audioCtx.createBiquadFilter(); reverbFilter.type = 'lowpass'; reverbFilter.frequency.value = 2500; reverbDelay.connect(reverbFeedback).connect(reverbFilter).connect(reverbDelay); reverbNode = { input: reverbDelay, output: reverbFilter };
-                musicGainNode.connect(musicLowPassFilter).connect(audioCtx.destination);
-                const reverbOutputGain = audioCtx.createGain(); reverbOutputGain.gain.value = 0.25; reverbNode.output.connect(reverbOutputGain).connect(audioCtx.destination);
-                musicGainNode.gain.value = 0.45;
+                
+                const reverbDelay = audioCtx.createDelay(0.5); reverbDelay.delayTime.value = 0.15; 
+                const reverbFeedback = audioCtx.createGain(); reverbFeedback.gain.value = 0.35; 
+                const reverbFilter = audioCtx.createBiquadFilter(); reverbFilter.type = 'lowpass'; reverbFilter.frequency.value = 2500; 
+                reverbDelay.connect(reverbFeedback).connect(reverbFilter).connect(reverbDelay); 
+                reverbNode = { input: reverbDelay, output: reverbFilter };
+                const reverbOutputGain = audioCtx.createGain(); reverbOutputGain.gain.value = 0.25;
+                
+                // Setup Fade Gain Nodes
+                backgroundFadeGain = audioCtx.createGain();
+                backgroundFadeGain.gain.value = 1; // Start at full passthrough initially
+                engineFadeGain = audioCtx.createGain();
+                engineFadeGain.gain.value = 1; // Start at full passthrough initially
+
+                // Connect music path through backgroundFadeGain
+                musicGainNode.connect(musicLowPassFilter).connect(backgroundFadeGain);
+                backgroundFadeGain.connect(audioCtx.destination);
+
+                // Connect reverb path also through backgroundFadeGain (to fade with music)
+                reverbNode.output.connect(reverbOutputGain).connect(backgroundFadeGain);
+                
+                // Connect engineFadeGain to destination (engine hum will be routed to this later)
+                engineFadeGain.connect(audioCtx.destination);
+
+                musicGainNode.gain.value = 0.45; // Normal operating volume for music source
                 console.log("setupMasterAudioNodes: Success."); return true;
-            } catch (error) { console.error("setupMasterAudioNodes: Error:", error); musicGainNode = null; musicLowPassFilter = null; reverbNode = null; return false; }
+            } catch (error) { 
+                console.error("setupMasterAudioNodes: Error:", error); 
+                musicGainNode = null; musicLowPassFilter = null; reverbNode = null; 
+                backgroundFadeGain = null; engineFadeGain = null;
+                return false; 
+            }
         }
         console.log("setupMasterAudioNodes: Already exist."); return true;
     }
+
 
     function triggerHapticFeedback(duration = 50) { if (navigator.vibrate) { try { navigator.vibrate(duration); } catch (e) { console.warn("Haptic feedback failed:", e); } } }
 
@@ -588,7 +634,11 @@
         if (!audioInitialized || !audioCtx || audioCtx.state !== 'running') { return null; }
         try {
             const startTime = (options.absoluteTime !== undefined) ? options.absoluteTime : audioCtx.currentTime + when;
-            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); const outputNode = options.outputNode || audioCtx.destination;
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); 
+            
+            // Default output to musicGainNode if not specified, to allow master music fade
+            const outputNode = options.outputNode || (musicGainNode ? musicGainNode : audioCtx.destination);
+
             if (startTime < audioCtx.currentTime) {
                  console.warn(`playTone: Skipping note scheduled in the past. Freq: ${freq}, Scheduled: ${startTime.toFixed(3)}, Now: ${audioCtx.currentTime.toFixed(3)}`);
                  return null;
@@ -612,7 +662,29 @@
     function playBatteryPickupSound() { playTone(329.63, 0.08, 'sine', 0.35, 0.0); playTone(392.00, 0.08, 'sine', 0.35, 0.08); playTone(523.25, 0.15, 'sine', 0.4, 0.16); }
     function playLowBatteryWarning() { if (!lowBatteryWarningPlayed) { playTone(880, 0.08, 'square', 0.25, 0); playTone(880, 0.08, 'square', 0.25, 0.15); lowBatteryWarningPlayed = true; setTimeout(() => { lowBatteryWarningPlayed = false; }, 5000); } }
     function playBonusFlourish() { const baseFreq = 783.99; const vol = 0.30; playTone(baseFreq, 0.08, 'triangle', vol, 0.0); playTone(baseFreq * 1.25, 0.08, 'triangle', vol, 0.08); playTone(baseFreq * 1.5, 0.12, 'triangle', vol, 0.16); }
-    function playEngineHum() { if (engineHumNodes || !audioInitialized || !audioCtx || audioCtx.state !== 'running') return; try { const baseFreq = 60; const humGain = audioCtx.createGain(); const panner = audioCtx.createStereoPanner(); const filter = audioCtx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.value = 5000; const humOsc = audioCtx.createOscillator(); humOsc.type = 'sawtooth'; humOsc.frequency.setValueAtTime(baseFreq, audioCtx.currentTime); const detuneOsc = audioCtx.createOscillator(); detuneOsc.frequency.value = 5; const detuneGain = audioCtx.createGain(); detuneGain.gain.value = 15; humGain.gain.value = 0.06; detuneOsc.connect(detuneGain).connect(humOsc.detune); humOsc.connect(filter).connect(panner).connect(humGain).connect(audioCtx.destination); humOsc.start(); detuneOsc.start(); engineHumNodes = { osc: humOsc, gain: humGain, panner: panner, filter: filter, detuneOsc: detuneOsc }; } catch (e) { console.error("Error starting engine hum:", e); engineHumNodes = null; } }
+    
+    function playEngineHum() { 
+        if (engineHumNodes || !audioInitialized || !audioCtx || audioCtx.state !== 'running' || !engineFadeGain) return; 
+        try { 
+            const baseFreq = 60; 
+            const humGain = audioCtx.createGain(); // This is engineHumNodes.gain
+            const panner = audioCtx.createStereoPanner(); 
+            const filter = audioCtx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.value = 5000; 
+            const humOsc = audioCtx.createOscillator(); humOsc.type = 'sawtooth'; humOsc.frequency.setValueAtTime(baseFreq, audioCtx.currentTime); 
+            const detuneOsc = audioCtx.createOscillator(); detuneOsc.frequency.value = 5; 
+            const detuneGain = audioCtx.createGain(); detuneGain.gain.value = 15; 
+            humGain.gain.value = 0.06; // Normal operating volume for the engine source
+            detuneOsc.connect(detuneGain).connect(humOsc.detune); 
+            humOsc.connect(filter).connect(panner).connect(humGain).connect(engineFadeGain); // Route through engineFadeGain
+            humOsc.start(); 
+            detuneOsc.start(); 
+            engineHumNodes = { osc: humOsc, gain: humGain, panner: panner, filter: filter, detuneOsc: detuneOsc }; 
+        } catch (e) { 
+            console.error("Error starting engine hum:", e); 
+            engineHumNodes = null; 
+        } 
+    }
+
     function stopEngineHum() { if (!engineHumNodes) return; try { const now = audioCtx.currentTime; engineHumNodes.gain.gain.cancelScheduledValues(now); engineHumNodes.gain.gain.setTargetAtTime(0, now, 0.01); engineHumNodes.osc.stop(now + 0.05); if (engineHumNodes.detuneOsc) engineHumNodes.detuneOsc.stop(now + 0.05); } catch(e) {} engineHumNodes = null; }
     function modulateEngineHum(batteryPercent, vertDelta, horzDelta) { if (!engineHumNodes || !audioInitialized || !audioCtx || audioCtx.state !== 'running') return; try { const now = audioCtx.currentTime; const baseFreq = 60; const pitchRange = 20; const pitchMod = (vertDelta / MOVE_SPEED_Y) * pitchRange; engineHumNodes.osc.frequency.linearRampToValueAtTime(baseFreq + pitchMod, now + 0.1); let panValue = 0; if (keys['ArrowLeft'] || keys['a']) panValue = -0.6; if (keys['ArrowRight'] || keys['d']) panValue = 0.6; engineHumNodes.panner.pan.linearRampToValueAtTime(panValue, now + 0.05); const minVol = 0.05; const maxVol = 0.10; const targetVol = maxVol - (batteryPercent / 100) * (maxVol - minVol); engineHumNodes.gain.gain.linearRampToValueAtTime(targetVol, now + 0.2); const minFilterFreq = 800; const maxFilterFreq = 5000; const targetFilterFreq = (batteryPercent < 30) ? minFilterFreq + (batteryPercent/30) * (1500 - minFilterFreq) : maxFilterFreq; engineHumNodes.filter.frequency.linearRampToValueAtTime(targetFilterFreq, now + 0.3); } catch(e) { console.error("Error modulating engine hum:", e); stopEngineHum(); } }
     function playDodgeSound(direction) { playTone(600 + direction * 100, 0.05, 'noise', 0.05, 0); }
@@ -1034,6 +1106,11 @@
              else {
                  console.log("startGame: Audio ready, playing sounds/music.");
                  playStartJingle(); playEngineHum();
+                 
+                 // Ensure fade gains are at target volume when game starts
+                 if (backgroundFadeGain && backgroundFadeGain.gain) backgroundFadeGain.gain.value = 1.0;
+                 if (engineFadeGain && engineFadeGain.gain) engineFadeGain.gain.value = 1.0;
+
                  if (musicGainNode) musicGainNode.gain.setValueAtTime(0.45, audioCtx.currentTime);
                  if (musicLowPassFilter) musicLowPassFilter.frequency.setValueAtTime(20000, audioCtx.currentTime);
                  startMusicLoopChecker();
@@ -1078,30 +1155,26 @@
         console.log(`${buttonId} Clicked. AudioContext state: ${audioCtx?.state}`);
         if (!audioCtx) { console.error("Cannot start game, AudioContext creation failed."); return; }
 
-        // --- FIX FOR DOUBLE CLICK ---
-        // Only check gameRunning for the *start* button. Replay should always work.
         if (buttonId === 'startButton' && gameRunning) {
             console.warn("Start button clicked, but game is already running.");
             return;
         }
         
         if (buttonId === 'replayButton') {
-            new Image().src = "https://bit.ly/hoverrush-gameover";
+            fetch('https://bit.ly/hoverrush-gameover', { mode: 'no-cors' })
+                .catch(err => console.warn('Silent ping to Bitly failed:', err)); 
         }
 
-        // Prepare to start/restart
         const attemptStartGame = () => {
-            // This function assumes the audio context is ready or doesn't need resuming again
-            if (initAudio()) { // Ensures nodes are ready
+            if (initAudio()) { 
                 console.log(`${buttonId}: Audio ready, starting game.`);
-                startGame(); // startGame now handles mobile controls display
+                startGame(); 
             } else {
                 console.error(`${buttonId}: Failed to initialize audio nodes.`);
                 alert("Audio system failed to initialize.");
             }
         };
 
-        // Handle Audio Context State
         if (audioCtx.state === 'suspended') {
             console.log("AudioContext suspended, resuming...");
             audioCtx.resume().then(() => {
@@ -1111,7 +1184,6 @@
                  } else {
                      console.error(`${buttonId}: AudioContext did not resume to 'running' state.`);
                      alert("Could not enable audio. Please tap the screen or button again.");
-                     // Optionally retry resume on next interaction
                  }
             }).catch(err => {
                 console.error("AudioContext resume failed:", err);
@@ -1119,12 +1191,11 @@
             });
         } else if (audioCtx.state === 'running') {
              console.log("AudioContext already running.");
-            attemptStartGame(); // Audio already running, proceed to init/start
+            attemptStartGame(); 
         } else {
              console.error(`AudioContext in unexpected state: ${audioCtx.state}. Cannot start.`);
              alert(`Audio system error (State: ${audioCtx.state}). Please reload.`);
         }
-        // --- END FIX ---
     }
     startButton.addEventListener('click', handleStartOrReplay);
     replayButton.addEventListener('click', handleStartOrReplay);
@@ -1157,16 +1228,15 @@
     // --- Resize & Visibility ---
     function resizeGame() {
         const width = window.innerWidth;
-        const height = window.innerHeight; // Using window.innerHeight for actual viewport height
+        const height = window.innerHeight; 
 
-        // Fix #3: Ensure canvas drawing buffer matches CSS/viewport size (from previous step)
-        gameCanvas.width = width;    // Set the drawing surface resolution (attribute)
-        gameCanvas.height = height;  // Set the drawing surface resolution (attribute)
-        gameCanvas.style.width = width + 'px';   // Set the CSS display size
-        gameCanvas.style.height = height + 'px'; // Set the CSS display size
+        gameCanvas.width = width;   
+        gameCanvas.height = height; 
+        gameCanvas.style.width = width + 'px';  
+        gameCanvas.style.height = height + 'px';
 
         console.log(`Window resized. Canvas size set to: ${width}x${height}. Style size: ${gameCanvas.style.width}x${gameCanvas.style.height}`);
-        calculateDimensions(); // This updates playableHeight using the new gameCanvas.height
+        calculateDimensions(); 
         updateBatteryUI();
         updateScoreUI();
 
@@ -1180,30 +1250,78 @@
         }
         if (gameRunning && playerControlEnabled) {
             carX = Math.max(MIN_CAR_X, Math.min(carX, MAX_CAR_X));
-            // Ensure carY stays within new playableHeight boundaries
             carY = Math.max(0, Math.min(carY, playableHeight - CAR_HEIGHT));
         }
     }
     let resizeTimeout;
     window.addEventListener('resize', () => { clearTimeout(resizeTimeout); resizeTimeout = setTimeout(resizeGame, 100); });
     window.addEventListener('orientationchange', () => { console.log("Orientation changed."); clearTimeout(resizeTimeout); resizeTimeout = setTimeout(resizeGame, 150); });
+    
+    
     document.addEventListener('visibilitychange', () => {
         if (!audioCtx) return;
-        if (document.hidden) {
-            console.log("Page hidden. Stopping music loop checker."); stopBackgroundMusic();
-        } else {
-            console.log("Page visible.");
+
+        if (document.visibilityState === 'visible') {
+            console.log("Tab became visible. Checking AudioContext state...");
+
+            const setupAndFadeInAudio = () => {
+                if (!audioInitialized && audioCtx.state === 'running') {
+                    console.log("Attempting audio (re)-initialization as tab became visible.");
+                    initAudio(); 
+                }
+
+                if (gameRunning && audioInitialized) { 
+                    if (musicShouldBePlaying && !musicLoopIntervalId && !isChargingSequence && !isCaptured) {
+                        console.log("Restarting background music loop checker on tab visibility.");
+                        startMusicLoopChecker(); 
+                        if (backgroundFadeGain && backgroundFadeGain.gain) {
+                             // musicGainNode.gain already at 0.45, backgroundFadeGain goes from 0 to 1
+                            fadeInAudio(backgroundFadeGain.gain, 1.0, 2.0); 
+                        }
+                    }
+                    
+                    if (!engineHumNodes) { 
+                        console.log("Restarting engine hum on tab visibility.");
+                        playEngineHum(); 
+                    }
+                    if (engineHumNodes && engineHumNodes.gain && engineFadeGain && engineFadeGain.gain) {
+                        // engineHumNodes.gain.gain controls the actual engine volume (e.g. 0.06)
+                        // engineFadeGain fades this pass-through from 0 to 1
+                        fadeInAudio(engineFadeGain.gain, 1.0, 1.5); 
+                    }
+                }
+            };
+
             if (audioCtx.state === 'suspended') {
-                 console.warn("Page visible but AudioContext is suspended. Trying to resume...");
-                 audioCtx.resume().then(() => {
-                     console.log("AudioContext resumed on visibility change.");
-                     if(!audioInitialized) { console.log("Attempting audio re-initialization after resume."); initAudio(); }
-                     if (gameRunning && musicShouldBePlaying && audioInitialized && !musicLoopIntervalId && !isChargingSequence && !isCaptured) { console.log("Restarting background music loop checker after visibility change + resume."); startMusicLoopChecker(); }
-                 }).catch(err => { console.error("Failed to resume AudioContext on visibility change:", err); });
+                console.warn("Page visible but AudioContext is suspended. Trying to resume...");
+                audioCtx.resume().then(() => {
+                    console.log("AudioContext resumed on visibility change.");
+                    setupAndFadeInAudio();
+                }).catch(err => {
+                    console.error("Failed to resume AudioContext on visibility change:", err);
+                });
             } else if (audioCtx.state === 'running') {
-                 console.log("AudioContext is running on visibility change.");
-                 if (!audioInitialized) { console.log("Attempting audio initialization as context is running but flag was false."); initAudio(); }
-                 if (gameRunning && musicShouldBePlaying && audioInitialized && !musicLoopIntervalId && !isChargingSequence && !isCaptured) { console.log("Restarting background music loop checker after visibility change (context was running)."); startMusicLoopChecker(); }
+                console.log("AudioContext is running on visibility change.");
+                setupAndFadeInAudio();
+            } else {
+                console.warn("AudioContext not in a resumable/running state on visibility change:", audioCtx.state);
+            }
+
+        } else if (document.visibilityState === 'hidden') {
+            console.log("Tab became hidden. Setting fade gains to 0 and stopping sounds.");
+            if (audioCtx && audioCtx.state === 'running') { 
+                if (backgroundFadeGain && backgroundFadeGain.gain) {
+                    backgroundFadeGain.gain.cancelScheduledValues(audioCtx.currentTime);
+                    backgroundFadeGain.gain.setValueAtTime(0, audioCtx.currentTime);
+                }
+                if (engineFadeGain && engineFadeGain.gain) {
+                    engineFadeGain.gain.cancelScheduledValues(audioCtx.currentTime);
+                    engineFadeGain.gain.setValueAtTime(0, audioCtx.currentTime);
+                }
+            }
+            stopBackgroundMusic(); 
+            if (gameRunning && engineHumNodes) { 
+                stopEngineHum(); 
             }
         }
     });
@@ -1211,7 +1329,7 @@
     // --- Initialization ---
     document.addEventListener('DOMContentLoaded', () => {
         console.log("DOM Content Loaded.");
-        resizeGame(); // Call resizeGame early to set initial dimensions correctly
+        resizeGame(); 
         updateBatteryUI();
         updateScoreUI();
 
@@ -1225,7 +1343,7 @@
                 initialSwarmLoopId = requestAnimationFrame(initialSwarmLoop);
             } else { console.warn("Cannot run initial swarm loop: Context or canvas dimensions invalid."); }
         }
-        requestAnimationFrame(() => { // Ensure DOM is painted and dimensions are available
+        requestAnimationFrame(() => { 
            if (gameCanvas.width === 0 || gameCanvas.height === 0) {
                console.warn("Canvas size 0x0 on first frame, attempting resize again.");
                resizeGame();
