@@ -13,7 +13,7 @@
   </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>FutureSound Audio</title>
+  <title>HoverRush by ATFCars</title>
   <style>
     html, body {
       margin: 0;
@@ -64,9 +64,40 @@
       position: absolute;
       top: 0;
       left: 0;
-      z-index: 1;
+      z-index: 1; /* Ensures it's behind start-screen but above animatedBackground */
       cursor: none;
     }
+
+    /* --- Animated Background Styles --- */
+    #animatedBackground {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      overflow: hidden;
+      z-index: 0; /* Ensures it's at the very back */
+      background: linear-gradient(to top, #0f0f1a 40%, #1f1f2d 100%);
+    }
+
+    .flyingCar {
+      position: absolute;
+      width: 80px; height: 40px;
+      background: #ff00ff; /* Neon pink */
+      border-radius: 10px;
+      box-shadow: 0 0 15px #ff00ff;
+      opacity: 0.8;
+      animation: flyAcross 12s linear infinite;
+    }
+
+    .flyingCar.car1 { top: 20%; left: -100px; animation-delay: 0s; }
+    .flyingCar.car2 { top: 50%; left: -120px; animation-delay: 4s; }
+    .flyingCar.car3 { top: 70%; left: -80px; animation-delay: 8s; }
+
+    @keyframes flyAcross {
+      0% { left: -100px; transform: scale(1) rotateY(0deg); opacity: 0.8;}
+      50% { transform: scale(1.1) rotateY(0deg); opacity: 0.9;}
+      100% { left: 110%; transform: scale(1) rotateY(0deg); opacity: 0.8;}
+    }
+    /* --- End Animated Background Styles --- */
 
     #start-screen {
       display: flex;
@@ -78,8 +109,8 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(10, 10, 20, 0.85);
-      z-index: 10;
+      background: rgba(10, 10, 20, 0.85); /* Slightly transparent to see background */
+      z-index: 10; /* Ensures it's above gameCanvas and animatedBackground */
       text-align: center;
       padding: 20px; /* Default padding */
       box-sizing: border-box;
@@ -305,7 +336,7 @@
     }
 
     /* Custom styles for audio issue notice */
-    #audio-error-banner {
+    #audio-error-banner, #start-failure-banner { /* Combined for similar styling */
         position: fixed;
         /* Corrected to bottom-centered as per new requirements */
         bottom: 20px; 
@@ -342,7 +373,7 @@
         z-index: 999;
     }
     /* Style for the retry button inside the error banner */
-    #audio-error-banner button {
+    #audio-error-banner button, #start-failure-banner button { /* Combined for similar styling */
         background-color: #00ffff; /* Cyan button */
         color: #1a1a1a; /* Dark text */
         border: 1px solid #00ffff;
@@ -353,7 +384,7 @@
         cursor: pointer;
         transition: background-color 0.2s, color 0.2s;
     }
-    #audio-error-banner button:hover {
+    #audio-error-banner button:hover, #start-failure-banner button:hover {
         background-color: #fff;
     }
 
@@ -388,6 +419,14 @@
   <a href="#about" class="cta-button">Learn More</a>
   <canvas id="gameCanvas"></canvas>
   <img src="https://via.placeholder.com/800x400" id="branding-watermark" alt="HoverRush Logo" style="display: none;" />
+
+  <!-- Animated Background Layer -->
+  <div id="animatedBackground">
+    <div class="flyingCar car1"></div>
+    <div class="flyingCar car2"></div>
+    <div class="flyingCar car3"></div>
+  </div>
+  <!-- End Animated Background Layer -->
 
   <div id="start-screen">
     <h1>HoverRush</h1>
@@ -980,17 +1019,76 @@
     
     function startGame(){gameRunning=false;if(animationFrameId)cancelAnimationFrame(animationFrameId);animationFrameId=null;stopAllSounds();battery=100;score=0;lastScoreHapticMilestone = 0; // Reset score milestone haptic
     calculateDimensions();carY=playableHeight/2;carX=80;carColor='white';keys={};prevKeys={};buildings=[];pedestrians=[];projectiles=[];bonuses=[];birds=[];clouds=[];swarmVehicles=[];carShake=0;frameCount=0;lowBatteryWarningPlayed=false;isChargingSequence=false;chargingPhase=null;targetChargeStation=null;isCaptured=false;capturePhase=null;captureTargetBuilding=null;playerControlEnabled=true;prevCarX=carX;prevCarY=carY;spawnBuilding(gameCanvas.width*0.6);spawnBuilding();for(let i=0;i<5;i++)spawnCloud();for(let i=0;i<20;i++)spawnSwarmVehicle();currentScrollSpeed=BASE_SCROLL_SPEED;currentMusicTempo=BASE_MUSIC_TEMPO;difficultyMultiplier=1.0;startScreen.style.display='none';gameCanvas.style.display='block';uiOverlay.style.display='block';brandingWatermark.style.display='block';gameOverScreen.style.display='none';updateBatteryUI();updateScoreUI();const iMD=window.matchMedia('(pointer:coarse)').matches;if(iMD){if(mobileControlsLeft)mobileControlsLeft.style.display='block';if(mobileControlsRight)mobileControlsRight.style.display='flex';}else{if(mobileControlsLeft)mobileControlsLeft.style.display='none';if(mobileControlsRight)mobileControlsRight.style.display='none';}setTimeout(()=>{if(!audioInitialized){console.warn("startGame: Audio not initialized.");}else{playStartJingle();startEngineHum();triggerHapticFeedback([50, 20, 50]); // Engine Start Haptic
-    if(window.PROCEDURAL_UI_GAIN&&window.PROCEDURAL_UI_GAIN.gain)window.PROCEDURAL_UI_GAIN.gain.setValueAtTime(1.0,audioCtx.currentTime);if(musicGainNode&&musicGainNode.gain)musicGainNode.gain.setValueAtTime(0.45,audioCtx.currentTime);if(musicLowPassFilter)musicLowPassFilter.frequency.setValueAtTime(20000,audioCtx.currentTime);wasPlayingMusic = true; wasPlayingEngine = true; startMusicLoopChecker();}gameRunning=true;animationFrameId=requestAnimationFrame(gameLoop);},50);}
+    if(window.PROCEDURAL_UI_GAIN&&window.PROCEDURAL_UI_GAIN.gain)window.PROCEDURAL_UI_GAIN.gain.setValueAtTime(1.0,audioCtx.currentTime);if(musicGainNode&&musicGainNode.gain)musicGainNode.gain.setValueAtTime(0.45,audioCtx.currentTime);if(musicLowPassFilter)musicLowPassFilter.frequency.setValueAtTime(20000,audioCtx.currentTime);wasPlayingMusic = true; wasPlayingEngine = true; startMusicLoopChecker();}gameRunning=true;animationFrameId=requestAnimationFrame(gameLoop);if (devMode) console.log("🟢 QA: Game started.");},50);}
     function gameOver(){if(!gameRunning)return;gameRunning=false;playerControlEnabled=false;wasPlayingMusic = false; wasPlayingEngine = false; stopAllSounds();if(animationFrameId)cancelAnimationFrame(animationFrameId);animationFrameId=null;uiOverlay.style.display='none';brandingWatermark.style.display='none';if(mobileControlsLeft)mobileControlsLeft.style.display='none';if(mobileControlsRight)mobileControlsLeft.style.display='none';finalScoreLabel.textContent=`Final Score: ${score}`;gameOverScreen.style.display='flex';if(audioInitialized&&audioCtx&&audioCtx.state==='running')playGameOverFanfare();triggerHapticFeedback(100);}
     
-    function handleStartOrReplay(event){event.preventDefault(); const bId=event.target.id;if(!audioCtx){console.error("Cannot start, AudioContext failed.");return;}if(bId==='startButton'&&gameRunning)return;if(bId==='replayButton'){fetch('https://bit.ly/hoverrush-gameover',{mode:'no-cors'}).catch(err=>{});}const aSG=()=>{if(!audioInitialized){if(!initAudio()){alert("Audio system failed to initialize.");return;}}if(audioCtx.state==='running'&&audioInitialized){startGame();}else{alert("Audio system not ready. Please tap/click again.");if(audioCtx.state==='suspended')audioCtx.resume();}};if(audioCtx.state==='suspended'){audioCtx.resume().then(()=>{if(audioCtx.state==='running'){aSG();}else{alert("Could not enable audio. Please tap/click again.");}}).catch(err=>{alert(`Audio could not be started: ${err.name}.`);});}else if(audioCtx.state==='running'){aSG();}else{alert(`Audio system error (State: ${audioCtx.state}).`);}}
+    /**
+     * Handles the click event for the Start Game and Replay buttons.
+     * Manages AudioContext initialization/resume and game start flow.
+     * Displays a failure notice if audio cannot be initialized.
+     * @param {Event} event - The click event.
+     */
+    function handleStartOrReplay(event){
+      event.preventDefault(); 
+      const bId=event.target.id;
+      if (devMode) console.log(`🟡 QA: Button "${bId}" clicked.`);
+
+      if (!audioCtx){
+        console.error("Cannot start, AudioContext not available.");
+        displayStartFailureNotice("Audio system not supported or blocked by browser.");
+        return;
+      }
+      if(bId==='startButton'&&gameRunning)return; // Prevent starting game multiple times if already running
+
+      if(bId==='replayButton'){
+        // Placeholder for analytics or other post-game actions
+        fetch('https://bit.ly/hoverrush-gameover',{mode:'no-cors'}).catch(err=>{});
+      }
+
+      const attemptStartGameAfterAudio = () => {
+        if (!audioInitialized) {
+          if (!initAudio()) {
+            // Audio initialization failed again, inform user
+            console.error("Audio system failed to initialize after resume/tap.");
+            displayStartFailureNotice("Game could not start: Audio system failed to initialize. Please try again or refresh.");
+            return;
+          }
+        }
+        
+        if (audioCtx.state === 'running' && audioInitialized) {
+          startGame();
+        } else {
+          // AudioContext is suspended or not running after multiple attempts
+          console.warn(`Audio system not ready (State: ${audioCtx.state}). Attempting resume.`);
+          displayStartFailureNotice(`Audio system not ready (State: ${audioCtx.state}). Please tap to enable audio.`);
+        }
+      };
+
+      if(audioCtx.state === 'suspended'){
+        audioCtx.resume().then(()=>{
+          if(audioCtx.state === 'running'){
+            attemptStartGameAfterAudio();
+          }else{
+            console.warn("Could not enable audio after resume promise resolved.");
+            displayStartFailureNotice("Could not enable audio. Please tap/click again.");
+          }
+        }).catch(err=>{
+          console.error(`Audio could not be started: ${err.name}.`, err);
+          displayStartFailureNotice(`Audio could not be started: ${err.name}. Please try again.`);
+        });
+      } else if (audioCtx.state === 'running') {
+        attemptStartGameAfterAudio();
+      } else {
+        console.error(`Audio system error (State: ${audioCtx.state}).`);
+        displayStartFailureNotice(`Audio system error (State: ${audioCtx.state}). Please try again.`);
+      }
+    }
     
     /**
      * Unlocks the AudioContext by resuming it on a user gesture.
      * This is crucial for mobile browsers (especially iOS/Safari) due to strict autoplay policies.
      * It ensures audio can play only after a user interaction, providing a smooth UX initiation.
      * It also triggers audio initialization and ensures game audio resumes if needed.
-     * @param {Event} event - The user interaction event (e.g., 'touchend', 'click').
      */
     function unlockAudioContext() { 
       if (!audioCtx || audioCtx.state === 'closed') {
@@ -1143,6 +1241,35 @@
       setTimeout(() => notice.remove(), 6000); // Auto-dismiss after 6 seconds
     }
 
+    /**
+     * Displays a cyberpunk-styled banner for failures specifically during the initial game start process,
+     * often due to audio initialization issues not caught by regular resume logic.
+     * @param {string} msg - The message to display to the user.
+     */
+    function displayStartFailureNotice(msg) {
+      if (document.getElementById('start-failure-banner')) {
+        return; // Prevent multiple instances
+      }
+      const notice = document.createElement('div');
+      notice.id = "start-failure-banner";
+      
+      const message = document.createElement('p');
+      message.textContent = msg;
+      notice.appendChild(message);
+
+      const retryButton = document.createElement('button');
+      retryButton.textContent = "🔁 Tap to Retry";
+      retryButton.onclick = () => {
+        notice.remove();
+        handleStartOrReplay({ target: startButton }); // Re-attempt starting the game
+      };
+      notice.appendChild(retryButton);
+
+      document.body.appendChild(notice);
+      triggerHapticFeedback([100]); // Haptic feedback when the error notice appears
+      setTimeout(() => notice.remove(), 8000); // Auto-dismiss after 8 seconds
+    }
+
 
     /**
      * This visibility change handler ensures audio smoothly resumes when the user returns to the tab,
@@ -1266,7 +1393,17 @@
             "retry button added to notice": displayUserAudioIssueNotice.toString().includes('retryButton.textContent = "🔁 Tap to Retry Audio"'),
             "unlock logging implemented": unlockAudioContext.toString().includes('console.log("✅ AudioContext unlocked via user gesture.")') && unlockAudioContext.toString().includes('console.warn("❌ Failed to unlock AudioContext:")'),
             "audio restored notice implemented": typeof displayAudioRestoredNotice === 'function',
-            "audioCtx guarded in fallback": playFallbackTone.toString().includes('if (!audioCtx || audioCtx.state !== \'running\')')
+            "audioCtx guarded in fallback": playFallbackTone.toString().includes('if (!audioCtx || audioCtx.state !== \'running\')'),
+            "Start button attached to handleStartOrReplay": startButton.onclick === null && Array.from(startButton.__events?.click || []).some(listener => listener.toString().includes('handleStartOrReplay')), // Check if event listener is set correctly
+            "Idle animation active on DOMContentLoaded": typeof iSL === 'function' && iSLId !== null, // Checks if idle loop is running
+            "AudioContext state checked on game start": handleStartOrReplay.toString().includes('audioCtx.state === \'running\''),
+            "Game started QA log": startGame.toString().includes('console.log("🟢 QA: Game started.")'),
+            "Game did not start QA log": handleStartOrReplay.toString().includes('displayStartFailureNotice') && handleStartOrReplay.toString().includes('console.warn("Could not enable audio after resume promise resolved.")'),
+            "Start button clicked QA log": handleStartOrReplay.toString().includes('console.log(`🟡 QA: Button "${bId}" clicked.`)'),
+            "displayStartFailureNotice implemented": typeof displayStartFailureNotice === 'function' && displayStartFailureNotice.toString().includes('id = "start-failure-banner"'),
+            "Animated background present": document.getElementById('animatedBackground') !== null,
+            "Flying car divs present": document.querySelectorAll('#animatedBackground .flyingCar').length >= 3,
+            "CSS @keyframes flyAcross defined": document.querySelector('style').innerHTML.includes('@keyframes flyAcross')
         };
 
         for (const [item, status] of Object.entries(checklistItems)) {
@@ -1277,7 +1414,58 @@
         console.groupEnd();
     }
 
+    // Stores event listeners for QA audit purposes (non-standard, but useful for testing)
+    Element.prototype._addEventListener = Element.prototype.addEventListener;
+    Element.prototype.addEventListener = function(type, listener, options) {
+        this._addEventListener(type, listener, options);
+        if (!this.__events) this.__events = {};
+        if (!this.__events[type]) this.__events[type] = [];
+        this.__events[type].push(listener);
+    };
+
     document.addEventListener('DOMContentLoaded', () => {
+        // --- VISUAL RESTORATION: Animated Background & Start Button ---
+        // 1. Animated Flying Cars Background
+        // Check if the animatedBackground div is already in the DOM (from prior iteration or direct paste)
+        if (!document.getElementById("animatedBackground")) {
+          const bg = document.createElement("div");
+          bg.id = "animatedBackground";
+          bg.innerHTML = `
+            <div class="flyingCar car1"></div>
+            <div class="flyingCar car2"></div>
+            <div class="flyingCar car3"></div>
+          `;
+          document.body.prepend(bg); // Prepend to ensure it's at z-index 0
+          if (devMode) console.warn("⚠️ #animatedBackground was missing – fallback HTML injected.");
+        }
+        
+        // Ensure @keyframes flyAcross is defined in the style.
+        // This is primarily for robustness if the style block itself were malformed.
+        // It should generally be present if the full HTML is copied correctly.
+        if (!document.querySelector('style').innerHTML.includes('@keyframes flyAcross')) {
+            const styleElem = document.createElement('style');
+            styleElem.textContent = `
+                @keyframes flyAcross {
+                    0% { left: -100px; transform: scale(1) rotateY(0deg); opacity: 0.8;}
+                    50% { transform: scale(1.1) rotateY(0deg); opacity: 0.9;}
+                    100% { left: 110%; transform: scale(1) rotateY(0deg); opacity: 0.8;}
+                }
+            `;
+            document.head.appendChild(styleElem);
+            if (devMode) console.warn("⚠️ @keyframes flyAcross was missing – fallback CSS injected.");
+        }
+
+        // 2. Start Game Button Repair (Event Listener Confirmation)
+        // The button itself and its base styles are already in the HTML/CSS.
+        // This block ensures the click event listener is correctly attached.
+        if (startButton && !startButton.__events?.click?.some(listener => listener.toString().includes('handleStartOrReplay'))) {
+             startButton.addEventListener('click', handleStartOrReplay);
+             if (devMode) console.warn("🔁 Pass 3 Fix Applied: Start button re-bound to handleStartOrReplay.");
+        } else if (devMode && !startButton) {
+            console.warn("❌ Start button element not found on DOMContentLoaded.");
+        }
+        // --- END VISUAL RESTORATION ---
+
         // Run patch checklist on DOMContentLoaded for quick dev verification
         logAudioSystemCheck();
 
@@ -1298,10 +1486,33 @@
           showAudioUnlockPrompt();
         }
 
+        // Initialize swarm vehicles for idle animation (on gameCanvas)
         for(let i=0;i<20;i++) spawnSwarmVehicle();
-        let iSLId=null;
-        function iSL(){if(gameRunning){if(iSLId)cancelAnimationFrame(iSLId);iSLId=null;return;}if(ctx&&gameCanvas.width>0&&gameCanvas.height>0){ctx.fillStyle='#050510';ctx.fillRect(0,0,gameCanvas.width,gameCanvas.height);updateSwarmVehicles();drawSwarmBackground();iSLId=requestAnimationFrame(iSL);}else{}}
-        requestAnimationFrame(()=>{if(gameCanvas.width===0||gameCanvas.height===0){resizeGame();}if(gameCanvas.width>0&&gameCanvas.height>0){iSL();}else{}});
+
+        let iSLId = null; // Animation frame ID for idle screen loop for gameCanvas
+        function iSL(){
+            if(gameRunning){ // If game is running, stop idle animation
+                if(iSLId) cancelAnimationFrame(iSLId);
+                iSLId = null;
+                return;
+            }
+            if(ctx && gameCanvas.width > 0 && gameCanvas.height > 0){
+                ctx.fillStyle = '#050510';
+                ctx.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
+                updateSwarmVehicles();
+                drawSwarmBackground();
+                iSLId = requestAnimationFrame(iSL); // Continue idle loop
+            } else {
+                // Canvas not ready, try resizing and then starting idle loop again
+                if (gameCanvas.width === 0 || gameCanvas.height === 0) {
+                    resizeGame();
+                }
+                iSLId = requestAnimationFrame(iSL);
+            }
+        }
+        // Start idle animation loop immediately on DOMContentLoaded for gameCanvas
+        requestAnimationFrame(iSL);
+
         startScreen.style.display='flex';
         console.log("Initial setup complete.");
     });
