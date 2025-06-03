@@ -462,7 +462,7 @@
 </style>
 </head>
 <body>
-<canvas id="backgroundCanvas"></canvas>
+<canvas id="backgroundCanvas"></canvas><canvas id="backgroundCanvas"></canvas>
 <a class="cta-button" href="#about">Learn More</a>
 <div id="animatedBackground">
 <div class="flyingCar car1"></div>
@@ -1724,7 +1724,6 @@ function handleStartOrReplay() {
   });
 }
 </script>
-
 <script>
 const backgroundCanvas = document.getElementById('backgroundCanvas');
 const bgCtx = backgroundCanvas.getContext('2d');
@@ -1799,5 +1798,800 @@ document.addEventListener('DOMContentLoaded', () => {
   for (let i = 0; i < 20; i++) spawnSwarmVehicleBG();
   updateAndDrawBackground();
 });
-</script></body>
+</script><script>
+    // Canvas & Context
+    const gameCanvas = document.getElementById('gameCanvas');
+    const ctx = gameCanvas.getContext('2d');
+
+    // UI Elements
+    const startScreen = document.getElementById('start-screen');
+    const startButton = document.getElementById('startButton');
+    const uiOverlay = document.getElementById('ui-overlay');
+    const batteryLevelUI = document.getElementById('battery-level');
+    const scoreLabel = document.getElementById('score-label');
+    const gameOverScreen = document.getElementById('game-over-screen');
+    const finalScoreLabel = document.getElementById('final-score');
+    const replayButton = document.getElementById('replayButton');
+    const mobileControlsLeft = document.getElementById('mobile-controls-left');
+    const mobileControlsRight = document.getElementById('mobile-controls-right');
+    const touchUpButton = document.getElementById('touch-up');
+    const touchDownButton = document.getElementById('touch-down');
+    const touchLeftButton = document.getElementById('touch-left');
+    const touchRightButton = document.getElementById('touch-right');
+    // *** ADDED JS REFERENCE for branding element ***
+    const brandingWatermark = document.getElementById('branding-watermark');
+    const gameOverBranding = document.getElementById('game-over-branding');
+
+
+    // Game State
+    let carX = 80, carY = 300, prevCarX = 80, prevCarY = 300;
+    let carColor = 'white', carShake = 0;
+    let battery = 100, score = 0;
+    let keys = {}, prevKeys = {};
+    let gameRunning = false, playerControlEnabled = true;
+    let animationFrameId = null, frameCount = 0, lowBatteryWarningPlayed = false;
+    const BASE_SCROLL_SPEED = 4.0, MAX_SCROLL_SPEED = 7.5, SCROLL_SPEED_INCREMENT = 0.05;
+    let currentScrollSpeed = BASE_SCROLL_SPEED;
+    const BASE_MUSIC_TEMPO = 160, MAX_MUSIC_TEMPO = 230, MUSIC_TEMPO_INCREMENT = 3;
+    let currentMusicTempo = BASE_MUSIC_TEMPO;
+    let isChargingSequence = false, chargingPhase = null, targetChargeStation = null;
+    let autoPilotStartY = 0, autoPilotProgress = 0, chargeStartTime = 0;
+    const CHARGE_DURATION_MS = 2000;
+    let isCaptured = false, capturePhase = null, captureTargetBuilding = null;
+    let captureStartTime = 0;
+    const CAPTURE_HOLD_DURATION_MS = 3000, CAPTURE_BATTERY_DRAIN = 5;
+    const CAR_HEIGHT = 30, CAR_WIDTH = 50, MIN_CAR_X = 20;
+    let MAX_CAR_X = 300;
+    const MOVE_SPEED_Y = 5, MOVE_SPEED_X = 3;
+    const BATTERY_DRAIN_RATE = 0.03, COLLISION_BATTERY_COST = 8, BONUS_BATTERY_GAIN = 20;
+    const SIDEWALK_HEIGHT = 40;
+    const PROJECTILE_SPEED_MULTIPLIER = 1.1, BONUS_SPEED_MULTIPLIER = 0.9, PEDESTRIAN_SPEED_MULTIPLIER = 0.4;
+    const CHARGING_TRIGGER_SPAWN_CHANCE = 0.0015, BIRD_SPEED_MULTIPLIER = 1.3;
+    // Fix: Reduce base spawn rates
+    const BASE_BIRD_SPAWN_CHANCE = 0.012;
+    const BASE_PEDESTRIAN_SPAWN_CHANCE = 0.010;
+    const BASE_PROJECTILE_THROW_CHANCE = 0.01;
+    const VERTIPORT_SPAWN_CHANCE = 0.01;
+    let buildings = [], pedestrians = [], projectiles = [], bonuses = [], birds = [], clouds = [], swarmVehicles = [];
+    let cityHeight = 450, playableHeight = 450;
+    const PROJECTILE_GRAVITY = 0.15; 
+    let difficultyMultiplier = 1.0; 
+
+    // --- Audio Engine (unchanged) ---
+    let audioCtx;
+    let audioInitialized = false;
+    try {
+         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+         console.log("AudioContext created. Initial state:", audioCtx.state);
+         audioCtx.onstatechange = () => {
+             console.log("AudioContext state changed to:", audioCtx.state);
+             if (audioCtx.state !== 'running') {
+                audioInitialized = false;
+                stopAllSounds(); 
+                console.warn("AudioContext state changed to non-running. Audio features may be disabled until next interaction.");
+             } else if (audioCtx.state === 'running' && !audioInitialized) {
+                console.log("AudioContext resumed automatically. Re-initialization might be needed.");
+                if (initAudio()) {
+                    console.log("Audio re-initialized automatically on state change to running.");
+                    if (gameRunning && musicShouldBePlaying && !musicLoopIntervalId) {
+                        console.log("Restarting music loop checker due to automatic context resume.");
+                        startMusicLoopChecker();
+                    }
+                }
+             }
+         };
+    } catch (e) {
+        console.error("FATAL: Web Audio API is not supported in this browser.", e);
+        audioCtx = null;
+    }
+
+    let musicOscillators = [], engineHumNodes = null;
+    let chargingSoundNodes = [], captureSoundNodes = [];
+    let musicGainNode = null, musicLowPassFilter = null, reverbNode = null;
+    let musicShouldBePlaying = false;
+    let musicLoopIntervalId = null;
+    let nextMusicScheduleTime = 0;
+    const musicScheduleLookahead = 0.25;
+    const musicCheckIntervalMs = 200;
+    let currentLoopLengthSeconds = 0;
+
+    function initAudio() {
+        if (!audioCtx) { console.warn("initAudio: No AudioContext."); return false; }
+        if (audioCtx.state === 'suspended') {
+            console.warn("initAudio: Context suspended, attempting resume...");
+            audioCtx.resume().then(() => {
+                 console.log("initAudio: Context resumed successfully during init.");
+                 if (audioCtx.state === 'running') { return initAudioInternal(); }
+                 else { console.error("initAudio: Context did not become running after resume."); return false; }
+            }).catch(err => { console.error("initAudio: Error resuming suspended context:", err); return false; });
+            return false;
+        }
+        if (audioCtx.state === 'running') { return initAudioInternal(); }
+        console.warn(`initAudio: Unexpected state ${audioCtx.state}. Cannot initialize.`); return false;
+    }
+
+    function initAudioInternal() {
+        if (!audioCtx || audioCtx.state !== 'running') { console.error("initAudioInternal: Context not ready. State:", audioCtx?.state); return false; }
+        if (audioInitialized) { console.log("initAudioInternal: Already initialized."); return true; }
+        console.log("initAudioInternal: Context running, initializing nodes...");
+        if (setupMasterAudioNodes()) {
+             audioInitialized = true;
+             console.log("initAudioInternal: Success.");
+             return true;
+        } else {
+             console.error("initAudioInternal: setupMasterAudioNodes failed.");
+             return false;
+        }
+    }
+
+    function setupMasterAudioNodes() {
+        if (!audioCtx || audioCtx.state !== 'running') { console.error("setupMasterAudioNodes: Context not ready. State:", audioCtx?.state); return false; }
+        if (!musicGainNode) {
+            try {
+                musicGainNode = audioCtx.createGain();
+                musicLowPassFilter = audioCtx.createBiquadFilter(); musicLowPassFilter.type = 'lowpass'; musicLowPassFilter.frequency.value = 20000;
+                const reverbDelay = audioCtx.createDelay(0.5); reverbDelay.delayTime.value = 0.15; const reverbFeedback = audioCtx.createGain(); reverbFeedback.gain.value = 0.35; const reverbFilter = audioCtx.createBiquadFilter(); reverbFilter.type = 'lowpass'; reverbFilter.frequency.value = 2500; reverbDelay.connect(reverbFeedback).connect(reverbFilter).connect(reverbDelay); reverbNode = { input: reverbDelay, output: reverbFilter };
+                musicGainNode.connect(musicLowPassFilter).connect(audioCtx.destination);
+                const reverbOutputGain = audioCtx.createGain(); reverbOutputGain.gain.value = 0.25; reverbNode.output.connect(reverbOutputGain).connect(audioCtx.destination);
+                musicGainNode.gain.value = 0.45;
+                console.log("setupMasterAudioNodes: Success."); return true;
+            } catch (error) { console.error("setupMasterAudioNodes: Error:", error); musicGainNode = null; musicLowPassFilter = null; reverbNode = null; return false; }
+        }
+        console.log("setupMasterAudioNodes: Already exist."); return true;
+    }
+
+    function triggerHapticFeedback(duration = 50) { if (navigator.vibrate) { try { navigator.vibrate(duration); } catch (e) { console.warn("Haptic feedback failed:", e); } } }
+
+    function playTone(freq, duration = 0.2, type = 'square', vol = 0.3, when = 0, options = {}) {
+        if (!audioInitialized || !audioCtx || audioCtx.state !== 'running') { return null; }
+        try {
+            const startTime = (options.absoluteTime !== undefined) ? options.absoluteTime : audioCtx.currentTime + when;
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); const outputNode = options.outputNode || audioCtx.destination;
+            if (startTime < audioCtx.currentTime) {
+                 console.warn(`playTone: Skipping note scheduled in the past. Freq: ${freq}, Scheduled: ${startTime.toFixed(3)}, Now: ${audioCtx.currentTime.toFixed(3)}`);
+                 return null;
+            }
+            osc.type = type;
+            if (options.detune) osc.detune.setValueAtTime(options.detune, startTime);
+            if (options.frequency instanceof AudioParam) { options.frequency.cancelScheduledValues(startTime); options.frequency.setValueAtTime(options.frequency.value, startTime); options.frequency.connect(osc.frequency); } else { osc.frequency.setValueAtTime(freq, startTime); }
+            gain.gain.setValueAtTime(vol, startTime);
+            if (options.rampTo !== undefined) { gain.gain.linearRampToValueAtTime(options.rampTo, startTime + duration * 0.8); gain.gain.linearRampToValueAtTime(0.001, startTime + duration); } else { gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration); }
+            osc.connect(gain).connect(outputNode);
+            osc.start(startTime);
+            const stopTime = startTime + duration;
+            if (duration > 0 && stopTime > audioCtx.currentTime) { osc.stop(stopTime); } else if (duration <= 0) {} else { try { osc.stop(); } catch (e) {} }
+            if (options.frequency instanceof AudioParam) { setTimeout(() => { try { options.frequency.disconnect(osc.frequency); } catch(e) {} }, duration * 1000 + 100); }
+            return { osc, gain };
+        } catch (error) { console.error("playTone Error:", error, {freq, duration, type, vol, when, options}); return null; }
+    }
+
+    function playStartJingle() { if (!audioInitialized) return; const now = audioCtx.currentTime; const vol = 0.4; const dur = 0.2; playTone(110, dur + 0.2, 'sawtooth', vol * 0.15, 0); playTone(440, dur, 'square', vol, 0.10); playTone(1760, dur * 0.8, 'sine', vol * 0.20, 0.3, { rampTo: 0 }); if (reverbNode) playTone(1760, dur * 0.5, 'sine', vol * 0.4, 0.35, { outputNode: reverbNode.input }); }
+    function playCollisionSound() { if (!audioInitialized) return; const now = audioCtx.currentTime; const noiseDur = 0.15; try { const noiseEnv = audioCtx.createGain(); noiseEnv.connect(audioCtx.destination); noiseEnv.gain.setValueAtTime(0.3, now); noiseEnv.gain.exponentialRampToValueAtTime(0.001, now + noiseDur); const noiseSrc = audioCtx.createBufferSource(); const bufferSize = audioCtx.sampleRate * noiseDur; const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate); const data = buffer.getChannelData(0); for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1; noiseSrc.buffer = buffer; noiseSrc.connect(noiseEnv); noiseSrc.start(now); noiseSrc.stop(now + noiseDur); } catch (e) { console.error("Error playing collision noise:", e); } playTone(987.77, 0.1, 'triangle', 0.25, 0.02); for(let i=0; i<3; i++) { playTone(2000, 0.03, 'noise', 0.08, 0.1 + i * 0.04); } }
+    function playBatteryPickupSound() { playTone(329.63, 0.08, 'sine', 0.35, 0.0); playTone(392.00, 0.08, 'sine', 0.35, 0.08); playTone(523.25, 0.15, 'sine', 0.4, 0.16); }
+    function playLowBatteryWarning() { if (!lowBatteryWarningPlayed) { playTone(880, 0.08, 'square', 0.25, 0); playTone(880, 0.08, 'square', 0.25, 0.15); lowBatteryWarningPlayed = true; setTimeout(() => { lowBatteryWarningPlayed = false; }, 5000); } }
+    function playBonusFlourish() { const baseFreq = 783.99; const vol = 0.30; playTone(baseFreq, 0.08, 'triangle', vol, 0.0); playTone(baseFreq * 1.25, 0.08, 'triangle', vol, 0.08); playTone(baseFreq * 1.5, 0.12, 'triangle', vol, 0.16); }
+    function playEngineHum() { if (engineHumNodes || !audioInitialized || !audioCtx || audioCtx.state !== 'running') return; try { const baseFreq = 60; const humGain = audioCtx.createGain(); const panner = audioCtx.createStereoPanner(); const filter = audioCtx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.value = 5000; const humOsc = audioCtx.createOscillator(); humOsc.type = 'sawtooth'; humOsc.frequency.setValueAtTime(baseFreq, audioCtx.currentTime); const detuneOsc = audioCtx.createOscillator(); detuneOsc.frequency.value = 5; const detuneGain = audioCtx.createGain(); detuneGain.gain.value = 15; humGain.gain.value = 0.06; detuneOsc.connect(detuneGain).connect(humOsc.detune); humOsc.connect(filter).connect(panner).connect(humGain).connect(audioCtx.destination); humOsc.start(); detuneOsc.start(); engineHumNodes = { osc: humOsc, gain: humGain, panner: panner, filter: filter, detuneOsc: detuneOsc }; } catch (e) { console.error("Error starting engine hum:", e); engineHumNodes = null; } }
+    function stopEngineHum() { if (!engineHumNodes) return; try { const now = audioCtx.currentTime; engineHumNodes.gain.gain.cancelScheduledValues(now); engineHumNodes.gain.gain.setTargetAtTime(0, now, 0.01); engineHumNodes.osc.stop(now + 0.05); if (engineHumNodes.detuneOsc) engineHumNodes.detuneOsc.stop(now + 0.05); } catch(e) {} engineHumNodes = null; }
+    function modulateEngineHum(batteryPercent, vertDelta, horzDelta) { if (!engineHumNodes || !audioInitialized || !audioCtx || audioCtx.state !== 'running') return; try { const now = audioCtx.currentTime; const baseFreq = 60; const pitchRange = 20; const pitchMod = (vertDelta / MOVE_SPEED_Y) * pitchRange; engineHumNodes.osc.frequency.linearRampToValueAtTime(baseFreq + pitchMod, now + 0.1); let panValue = 0; if (keys['ArrowLeft'] || keys['a']) panValue = -0.6; if (keys['ArrowRight'] || keys['d']) panValue = 0.6; engineHumNodes.panner.pan.linearRampToValueAtTime(panValue, now + 0.05); const minVol = 0.05; const maxVol = 0.10; const targetVol = maxVol - (batteryPercent / 100) * (maxVol - minVol); engineHumNodes.gain.gain.linearRampToValueAtTime(targetVol, now + 0.2); const minFilterFreq = 800; const maxFilterFreq = 5000; const targetFilterFreq = (batteryPercent < 30) ? minFilterFreq + (batteryPercent/30) * (1500 - minFilterFreq) : maxFilterFreq; engineHumNodes.filter.frequency.linearRampToValueAtTime(targetFilterFreq, now + 0.3); } catch(e) { console.error("Error modulating engine hum:", e); stopEngineHum(); } }
+    function playDodgeSound(direction) { playTone(600 + direction * 100, 0.05, 'noise', 0.05, 0); }
+    function playPullDownSound() { playTone(400, 1.0, 'sawtooth', 0.35, 0, { rampTo: 80 }); playTone(150, 1.0, 'square', 0.15, 0.1, { rampTo: 40, detune: -30 }); playTone(55, 1.2, 'sine', 0.12, 0); }
+    function playChargingSound() { if (!audioInitialized) return; stopChargingSound(); const baseFreq = 130.81; const chord = [0, 4, 7, 12]; const vol = 0.20; const noteDur = 0.1; let delay = 0; for(let i=0; i<8; i++) { const interval = chord[i % chord.length]; const freq = baseFreq * Math.pow(2, interval / 12); const node = playTone(freq, noteDur * 0.9, 'sine', vol * (1 - (i%4)*0.1), delay); if(node) chargingSoundNodes.push(node); delay += noteDur; } chargingSoundNodes.push(setTimeout(playChargingSound, delay * 1000)); }
+    function stopChargingSound() { chargingSoundNodes.forEach(item => { if (typeof item === 'number') clearTimeout(item); else if (item && item.osc) try { item.osc.stop(audioCtx.currentTime); item.gain.gain.cancelScheduledValues(audioCtx.currentTime); item.gain.gain.setValueAtTime(0, audioCtx.currentTime);} catch (e) {} }); chargingSoundNodes = []; }
+    function playChargeCompleteSound() { playTone(523.25, 0.1, 'triangle', 0.4, 0.0); playTone(659.25, 0.1, 'triangle', 0.4, 0.1); playTone(783.99, 0.1, 'triangle', 0.4, 0.2); playTone(1046.50, 0.25,'triangle', 0.5, 0.3); triggerHapticFeedback(30); }
+    function playLaunchSound() { playTone(300, 0.5, 'sawtooth', 0.5, 0, { rampTo: 2500 }); playTone(400, 0.6, 'noise', 0.3, 0.05, { rampTo: 0.01 }); }
+    function playGameOverFanfare() { const now = audioCtx.currentTime; const vol = 0.25; const notes = [ { freq: 440.00, delay: 0.0, dur: 0.3 }, { freq: 349.23, delay: 0.3, dur: 0.3 }, { freq: 293.66, delay: 0.6, dur: 0.3 }, { freq: 261.63, delay: 0.9, dur: 0.6 }, ]; notes.forEach(n => playTone(n.freq, n.dur, 'triangle', vol, n.delay, { rampTo: 0.001 })); console.log("Playing soft game over fanfare"); }
+    function playWaveBeamSound(building) { playTone(1500, 0.1, 'sine', 0.08, 0, { detune: 200 }); playTone(1800, 0.1, 'sine', 0.08, 0.05, { detune: -150 }); }
+    function playLockOnSound() { playTone(523.25, 0.1, 'square', 0.35, 0); playTone(369.99, 0.1, 'square', 0.35, 0.05); }
+    function playCaptureDescentHum() { if (!audioInitialized) return; stopCaptureSounds(); const node = playTone(100, 0, 'sawtooth', 0.25); if (node) { try {node.osc.frequency.linearRampToValueAtTime(50, audioCtx.currentTime + 1.5); captureSoundNodes.push(node);} catch(e){ console.error("Error ramping capture hum:", e); try{node.osc.stop();}catch(_){} } } }
+    function playCaptureHoldingPulse() { playTone(220, 0.08, 'sine', 0.12, Math.random() * 0.2); playTone(330, 0.08, 'sine', 0.08, 0.15 + Math.random() * 0.2); }
+    function playCaptureReleaseChime() { playTone(329.63, 0.1, 'triangle', 0.35, 0); playTone(392.00, 0.1, 'triangle', 0.35, 0.1); playTone(523.25, 0.2, 'triangle', 0.4, 0.2); }
+    function stopCaptureSounds() { captureSoundNodes.forEach(item => { if (item && item.osc) try { item.osc.stop(audioCtx.currentTime); item.gain.gain.cancelScheduledValues(audioCtx.currentTime); item.gain.gain.setValueAtTime(0, audioCtx.currentTime);} catch (e) {} }); captureSoundNodes = []; }
+    function playVertiportRefuelSound() { const now = audioCtx.currentTime; const vol = 0.2; playTone(1200, 0.05, 'square', vol * 0.8, 0.0, { detune: 100 }); playTone(1500, 0.05, 'square', vol * 0.7, 0.07); for (let i = 0; i < 4; i++) { playTone(200 + Math.random() * 100, 0.1, 'sine', vol * 0.5, 0.2 + i * 0.08 + Math.random() * 0.04, { detune: (Math.random() - 0.5) * 300 }); } if (!audioInitialized || !audioCtx) return; try { const riseOsc = audioCtx.createOscillator(); const riseGain = audioCtx.createGain(); riseOsc.type = 'triangle'; riseOsc.frequency.setValueAtTime(200, now + 0.4); riseOsc.frequency.linearRampToValueAtTime(800, now + 0.4 + 0.6); riseGain.gain.setValueAtTime(0, now + 0.4); riseGain.gain.linearRampToValueAtTime(vol * 1.1, now + 0.4 + 0.2); riseGain.gain.linearRampToValueAtTime(0.001, now + 0.4 + 0.6); riseOsc.connect(riseGain).connect(audioCtx.destination); riseOsc.start(now + 0.4); riseOsc.stop(now + 0.4 + 0.6); } catch(e) { console.error("Error playing refuel sound rise:", e); } }
+    function playCollisionDissonance() { playTone(450, 0.15, 'sawtooth', 0.2, 0, { detune: 50 }); playTone(150, 0.2, 'square', 0.15, 0.02); }
+    function applyLowBatteryMusicFilter(isLow) { if (!musicLowPassFilter || !audioInitialized || !audioCtx || audioCtx.state !== 'running') return; const targetFreq = isLow ? 800 : 20000; const targetQ = isLow ? 5 : 1; const now = audioCtx.currentTime; try { musicLowPassFilter.frequency.cancelScheduledValues(now); musicLowPassFilter.Q.cancelScheduledValues(now); musicLowPassFilter.frequency.linearRampToValueAtTime(targetFreq, now + 0.5); musicLowPassFilter.Q.linearRampToValueAtTime(targetQ, now + 0.5); } catch(e) { console.error("Error applying low battery filter:", e); } }
+
+
+    // --- Music Loop Functions (unchanged) ---
+    function scheduleMusicBlock() {
+        if (!audioInitialized || !audioCtx || audioCtx.state !== 'running' || !musicGainNode) { console.warn("scheduleMusicBlock: Cannot schedule, audio not ready."); stopBackgroundMusic(); return; }
+        musicOscillators.forEach(item => { if (item && item.osc && typeof item.osc.stop === 'function') { try { item.osc.stop(audioCtx.currentTime); } catch (e) {} } }); musicOscillators = [];
+        try {
+            const tempo = currentMusicTempo; const quarterNoteTime = 60 / tempo; const measureTime = quarterNoteTime * 4; const loopLengthSeconds = measureTime * 8; currentLoopLengthSeconds = loopLengthSeconds;
+            const blockStartTime = nextMusicScheduleTime + musicScheduleLookahead;
+            const pulseVol = 0.25;
+            for (let t = 0; t < loopLengthSeconds; t += quarterNoteTime) {
+                 const scheduleTime = blockStartTime + t;
+                 const kickNode = playTone(80, 0.1, 'sine', pulseVol * 1.2, 0, { outputNode: musicGainNode, rampTo: 0.01, absoluteTime: scheduleTime });
+                 const kickClickNode = playTone(80, 0.05, 'noise', pulseVol * 0.5, 0, { outputNode: musicGainNode, absoluteTime: scheduleTime });
+                 const snareNode = playTone(250, 0.1, 'noise', pulseVol * 0.8, 0, { outputNode: musicGainNode, rampTo: 0.01, absoluteTime: scheduleTime + quarterNoteTime });
+                 if (kickNode) musicOscillators.push(kickNode); if (kickClickNode) musicOscillators.push(kickClickNode); if (snareNode) musicOscillators.push(snareNode);
+            }
+            const bassNotes = [65.41, 73.42, 87.31, 98.00]; const bassVol = 0.35; const bar = Math.floor((blockStartTime / measureTime)) % 8; const bassNoteIndex = Math.floor(bar / 2) % bassNotes.length; const bassFreq = bassNotes[bassNoteIndex];
+            for (let t = 0; t < loopLengthSeconds; t += (quarterNoteTime / 2)) {
+                if (t % (quarterNoteTime * 2) < quarterNoteTime) {
+                    const scheduleTime = blockStartTime + t; const node = playTone(bassFreq, (quarterNoteTime / 2) * 0.8, 'sawtooth', bassVol, 0, { outputNode: musicGainNode, absoluteTime: scheduleTime }); if (node) musicOscillators.push(node);
+                }
+            }
+            const melodyVol = 0.15; const arpNotes = (bar < 4) ? [0, 3, 7, 10] : [0, 4, 7, 12]; const arpBaseFreq = 261.63;
+            for (let t = 0; t < loopLengthSeconds; t += (quarterNoteTime / 4)) {
+                const scheduleTime = blockStartTime + t; const arpNoteIndex = Math.floor(t / (quarterNoteTime / 4)) % arpNotes.length; const freq = arpBaseFreq * Math.pow(2, arpNotes[arpNoteIndex] / 12); const node = playTone(freq, (quarterNoteTime / 4) * 0.7, 'triangle', melodyVol, 0, { outputNode: musicGainNode, absoluteTime: scheduleTime }); if (node) musicOscillators.push(node);
+            }
+            const blockEndTime = blockStartTime + loopLengthSeconds; nextMusicScheduleTime = blockEndTime - musicScheduleLookahead;
+        } catch (error) { console.error("Error scheduling background music block:", error); stopBackgroundMusic(); }
+    }
+    function checkMusicSchedule() {
+        if (!gameRunning || !audioInitialized || !audioCtx || audioCtx.state !== 'running' || !musicShouldBePlaying || isChargingSequence || isCaptured) { stopBackgroundMusic(); return; }
+        const currentTime = audioCtx.currentTime;
+        const lastBlockEndTime = nextMusicScheduleTime + musicScheduleLookahead;
+        if (currentTime > lastBlockEndTime + 1.0) { console.warn(`Music loop checker significantly delayed. Resetting schedule time.`); nextMusicScheduleTime = currentTime; }
+        if (currentTime >= nextMusicScheduleTime) { scheduleMusicBlock(); }
+    }
+    function startMusicLoopChecker() {
+        if (!audioInitialized || !audioCtx || audioCtx.state !== 'running') { console.warn("startMusicLoopChecker: Cannot start, audio not ready."); return; }
+        if (musicLoopIntervalId !== null) { console.log("startMusicLoopChecker: Loop checker already running."); return; }
+        console.log(`startMusicLoopChecker: Starting music loop checker (Interval: ${musicCheckIntervalMs}ms)`);
+        musicShouldBePlaying = true; nextMusicScheduleTime = audioCtx.currentTime;
+        scheduleMusicBlock(); // Schedule first block immediately
+        musicLoopIntervalId = setInterval(checkMusicSchedule, musicCheckIntervalMs);
+    }
+    function stopBackgroundMusic() {
+        if (musicLoopIntervalId !== null) { clearInterval(musicLoopIntervalId); musicLoopIntervalId = null; console.log("stopBackgroundMusic: Cleared music loop interval."); }
+        musicOscillators.forEach(item => { if (item && item.osc && typeof item.osc.stop === 'function') { try { if(item.gain && typeof item.gain.gain.cancelScheduledValues === 'function') { item.gain.gain.cancelScheduledValues(audioCtx.currentTime); item.gain.gain.setTargetAtTime(0.0001, audioCtx.currentTime, 0.005); } item.osc.stop(audioCtx.currentTime + 0.02); } catch (e) {} } }); musicOscillators = [];
+        musicShouldBePlaying = false; nextMusicScheduleTime = 0; currentLoopLengthSeconds = 0;
+    }
+    function stopAllSounds() {
+        console.log("Stopping all sounds...");
+        stopBackgroundMusic(); stopEngineHum(); stopChargingSound(); stopCaptureSounds();
+        if (musicGainNode && audioCtx && audioCtx.state === 'running') { musicGainNode.gain.cancelScheduledValues(audioCtx.currentTime); musicGainNode.gain.setValueAtTime(0.45, audioCtx.currentTime); }
+        if (musicLowPassFilter && audioCtx && audioCtx.state === 'running') { musicLowPassFilter.frequency.cancelScheduledValues(audioCtx.currentTime); musicLowPassFilter.frequency.setValueAtTime(20000, audioCtx.currentTime); musicLowPassFilter.Q.cancelScheduledValues(audioCtx.currentTime); musicLowPassFilter.Q.setValueAtTime(1, audioCtx.currentTime); }
+    }
+
+    // --- UI Updates (unchanged) ---
+    function updateBatteryUI() { const clampedBattery = Math.max(0, Math.min(battery, 100)); batteryLevelUI.style.width = `${clampedBattery}%`; const isLow = clampedBattery < 20; if (isLow) { batteryLevelUI.style.backgroundColor = '#f44336'; if (gameRunning && !isChargingSequence && !isCaptured) playLowBatteryWarning(); } else if (clampedBattery < 50) { batteryLevelUI.style.backgroundColor = '#ffeb3b'; lowBatteryWarningPlayed = false; } else { batteryLevelUI.style.backgroundColor = '#4CAF50'; lowBatteryWarningPlayed = false; } applyLowBatteryMusicFilter(isLow && !isChargingSequence && !isCaptured); }
+    function updateScoreUI() { scoreLabel.textContent = `Score: ${score}`; }
+
+    // --- Screen Shake (unchanged) ---
+    function triggerShake(duration = 5) { carShake = duration; }
+
+    // --- Game Dimensions & Calculations ---
+    function calculateDimensions() { playableHeight = gameCanvas.height - SIDEWALK_HEIGHT; cityHeight = playableHeight; MAX_CAR_X = gameCanvas.width * 0.4; }
+    // Fix: Removed getDifficultyMultiplier function, logic moved to updateGameState
+
+    // --- Entity Management (projectile physics & spawn rates updated) ---
+    function spawnBuilding(forceX = null) { const isVertiport = Math.random() < VERTIPORT_SPAWN_CHANCE && !buildings.some(b => b.isVertiport); const minWidth = isVertiport ? 100 : 60; const maxWidth = isVertiport ? 150 : 180; const minHeight = isVertiport ? playableHeight * 0.7 : 100; const maxHeight = isVertiport ? playableHeight * 0.85 : playableHeight * 0.65; const gap = 40 + Math.random() * 60; const lastBuilding = buildings[buildings.length - 1]; let nextX = forceX !== null ? forceX : (lastBuilding ? lastBuilding.x + lastBuilding.width + gap : gameCanvas.width + 50); const height = minHeight + Math.random() * (maxHeight - minHeight); buildings.push({ x: nextX, y: gameCanvas.height - height, width: minWidth + Math.random() * (maxWidth - minWidth), height: height, color: isVertiport ? '#607D8B' : `hsl(${190 + Math.random()*50}, 25%, ${15 + Math.random()*15}%)`, isVertiport: isVertiport, wavePhase: Math.random() * Math.PI * 2 }); }
+    function updateBuildings() { for (let i = buildings.length - 1; i >= 0; i--) { const b = buildings[i]; b.x -= currentScrollSpeed; if (b.isVertiport) b.wavePhase += 0.1; if (b.x + b.width < 0) buildings.splice(i, 1); } const lastBuilding = buildings[buildings.length - 1]; if (!lastBuilding || lastBuilding.x + lastBuilding.width < gameCanvas.width + 100) { spawnBuilding(); } }
+    function drawBuildings() { buildings.forEach(b => { ctx.fillStyle = b.color; ctx.fillRect(b.x, b.y, b.width, b.height); if (b.isVertiport) { const platformY = b.y - 15; ctx.fillStyle = '#455A64'; ctx.fillRect(b.x - 10, platformY, b.width + 20, 15); ctx.fillStyle = '#B0BEC5'; ctx.beginPath(); ctx.arc(b.x + b.width / 2, platformY + 7.5, b.width * 0.3, 0, Math.PI * 2); ctx.fill(); const lightColor = (Math.sin(b.wavePhase * 2) > 0) ? '#0ff' : '#ff0'; ctx.fillStyle = lightColor; ctx.fillRect(b.x, platformY + 5, 10, 5); ctx.fillRect(b.x + b.width - 10, platformY + 5, 10, 5); const waveWidth = b.width * 0.6; const waveX = b.x + (b.width - waveWidth) / 2; const waveSegmentHeight = 20; const numSegments = Math.ceil(platformY / waveSegmentHeight); for(let i=0; i<numSegments; i++) { const segmentY = platformY - (i + 1) * waveSegmentHeight; const alpha = 0.1 + Math.abs(Math.sin(b.wavePhase + i * 0.5)) * 0.2; const hue = 180 + Math.sin(b.wavePhase + i*0.3) * 20; ctx.fillStyle = `hsla(${hue}, 100%, 70%, ${alpha})`; ctx.fillRect(waveX, segmentY, waveWidth, waveSegmentHeight - 2); } } else { ctx.fillStyle = 'rgba(255, 255, 180, 0.2)'; for(let wy = b.y + 10; wy < b.y + b.height - 10; wy += 25) { for(let wx = b.x + 10; wx < b.x + b.width - 10; wx += 25) { if(Math.random() > 0.4) { ctx.fillRect(wx, wy, 10, 15); } } } } }); }
+    function spawnPedestrian() { const type = Math.random() > 0.4 ? 'OldLady' : 'BalloonPerson'; pedestrians.push({ x: gameCanvas.width + 50 + Math.random() * 100, y: gameCanvas.height - SIDEWALK_HEIGHT + 5 + Math.random() * (SIDEWALK_HEIGHT - 20), type: type, size: type === 'OldLady' ? {w: 8, h: 16} : {w: 10, h: 18}, color: type === 'OldLady' ? 'pink' : `hsl(${Math.random()*360}, 60%, 70%)`, throwCooldown: 60 + Math.random() * 120, speed: currentScrollSpeed * PEDESTRIAN_SPEED_MULTIPLIER * (0.8 + Math.random() * 0.4), lastActionFrame: 0 }); }
+    function updatePedestriansAndProjectiles() {
+        // Fix: Use difficultyMultiplier here
+        const currentPedestrianSpawnChance = BASE_PEDESTRIAN_SPAWN_CHANCE * difficultyMultiplier;
+        const currentProjectileThrowChance = BASE_PROJECTILE_THROW_CHANCE * difficultyMultiplier; // Spawn chance also scaled
+
+        for (let i = pedestrians.length - 1; i >= 0; i--) {
+            const p = pedestrians[i];
+            p.x -= p.speed;
+            p.throwCooldown = Math.max(0, p.throwCooldown - 1);
+
+            if (p.throwCooldown === 0 && Math.random() < currentProjectileThrowChance) {
+                const projectileBaseSpeedX = -currentScrollSpeed * PROJECTILE_SPEED_MULTIPLIER; // Base for balloons
+
+                if (p.type === 'OldLady') {
+                    const itemType = Math.random() < 0.5 ? 'ChickenLeg' : 'CornCob';
+
+                    // Fix 1: Calculate arc height based on a percentage of playableHeight
+                    const minSkyHeight = playableHeight * 0.35; // Target 35% of playable height minimum arc
+                    const maxSkyHeight = playableHeight * 0.65; // Target 65% of playable height maximum arc
+                    const arcHeight = minSkyHeight + Math.random() * (maxSkyHeight - minSkyHeight);
+
+                    // Calculate initial vy needed to reach this height with current gravity
+                    const timeToApex = Math.sqrt((2 * arcHeight) / PROJECTILE_GRAVITY);
+                    let initialVy = -(timeToApex * PROJECTILE_GRAVITY);
+
+                    // Fix 2: Enforce minimum upward launch velocity
+                    if (initialVy > -3) {
+                        initialVy = -4 - Math.random() * 2; // Ensure a decent upward toss
+                    }
+
+                    // Fix 3: Vary horizontal speed more for wider/narrower arcs
+                    const initialVx = -currentScrollSpeed * (0.25 + Math.random() * 0.5);
+
+                    projectiles.push({
+                        type: itemType,
+                        x: p.x,
+                        y: Math.min(p.y - 25, playableHeight * 0.85), // Fix 1: Spawn higher, capped below very top
+                        vx: initialVx,
+                        vy: initialVy,
+                        size: {w: 4, h: (itemType === 'CornCob' ? 8 : 6)},
+                        maxSize: 30 + Math.random() * 15,
+                        currentSize: 4,
+                        growthRate: 0.3 + Math.random() * 0.2,
+                        color: itemType === 'ChickenLeg' ? 'orange' : '#FFC107',
+                        rotation: 0,
+                        rotationSpeed: (Math.random() - 0.5) * 0.8,
+                        stuckFrames: 0, // Fix: Initialize stuckFrames counter
+                        removeAfterFrames: -1 // Fix: Initialize removeAfterFrames counter
+                    });
+                } else { // Balloon person - keep original logic
+                    projectiles.push({ type: 'Balloon', x: p.x, y: p.y - 15, vx: projectileBaseSpeedX * (0.6 + Math.random() * 0.3), vy: -(1.5 + Math.random() * 1.8), size: {w: 12 + Math.random()*6, h: 16 + Math.random()*8}, color: `hsl(${Math.random()*360}, 80%, 70%)` });
+                }
+                // Fix: Scale projectile throw frequency
+                p.throwCooldown = (80 + Math.random() * 130) / difficultyMultiplier;
+                p.lastActionFrame = frameCount;
+            }
+            if (p.x + p.size.w < 0) {
+                pedestrians.splice(i, 1);
+            }
+        }
+
+        const maxPedestrians = 3 + Math.floor(difficultyMultiplier * 4); // Scale max pedestrians too
+        if (pedestrians.length < maxPedestrians && Math.random() < currentPedestrianSpawnChance) {
+            spawnPedestrian();
+        }
+
+        for (let i = projectiles.length - 1; i >= 0; i--) {
+            const proj = projectiles[i];
+            proj.x += proj.vx;
+            proj.y += proj.vy;
+
+            if (proj.type === 'ChickenLeg' || proj.type === 'CornCob') {
+                proj.vy += PROJECTILE_GRAVITY;
+                proj.rotation += proj.rotationSpeed;
+
+                if (proj.vy < 0 && proj.currentSize < proj.maxSize) {
+                    proj.currentSize += proj.growthRate;
+                    proj.size.w = proj.currentSize * (proj.type === 'CornCob' ? 0.6 : 1.0);
+                    proj.size.h = proj.currentSize * (proj.type === 'CornCob' ? 1.2 : 1.5);
+                }
+
+                // Fix 3 & 4: Improved Cleanup logic for projectiles stuck at ground level
+                const groundLevel = playableHeight - proj.size.h; // Ground level specific to this projectile's height
+                if (proj.y >= groundLevel - 5) { // If near or potentially touching the ground
+                    if (Math.abs(proj.vy) < 0.5) { // Check if velocity is very low (stuck or rolling)
+                         if (proj.stuckFrames !== undefined) {
+                            proj.stuckFrames++;
+                         }
+                    } else {
+                        proj.stuckFrames = 0; // Reset stuck count if it's bouncing noticeably
+                    }
+                     // If it's actually on or below ground level, start the removal timer
+                     if (proj.y >= groundLevel && proj.removeAfterFrames === -1) {
+                         proj.removeAfterFrames = 3; // Start 3-frame countdown to removal
+                     }
+                     // Ensure it visually stays on the ground, not below
+                     proj.y = Math.min(proj.y, groundLevel);
+                } else {
+                    proj.stuckFrames = 0; // Reset stuck count if clearly airborne
+                }
+
+                // Decrement remove counter if active
+                if (proj.removeAfterFrames !== undefined && proj.removeAfterFrames > 0) {
+                     proj.removeAfterFrames--;
+                }
+
+                // Remove if stuck for too long OR if removal countdown finished
+                if ((proj.stuckFrames !== undefined && proj.stuckFrames > 50) || (proj.removeAfterFrames !== undefined && proj.removeAfterFrames === 0)) {
+                    projectiles.splice(i, 1);
+                    continue; // Skip rest of the checks for this projectile
+                }
+
+            } else if (proj.type === 'Balloon') {
+                proj.vx += (Math.random() - 0.5) * 0.1;
+                proj.vx = Math.max(-1.2, Math.min(1.2, proj.vx));
+            }
+
+            // Standard off-screen check (top, left, far bottom)
+            if (proj.x + proj.size.w < 0 || proj.y + proj.size.h < -50 || proj.y > gameCanvas.height + 50) {
+                projectiles.splice(i, 1);
+            }
+        }
+    }
+    function drawPedestriansAndProjectiles() { pedestrians.forEach(p => { ctx.fillStyle = p.color; ctx.fillRect(p.x, p.y, p.size.w, p.size.h); const timeSinceAction = frameCount - p.lastActionFrame; const hintDuration = 30; if (p.lastActionFrame > 0 && timeSinceAction < hintDuration) { const alpha = 1 - (timeSinceAction / hintDuration); ctx.globalAlpha = alpha * 0.8; ctx.font = "12px Courier New"; ctx.textAlign = 'center'; if (p.type === 'OldLady') { ctx.fillStyle = 'orange'; ctx.fillText("🍗", p.x + p.size.w / 2, p.y - 5); } else { ctx.fillStyle = '#ccc'; ctx.fillText("o", p.x + p.size.w / 2, p.y - 5); } ctx.globalAlpha = 1.0; ctx.textAlign = 'left'; } }); projectiles.forEach(p => { ctx.save(); ctx.translate(p.x + p.size.w / 2, p.y + p.size.h / 2); if (p.type === 'ChickenLeg') { ctx.rotate(p.rotation); const meatWidth = p.size.w; const meatHeight = p.size.h * 0.65; const boneWidth = p.size.w * 0.25; const boneHeight = p.size.h * 0.4; const boneY = meatHeight / 2; ctx.fillStyle = '#D2691E'; ctx.beginPath(); ctx.ellipse(0, -meatHeight/4, meatWidth / 2, meatHeight / 2, 0, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = '#eee'; ctx.fillRect(-boneWidth / 2, boneY - boneHeight / 2, boneWidth, boneHeight); ctx.beginPath(); ctx.arc(-boneWidth / 2, boneY + boneHeight / 2, boneWidth * 0.4, 0, Math.PI * 2); ctx.arc(boneWidth / 2, boneY + boneHeight / 2, boneWidth * 0.4, 0, Math.PI * 2); ctx.fill(); } else if (p.type === 'CornCob') { ctx.rotate(p.rotation); const cobWidth = p.size.w; const cobHeight = p.size.h; const stickWidth = cobWidth * 0.3; const stickHeight = cobHeight * 0.3; const stickY = cobHeight * 0.35; ctx.fillStyle = '#FFC107'; ctx.beginPath(); ctx.ellipse(0, 0, cobWidth / 2, cobHeight / 2, 0, 0, Math.PI * 2); ctx.fill(); ctx.strokeStyle = 'rgba(139, 69, 19, 0.5)'; ctx.lineWidth = Math.max(1, cobWidth * 0.05); for(let i = -cobWidth/2 + 3; i < cobWidth/2 - 3; i += cobWidth * 0.15) { ctx.beginPath(); ctx.moveTo(i, -cobHeight/2.5); ctx.lineTo(i + cobWidth*0.05, cobHeight/2.5); ctx.stroke(); ctx.beginPath(); ctx.moveTo(i+cobWidth*0.05, -cobHeight/2.5); ctx.lineTo(i, cobHeight/2.5); ctx.stroke(); } ctx.fillStyle = '#D2B48C'; ctx.fillRect(-stickWidth / 2, stickY, stickWidth, stickHeight); } else if (p.type === 'Balloon') { ctx.fillStyle = p.color; ctx.beginPath(); ctx.ellipse(0, 0, p.size.w / 2, p.size.h / 2, 0, 0, Math.PI * 2); ctx.fill(); ctx.strokeStyle = '#ccc'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, p.size.h / 2); ctx.lineTo(0, p.size.h / 2 + 10); ctx.stroke(); } else { ctx.fillStyle = p.color; ctx.fillRect(-p.size.w / 2, -p.size.h / 2, p.size.w, p.size.h); } ctx.restore(); }); }
+    function spawnBonus() { const isChargingTrigger = Math.random() < CHARGING_TRIGGER_SPAWN_CHANCE && !isChargingSequence; bonuses.push({ type: isChargingTrigger ? 'ChargingTrigger' : 'Battery', x: gameCanvas.width + 100 + Math.random() * 200, y: isChargingTrigger ? playableHeight * 0.1 + Math.random() * playableHeight * 0.3 : Math.random() * (playableHeight * 0.8), size: isChargingTrigger ? 30 : 20, speed: currentScrollSpeed * BONUS_SPEED_MULTIPLIER }); }
+    function updateBonuses() { for (let i = bonuses.length - 1; i >= 0; i--) { const b = bonuses[i]; b.x -= b.speed; if (b.x + b.size < 0) bonuses.splice(i, 1); } const batteryCount = bonuses.filter(b => b.type === 'Battery').length; const triggerCount = bonuses.filter(b => b.type === 'ChargingTrigger').length; if (batteryCount < 3 && Math.random() < 0.005) spawnBonus(); if (triggerCount === 0 && Math.random() < CHARGING_TRIGGER_SPAWN_CHANCE) spawnBonus(); }
+    function drawBonuses() { bonuses.forEach(b => { if (b.type === 'Battery') { ctx.fillStyle = '#4CAF50'; ctx.fillRect(b.x, b.y, b.size, b.size); ctx.fillStyle = 'white'; ctx.fillRect(b.x + b.size * 0.4, b.y + b.size * 0.2, b.size * 0.2, b.size * 0.6); ctx.fillRect(b.x + b.size * 0.2, b.y + b.size * 0.4, b.size * 0.6, b.size * 0.2); } else if (b.type === 'ChargingTrigger') { ctx.fillStyle = '#0ff'; ctx.beginPath(); ctx.arc(b.x + b.size / 2, b.y + b.size / 2, b.size / 2, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = '#ff0'; ctx.beginPath(); ctx.moveTo(b.x + b.size * 0.6, b.y + b.size * 0.2); ctx.lineTo(b.x + b.size * 0.4, b.y + b.size * 0.5); ctx.lineTo(b.x + b.size * 0.55, b.y + b.size * 0.5); ctx.lineTo(b.x + b.size * 0.35, b.y + b.size * 0.8); ctx.lineTo(b.x + b.size * 0.6, b.y + b.size * 0.45); ctx.lineTo(b.x + b.size * 0.45, b.y + b.size * 0.45); ctx.closePath(); ctx.fill(); } }); }
+    function spawnBird() {
+      // Fix: Use difficultyMultiplier here
+      const currentBirdSpawnChance = BASE_BIRD_SPAWN_CHANCE * difficultyMultiplier;
+      // Spawn logic remains the same, but uses the scaled chance
+      if (birds.length < (4 + Math.floor(difficultyMultiplier * 6)) && Math.random() < currentBirdSpawnChance) { // Corrected maxBirds logic based on prompt
+        const isLarge = Math.random() < 0.3; const size = isLarge ? 25 + Math.random() * 10 : 12 + Math.random() * 8; const baseY = playableHeight * (isLarge ? 0.3 : 0.15) + Math.random() * playableHeight * (isLarge ? 0.4 : 0.7); let baseSpeed = currentScrollSpeed * BIRD_SPEED_MULTIPLIER * 1.1;
+         let ampMultiplier = 1.2; let freqMultiplier = 1.2; if (score > 3000) { ampMultiplier = 1.5 + (difficultyMultiplier - 1.15) * 1.2; freqMultiplier = 1.5 + (difficultyMultiplier - 1.15) * 1.0; }
+
+         birds.push({ x: gameCanvas.width + 50 + Math.random() * 100, y: baseY, baseY: baseY, size: size, type: isLarge ? 'large' : 'small', speed: baseSpeed * (isLarge ? (0.8 + Math.random() * 0.1) : (1.0 + Math.random() * 0.2)), color: `hsl(30, ${15+Math.random()*10}%, ${isLarge ? 40 : 60 + Math.random() * 20}%)`, wingPhase: Math.random() * Math.PI * 2, wingSpeed: (isLarge ? 0.15 : 0.25) + Math.random() * 0.08, wanderAmplitudeY: (25 + Math.random() * 50) * (isLarge ? 1.3 : 1.0) * ampMultiplier, wanderFrequencyY: (0.025 + Math.random() * 0.035) * (isLarge ? 0.8 : 1.0) * freqMultiplier, wanderPhaseOffsetY: Math.random() * Math.PI * 2, wanderAmplitudeX: (40 + Math.random() * 70) * (isLarge ? 0.8 : 1.0) * ampMultiplier, wanderFrequencyX: (0.02 + Math.random() * 0.025) * (isLarge ? 0.9 : 1.0) * freqMultiplier, wanderPhaseOffsetX: Math.random() * Math.PI * 2, baseXOffset: 0 });
+      }
+    }
+    function updateBirds() {
+       const maxBirds = 4 + Math.floor(difficultyMultiplier * 6); // Corrected maxBirds logic
+        for (let i = birds.length - 1; i >= 0; i--) {
+            const bird = birds[i];
+            const timeFactorY = frameCount * bird.wanderFrequencyY + bird.wanderPhaseOffsetY;
+            const timeFactorX = frameCount * bird.wanderFrequencyX + bird.wanderPhaseOffsetX;
+            const offsetY = Math.sin(timeFactorY) * bird.wanderAmplitudeY;
+            const offsetX = Math.cos(timeFactorX) * bird.wanderAmplitudeX;
+            bird.baseXOffset -= bird.speed;
+            bird.x = (gameCanvas.width + bird.baseXOffset) + offsetX;
+            bird.y = bird.baseY + offsetY;
+            bird.wingPhase += bird.wingSpeed;
+            bird.y = Math.max(0, Math.min(bird.y, playableHeight - bird.size));
+            if (bird.x + bird.size < -150) {
+                birds.splice(i, 1);
+            }
+        }
+         spawnBird();
+    }
+    function drawBirds() { birds.forEach(bird => { ctx.save(); ctx.translate(bird.x + bird.size / 2, bird.y + bird.size / 2); ctx.fillStyle = bird.color; ctx.beginPath(); ctx.ellipse(0, 0, bird.size * 0.4, bird.size * 0.25, 0, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.arc(bird.size * 0.35, -bird.size * 0.1, bird.size * 0.15, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.moveTo(bird.size * 0.5, -bird.size * 0.1); ctx.lineTo(bird.size * 0.6, -bird.size * 0.15); ctx.lineTo(bird.size * 0.6, -bird.size * 0.05); ctx.closePath(); ctx.fill(); const wingY = Math.sin(bird.wingPhase) * (bird.size * 0.35); const wingAngle = Math.sin(bird.wingPhase) * 0.8; const wingLength = bird.size * 0.9; const wingWidth = bird.size * 0.4; ctx.save(); ctx.translate(-bird.size * 0.15, 0); ctx.rotate(-wingAngle); ctx.beginPath(); ctx.moveTo(0, 0); ctx.bezierCurveTo(-wingLength * 0.4, -wingY - wingWidth * 0.5, -wingLength * 0.8, -wingY - wingWidth * 0.2, -wingLength, -wingY + wingWidth * 0.1); ctx.bezierCurveTo(-wingLength * 0.9, -wingY + wingWidth * 0.5, -wingLength * 0.5, -wingY + wingWidth * 0.7, 0, 0); ctx.closePath(); ctx.fill(); ctx.restore(); ctx.save(); ctx.translate(bird.size * 0.15, 0); ctx.rotate(wingAngle); ctx.beginPath(); ctx.moveTo(0, 0); ctx.bezierCurveTo(wingLength * 0.4, -wingY - wingWidth * 0.5, wingLength * 0.8, -wingY - wingWidth * 0.2, wingLength, -wingY + wingWidth * 0.1); ctx.bezierCurveTo(wingLength * 0.9, -wingY + wingWidth * 0.5, wingLength * 0.5, -wingY + wingWidth * 0.7, 0, 0); ctx.closePath(); ctx.fill(); ctx.restore(); ctx.restore(); }); }
+    function checkCollisions() { if (isChargingSequence || isCaptured) return; const carRect = { x: carX, y: carY, width: CAR_WIDTH, height: CAR_HEIGHT }; buildings.forEach(b => { if (b.isVertiport) { const waveWidth = b.width * 0.6; const waveX = b.x + (b.width - waveWidth) / 2; const waveRect = { x: waveX, y: 0, width: waveWidth, height: b.y - 15 }; if (isColliding(carRect, waveRect)) { startCaptureSequence(b); return; } } if (b.x < carRect.x + carRect.width && b.x + b.width > carRect.x) { if (isColliding(carRect, { x: b.x, y: b.y, width: b.width, height: b.height })) { handleCollision(b); } } }); if (isCaptured) return; for (let i = projectiles.length - 1; i >= 0; i--) { const p = projectiles[i]; if (isColliding(carRect, { x: p.x, y: p.y, width: p.size.w, height: p.size.h })) { handleCollision(p); projectiles.splice(i, 1); } } for (let i = birds.length - 1; i >= 0; i--) { const bird = birds[i]; const birdRect = { x: bird.x, y: bird.y, width: bird.size, height: bird.size }; if (isColliding(carRect, birdRect)) { handleCollision(bird); birds.splice(i, 1); } } for (let i = bonuses.length - 1; i >= 0; i--) { const b = bonuses[i]; if (isColliding(carRect, { x: b.x, y: b.y, width: b.size, height: b.size })) { if (b.type === 'ChargingTrigger') { startChargingSequence(b); } else { handleBonusPickup(b); } bonuses.splice(i, 1); break; } } }
+    function isColliding(rect1, rect2) { return rect1.x < rect2.x + rect2.width && rect1.x + rect1.width > rect2.x && rect1.y < rect2.y + rect2.height && rect1.y + rect1.height > rect2.y; }
+    function handleCollision(obstacle) { if (carShake < 2) { battery -= COLLISION_BATTERY_COST; triggerShake(10); playCollisionSound(); updateBatteryUI(); currentScrollSpeed = Math.min(MAX_SCROLL_SPEED, currentScrollSpeed + SCROLL_SPEED_INCREMENT); const oldTempo = currentMusicTempo; currentMusicTempo = Math.min(MAX_MUSIC_TEMPO, currentMusicTempo + MUSIC_TEMPO_INCREMENT); playCollisionDissonance(); } }
+    function handleBonusPickup(bonus) { if (bonus.type === 'Battery') { battery = Math.min(100, battery + BONUS_BATTERY_GAIN); playBatteryPickupSound(); } else if (bonus.type === 'ChargingTrigger') { playBonusFlourish(); } if (bonus.type === 'Battery') score += 50; updateBatteryUI(); updateScoreUI(); }
+    function drawGameBackground() { const gradient = ctx.createLinearGradient(0, 0, 0, playableHeight); gradient.addColorStop(0, '#1a2a3a'); gradient.addColorStop(0.7, '#334455'); gradient.addColorStop(1, '#445566'); ctx.fillStyle = gradient; ctx.fillRect(0, 0, gameCanvas.width, playableHeight); ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'; for(let i=0; i<60; i++) { let starX = (100 + i * 50 + frameCount * 0.15) % gameCanvas.width; let starY = (50 + i * 30) % playableHeight * 0.85; let size = 1 + Math.random() * 1.5; if (frameCount % (50 + i % 15) < 4) { ctx.fillRect(starX, starY, size*1.5, size*1.5); } else { ctx.fillRect(starX, starY, size, size); } } drawClouds(); drawSwarmBackground(); drawBuildings(); if (isChargingSequence && targetChargeStation) { ctx.fillStyle = '#444'; ctx.fillRect(targetChargeStation.x, targetChargeStation.y, targetChargeStation.width, 15); ctx.fillStyle = '#0ff'; ctx.fillRect(targetChargeStation.x + 5, targetChargeStation.y + 5, targetChargeStation.width - 10, 5); ctx.fillStyle = '#ff0'; ctx.fillRect(targetChargeStation.x + 15, targetChargeStation.y + 2, 10, 11); ctx.fillRect(targetChargeStation.x + targetChargeStation.width - 25, targetChargeStation.y + 2, 10, 11); } ctx.fillStyle = '#555'; ctx.fillRect(0, playableHeight, gameCanvas.width, SIDEWALK_HEIGHT); ctx.strokeStyle = '#888'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(0, playableHeight + 1); ctx.lineTo(gameCanvas.width, playableHeight + 1); ctx.stroke(); }
+    function drawCar() { let drawX = carX; let drawY = carY; if (carShake > 0) { drawX += (Math.random() - 0.5) * 8; drawY += (Math.random() - 0.5) * 8; carShake--; } const bodyWidth = CAR_WIDTH * 0.8; const bodyHeight = CAR_HEIGHT * 0.7; const bodyX = drawX + (CAR_WIDTH - bodyWidth) / 2; const bodyY = drawY + (CAR_HEIGHT - bodyHeight) / 2; const rotorSize = CAR_WIDTH * 0.3; const rotorOffsetY = bodyHeight * 0.3; ctx.fillStyle = carColor; ctx.fillRect(bodyX, bodyY, bodyWidth, bodyHeight); ctx.fillStyle = '#aaf'; ctx.fillRect(bodyX + bodyWidth * 0.5, bodyY + bodyHeight * 0.15, bodyWidth * 0.45, bodyHeight * 0.7); const rotorColor1 = '#ccc'; const rotorColor2 = '#999'; const rotorAnimSpeed = 0.3; const rotorColor = (Math.sin(frameCount * rotorAnimSpeed) > 0) ? rotorColor1 : rotorColor2; ctx.fillStyle = rotorColor; ctx.fillRect(drawX - rotorSize * 0.1, drawY - rotorOffsetY, rotorSize, rotorSize * 0.4); ctx.fillRect(drawX + CAR_WIDTH - rotorSize * 0.9, drawY - rotorOffsetY, rotorSize, rotorSize * 0.4); ctx.fillRect(drawX - rotorSize * 0.1, drawY + CAR_HEIGHT - rotorOffsetY, rotorSize, rotorSize * 0.4); ctx.fillRect(drawX + CAR_WIDTH - rotorSize * 0.9, drawY + CAR_HEIGHT - rotorOffsetY, rotorSize, rotorSize * 0.4); ctx.fillStyle = 'rgba(0, 255, 255, 0.2)'; ctx.fillRect(drawX, drawY + CAR_HEIGHT - 5, CAR_WIDTH, 5); }
+    function spawnCloud() { const layer = Math.random(); const size = 60 + Math.random() * 120; clouds.push({ x: gameCanvas.width + size + Math.random() * 200, y: playableHeight * 0.05 + Math.random() * playableHeight * 0.5, size: size, opacity: 0.15 + layer * 0.3, speed: currentScrollSpeed * (0.2 + layer * 0.4), numPuffs: 3 + Math.floor(Math.random() * 3), puffOffsets: [] }); const cloud = clouds[clouds.length - 1]; for(let i = 0; i < cloud.numPuffs; i++) { cloud.puffOffsets.push({ x: (Math.random() - 0.5) * cloud.size * 0.7, y: (Math.random() - 0.5) * cloud.size * 0.25, radiusX: cloud.size * (0.25 + Math.random() * 0.2), radiusY: cloud.size * (0.15 + Math.random() * 0.15) }); } }
+    function updateClouds() { for (let i = clouds.length - 1; i >= 0; i--) { const cloud = clouds[i]; cloud.x -= cloud.speed; if (cloud.x + cloud.size < 0) { clouds.splice(i, 1); } } if (clouds.length < 8 && Math.random() < 0.02) { spawnCloud(); } }
+    function drawClouds() { clouds.forEach(cloud => { ctx.fillStyle = `rgba(200, 200, 220, ${cloud.opacity})`; cloud.puffOffsets.forEach(puff => { ctx.beginPath(); ctx.ellipse(cloud.x + puff.x, cloud.y + puff.y, puff.radiusX, puff.radiusY, 0, 0, Math.PI * 2); ctx.fill(); }); }); }
+    function spawnSwarmVehicle() { const layer = Math.random(); const size = 5 + layer * 15; swarmVehicles.push({ x: Math.random() * gameCanvas.width, y: Math.random() * playableHeight * 0.9, sizeW: size * (1.5 + Math.random() * 0.5), sizeH: size, speed: currentScrollSpeed * (0.1 + layer * 0.3), color: `hsl(${180 + Math.random() * 60}, 70%, ${30 + layer * 40}%)`, bobPhase: Math.random() * Math.PI * 2, bobSpeed: 0.01 + Math.random() * 0.02, bobAmplitude: 2 + layer * 5 }); }
+    function updateSwarmVehicles() { for (let i = swarmVehicles.length - 1; i >= 0; i--) { const v = swarmVehicles[i]; v.x -= v.speed; v.bobPhase += v.bobSpeed; v.y += Math.sin(v.bobPhase) * v.bobAmplitude * 0.1; if (v.x + v.sizeW < 0) { v.x = gameCanvas.width + v.sizeW + Math.random() * 100; v.y = Math.random() * playableHeight * 0.9; v.bobPhase = Math.random() * Math.PI * 2; } } if (swarmVehicles.length < 30 && Math.random() < 0.05) { spawnSwarmVehicle(); } }
+    function drawSwarmBackground() { swarmVehicles.forEach(v => { ctx.fillStyle = v.color; const bodyY = v.y + Math.sin(v.bobPhase) * v.bobAmplitude; ctx.fillRect(v.x, bodyY, v.sizeW, v.sizeH * 0.6); ctx.fillRect(v.x - v.sizeW * 0.1, bodyY - v.sizeH * 0.2, v.sizeW * 0.3, v.sizeH * 0.3); ctx.fillRect(v.x + v.sizeW * 0.8, bodyY - v.sizeH * 0.2, v.sizeW * 0.3, v.sizeH * 0.3); ctx.fillStyle = `rgba(200, 220, 255, 0.1)`; ctx.fillRect(v.x - v.sizeW * 0.1, bodyY - v.sizeH * 0.1, v.sizeW * 1.2, v.sizeH * 0.8); }); }
+    function findChargingStationSpot(triggerX) { let bestSpot = null; let maxGap = 0; for (let i = 0; i < buildings.length - 1; i++) { const b1 = buildings[i]; const b2 = buildings[i+1]; const gapStart = b1.x + b1.width; const gapEnd = b2.x; const gapWidth = gapEnd - gapStart; if (gapWidth > CAR_WIDTH + 40 && gapStart < triggerX + 100 && gapEnd > triggerX - 100) { if (gapWidth > maxGap) { maxGap = gapWidth; bestSpot = { x: gapStart + (gapWidth / 2) - 40, y: playableHeight - 10, width: 80 }; } } } if (!bestSpot) { bestSpot = { x: carX, y: gameCanvas.height + 50, width: 80 }; console.warn("No suitable gap found!"); } return bestSpot; }
+
+    // --- Charging/Capture Sequence Updates (unchanged audio logic) ---
+    function startChargingSequence(trigger) {
+        if (isChargingSequence || isCaptured) return;
+        isChargingSequence = true; chargingPhase = 'descending'; playerControlEnabled = false; targetChargeStation = findChargingStationSpot(trigger.x); autoPilotStartY = carY; autoPilotProgress = 0;
+        stopEngineHum(); playPullDownSound();
+        if (musicGainNode) musicGainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.5);
+        stopBackgroundMusic();
+    }
+    function updateChargingSequence() {
+        const descentSpeed = 0.015; const blastOffSpeed = 0.05;
+        if (chargingPhase === 'descending') {
+            autoPilotProgress = Math.min(1, autoPilotProgress + descentSpeed); const easedProgress = 0.5 * (1 - Math.cos(autoPilotProgress * Math.PI)); carY = autoPilotStartY + (targetChargeStation.y - CAR_HEIGHT / 2 - autoPilotStartY) * easedProgress; carX += (targetChargeStation.x + targetChargeStation.width/2 - CAR_WIDTH/2 - carX) * 0.05;
+            if (autoPilotProgress >= 1) { chargingPhase = 'charging'; carColor = '#0f0'; playChargingSound(); chargeStartTime = performance.now(); }
+        } else if (chargingPhase === 'charging') {
+            const elapsed = performance.now() - chargeStartTime; const chargeProgress = Math.min(1, elapsed / CHARGE_DURATION_MS); battery = Math.min(100, Math.floor(chargeProgress * 100)); updateBatteryUI();
+            if (chargeProgress >= 1) { chargingPhase = 'blastoff'; carColor = 'white'; stopChargingSound(); playChargeCompleteSound(); playLaunchSound(); autoPilotStartY = carY; autoPilotProgress = 0; }
+        } else if (chargingPhase === 'blastoff') {
+            autoPilotProgress = Math.min(1, autoPilotProgress + blastOffSpeed); const targetY = playableHeight / 2; const easedProgress = 0.5 * (1 - Math.cos(autoPilotProgress * Math.PI)); carY = autoPilotStartY + (targetY - autoPilotStartY) * easedProgress;
+            if (autoPilotProgress >= 1) {
+                 isChargingSequence = false; chargingPhase = null; playerControlEnabled = true; targetChargeStation = null;
+                 playEngineHum();
+                 if (musicGainNode) musicGainNode.gain.linearRampToValueAtTime(0.45, audioCtx.currentTime + 0.5);
+                 if (gameRunning) { startMusicLoopChecker(); }
+            }
+        }
+    }
+    function startCaptureSequence(building) {
+        if (isCaptured || isChargingSequence) return;
+        isCaptured = true; capturePhase = 'descending'; playerControlEnabled = false; captureTargetBuilding = building; autoPilotStartY = carY; autoPilotProgress = 0;
+        stopEngineHum(); playLockOnSound(); playVertiportRefuelSound(); playCaptureDescentHum();
+        stopBackgroundMusic();
+        if (musicGainNode) musicGainNode.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + 0.5);
+    }
+    function updateCaptureSequence() {
+        const descentSpeed = 0.01; const releaseSpeed = 0.04; const targetY = captureTargetBuilding.y - CAR_HEIGHT * 0.8;
+        if (capturePhase === 'descending') {
+            autoPilotProgress = Math.min(1, autoPilotProgress + descentSpeed); const easedProgress = 0.5 * (1 - Math.cos(autoPilotProgress * Math.PI)); carY = autoPilotStartY + (targetY - autoPilotStartY) * easedProgress; const targetX = captureTargetBuilding.x + captureTargetBuilding.width / 2 - CAR_WIDTH / 2; carX += (targetX - carX) * 0.03;
+            if (autoPilotProgress >= 1) { capturePhase = 'holding'; captureStartTime = performance.now(); stopCaptureSounds(); }
+        } else if (capturePhase === 'holding') {
+            const elapsed = performance.now() - captureStartTime; const drainProgress = Math.min(1, elapsed / CAPTURE_HOLD_DURATION_MS); battery = Math.max(0, 100 - Math.floor(drainProgress * CAPTURE_BATTERY_DRAIN)); updateBatteryUI(); if (frameCount % 30 === 0) playCaptureHoldingPulse();
+            if (elapsed >= CAPTURE_HOLD_DURATION_MS) { capturePhase = 'releasing'; playCaptureReleaseChime(); autoPilotStartY = carY; autoPilotProgress = 0; }
+        } else if (capturePhase === 'releasing') {
+            autoPilotProgress = Math.min(1, autoPilotProgress + releaseSpeed); const targetReleaseY = playableHeight / 2; const easedProgress = autoPilotProgress * autoPilotProgress; carY = autoPilotStartY + (targetReleaseY - autoPilotStartY) * easedProgress;
+            if (autoPilotProgress >= 1) {
+                 isCaptured = false; capturePhase = null; playerControlEnabled = true; captureTargetBuilding = null;
+                 playEngineHum();
+                 if (musicGainNode) musicGainNode.gain.linearRampToValueAtTime(0.45, audioCtx.currentTime + 0.5);
+                 if (gameRunning) { startMusicLoopChecker(); }
+            }
+        }
+    }
+
+    // --- updateGameState, gameLoop ---
+    function updateGameState() {
+       if (playerControlEnabled) {
+           let vertDelta = 0; let horzDelta = 0;
+           if ((keys['ArrowUp'] || keys['w']) && !(prevKeys['ArrowUp'] || prevKeys['w'])) { playDodgeSound(-1); }
+           if ((keys['ArrowDown'] || keys['s']) && !(prevKeys['ArrowDown'] || prevKeys['s'])) { playDodgeSound(1); }
+           if (keys['ArrowUp'] || keys['w']) vertDelta = -MOVE_SPEED_Y;
+           if (keys['ArrowDown'] || keys['s']) vertDelta = MOVE_SPEED_Y;
+           if (keys['ArrowLeft'] || keys['a']) horzDelta = -MOVE_SPEED_X;
+           if (keys['ArrowRight'] || keys['d']) horzDelta = MOVE_SPEED_X;
+           carY += vertDelta; carX += horzDelta;
+           carY = Math.max(0, Math.min(carY, playableHeight - CAR_HEIGHT));
+           carX = Math.max(MIN_CAR_X, Math.min(carX, MAX_CAR_X));
+           modulateEngineHum(battery, vertDelta, horzDelta);
+       }
+       updateBuildings(); updatePedestriansAndProjectiles(); updateBonuses(); updateBirds(); updateClouds(); updateSwarmVehicles();
+       if (playerControlEnabled) checkCollisions();
+       if (playerControlEnabled) {
+           battery -= BATTERY_DRAIN_RATE; score++;
+
+            // Fix: Update difficultyMultiplier based on score
+            if (score < 1000) {
+              difficultyMultiplier = 0.5;
+            } else if (score < 2000) {
+              difficultyMultiplier = 1.0;
+            } else if (score < 3000) {
+              difficultyMultiplier = 1.2;
+            } else if (score < 4000) {
+              difficultyMultiplier = 1.4;
+            } else {
+              difficultyMultiplier = 1.6;
+            }
+
+            // Fix: Use difficultyMultiplier for speed/tempo scaling
+            const difficultyProgress = Math.min(1, Math.max(0, (score - 1000) / 3000)); // Normalize progress between 1k and 4k score
+            currentScrollSpeed = BASE_SCROLL_SPEED + (MAX_SCROLL_SPEED - BASE_SCROLL_SPEED) * difficultyProgress * difficultyMultiplier; // Scale speed with difficulty multiplier
+            currentMusicTempo = BASE_MUSIC_TEMPO + (MAX_MUSIC_TEMPO - BASE_MUSIC_TEMPO) * difficultyProgress * difficultyMultiplier; // Scale tempo with difficulty multiplier
+
+            currentScrollSpeed = Math.min(MAX_SCROLL_SPEED * 1.2, currentScrollSpeed); // Cap speed slightly higher potentially
+            currentMusicTempo = Math.min(MAX_MUSIC_TEMPO * 1.2, currentMusicTempo); // Cap tempo slightly higher potentially
+       }
+       if (playerControlEnabled && battery <= 0) gameOver();
+    }
+
+    function gameLoop() {
+        if (!gameRunning) return;
+        frameCount++;
+        if (isChargingSequence) { updateChargingSequence(); updateBuildings(); updateClouds(); updateSwarmVehicles(); }
+        else if (isCaptured)    { updateCaptureSequence(); updateBuildings(); updateClouds(); updateSwarmVehicles(); }
+        else                    { updateGameState(); }
+        ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+        drawGameBackground(); drawPedestriansAndProjectiles(); drawBonuses(); drawBirds(); drawCar();
+        updateBatteryUI(); updateScoreUI();
+        prevCarX = carX; prevCarY = carY; prevKeys = { ...keys };
+        animationFrameId = requestAnimationFrame(gameLoop);
+    }
+
+    // --- Game Flow Control ---
+    function startGame() {
+        // Reset state
+        gameRunning = false; // Keep false until animation frame starts
+        if (animationFrameId) cancelAnimationFrame(animationFrameId); animationFrameId = null;
+        if (musicLoopIntervalId) stopBackgroundMusic();
+
+        // Reset variables
+        battery = 100; score = 0; calculateDimensions(); carY = playableHeight / 2; carX = 80; carColor = 'white'; keys = {}; prevKeys = {}; buildings = []; pedestrians = []; projectiles = []; bonuses = []; birds = []; clouds = []; swarmVehicles = []; carShake = 0; frameCount = 0; lowBatteryWarningPlayed = false; isChargingSequence = false; chargingPhase = null; targetChargeStation = null; isCaptured = false; capturePhase = null; captureTargetBuilding = null; playerControlEnabled = true; prevCarX = carX; prevCarY = carY;
+        spawnBuilding(gameCanvas.width * 0.6); spawnBuilding(); for(let i=0; i<5; i++) spawnCloud(); for(let i=0; i<20; i++) spawnSwarmVehicle();
+        currentScrollSpeed = BASE_SCROLL_SPEED; currentMusicTempo = BASE_MUSIC_TEMPO;
+        difficultyMultiplier = 1.0; // Reset difficulty multiplier
+
+        // *** UPDATED UI VISIBILITY ***
+        startScreen.style.display = 'none';
+        gameCanvas.style.display = 'block';
+        uiOverlay.style.display = 'block'; // Show score/battery
+        brandingWatermark.style.display = 'block'; // <<< SHOW WATERMARK
+        gameOverScreen.style.display = 'none';
+        updateBatteryUI(); updateScoreUI();
+
+        // *** SHOW MOBILE CONTROLS ON START IF MOBILE (using pointer: coarse) ***
+        const isMobileDevice = window.matchMedia('(pointer: coarse)').matches;
+        // Fix #2: Ensure controls are always displayed on mobile start/replay (from previous step)
+        if (isMobileDevice) {
+            console.log("Mobile device detected on start/replay, showing controls.");
+            if (mobileControlsLeft) {
+                mobileControlsLeft.style.display = 'block'; // Directly setting display
+            }
+            if (mobileControlsRight) {
+                mobileControlsRight.style.display = 'flex'; // Directly setting display
+            }
+        } else {
+            console.log("Desktop device detected on start/replay, controls remain hidden.");
+             if (mobileControlsLeft) {
+                mobileControlsLeft.style.display = 'none'; // Directly setting display
+            }
+            if (mobileControlsRight) {
+                mobileControlsRight.style.display = 'none'; // Directly setting display
+            }
+        }
+
+        // Schedule sounds/music (unchanged logic)
+        // Slight delay before starting game logic and audio
+        setTimeout(() => {
+             if (!audioInitialized) { console.warn("startGame: Audio not initialized."); }
+             else {
+                 console.log("startGame: Audio ready, playing sounds/music.");
+                 playStartJingle(); playEngineHum();
+                 if (musicGainNode) musicGainNode.gain.setValueAtTime(0.45, audioCtx.currentTime);
+                 if (musicLowPassFilter) musicLowPassFilter.frequency.setValueAtTime(20000, audioCtx.currentTime);
+                 startMusicLoopChecker();
+             }
+             gameRunning = true; // Set game running *before* requesting the frame
+             if (animationFrameId) cancelAnimationFrame(animationFrameId); // Clear any previous frame
+             animationFrameId = requestAnimationFrame(gameLoop); // Start the game loop
+             console.log("Game started. GameRunning:", gameRunning);
+             console.log("Gameplay watermark should be visible.");
+        }, 50); // Original delay kept
+    }
+
+    function gameOver() {
+      if (!gameRunning) return;
+      gameRunning = false; playerControlEnabled = false;
+      stopAllSounds();
+      if (animationFrameId) cancelAnimationFrame(animationFrameId); animationFrameId = null;
+
+      // *** UPDATED UI VISIBILITY & CONTROLS ***
+      uiOverlay.style.display = 'none'; // Hide score/battery
+      brandingWatermark.style.display = 'none'; // <<< HIDE WATERMARK
+      // Fix #2: Hide mobile controls immediately on game over (from previous step)
+      if (mobileControlsLeft) {
+          mobileControlsLeft.style.display = 'none';
+      }
+      if (mobileControlsRight) {
+          mobileControlsRight.style.display = 'none';
+      }
+
+
+      finalScoreLabel.textContent = `Final Score: ${score}`;
+      gameOverScreen.style.display = 'flex';
+      if (audioInitialized && audioCtx && audioCtx.state === 'running') { playGameOverFanfare(); }
+      triggerHapticFeedback(100);
+      console.log("Game over triggered. Gameplay watermark hidden.");
+    }
+
+    // --- Event Listeners ---
+    function handleStartOrReplay(event) {
+        event.preventDefault();
+        const buttonId = event.target.id;
+        console.log(`${buttonId} Clicked. AudioContext state: ${audioCtx?.state}`);
+        if (!audioCtx) { console.error("Cannot start game, AudioContext creation failed."); return; }
+
+        // --- FIX FOR DOUBLE CLICK ---
+        // Only check gameRunning for the *start* button. Replay should always work.
+        if (buttonId === 'startButton' && gameRunning) {
+            console.warn("Start button clicked, but game is already running.");
+            return;
+        }
+
+        // Prepare to start/restart
+        const attemptStartGame = () => {
+            // This function assumes the audio context is ready or doesn't need resuming again
+            if (initAudio()) { // Ensures nodes are ready
+                console.log(`${buttonId}: Audio ready, starting game.`);
+                startGame(); // startGame now handles mobile controls display
+            } else {
+                console.error(`${buttonId}: Failed to initialize audio nodes.`);
+                alert("Audio system failed to initialize.");
+            }
+        };
+
+        // Handle Audio Context State
+        if (audioCtx.state === 'suspended') {
+            console.log("AudioContext suspended, resuming...");
+            audioCtx.resume().then(() => {
+                 console.log(`AudioContext state after resume attempt: ${audioCtx.state}`);
+                 if (audioCtx.state === 'running') {
+                     attemptStartGame();
+                 } else {
+                     console.error(`${buttonId}: AudioContext did not resume to 'running' state.`);
+                     alert("Could not enable audio. Please tap the screen or button again.");
+                     // Optionally retry resume on next interaction
+                 }
+            }).catch(err => {
+                console.error("AudioContext resume failed:", err);
+                alert(`Audio could not be started: ${err.name}.`);
+            });
+        } else if (audioCtx.state === 'running') {
+             console.log("AudioContext already running.");
+            attemptStartGame(); // Audio already running, proceed to init/start
+        } else {
+             console.error(`AudioContext in unexpected state: ${audioCtx.state}. Cannot start.`);
+             alert(`Audio system error (State: ${audioCtx.state}). Please reload.`);
+        }
+        // --- END FIX ---
+    }
+    startButton.addEventListener('click', handleStartOrReplay);
+    replayButton.addEventListener('click', handleStartOrReplay);
+    window.addEventListener('keydown', (e) => { if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 's', 'a', 'd', ' '].includes(e.key)) { e.preventDefault(); } keys[e.key] = true; });
+    window.addEventListener('keyup', (e) => { keys[e.key] = false; });
+
+    // *** UPDATED TOUCH HANDLERS WITH HAPTICS ***
+    function handleTouchStart(key, event) {
+        event.preventDefault();
+        keys[key] = true;
+        if (navigator.vibrate) navigator.vibrate(10); // Add haptic feedback
+    }
+    function handleTouchEnd(key, event) {
+        event.preventDefault();
+        keys[key] = false;
+    }
+    touchUpButton.addEventListener('touchstart', (e) => handleTouchStart('ArrowUp', e), { passive: false });
+    touchUpButton.addEventListener('touchend', (e) => handleTouchEnd('ArrowUp', e));
+    touchDownButton.addEventListener('touchstart', (e) => handleTouchStart('ArrowDown', e), { passive: false });
+    touchDownButton.addEventListener('touchend', (e) => handleTouchEnd('ArrowDown', e));
+    touchLeftButton.addEventListener('touchstart', (e) => handleTouchStart('ArrowLeft', e), { passive: false });
+    touchLeftButton.addEventListener('touchend', (e) => handleTouchEnd('ArrowLeft', e));
+    touchRightButton.addEventListener('touchstart', (e) => handleTouchStart('ArrowRight', e), { passive: false });
+    touchRightButton.addEventListener('touchend', (e) => handleTouchEnd('ArrowRight', e));
+    [touchUpButton, touchDownButton, touchLeftButton, touchRightButton, startButton, replayButton].forEach(button => {
+        button.addEventListener('contextmenu', (e) => e.preventDefault());
+    });
+    // *** END UPDATED TOUCH HANDLERS ***
+
+    // --- Resize & Visibility ---
+    function resizeGame() {
+        const width = window.innerWidth;
+        const height = window.innerHeight; // Using window.innerHeight for actual viewport height
+
+        // Fix #3: Ensure canvas drawing buffer matches CSS/viewport size (from previous step)
+        gameCanvas.width = width;    // Set the drawing surface resolution (attribute)
+        gameCanvas.height = height;  // Set the drawing surface resolution (attribute)
+        gameCanvas.style.width = width + 'px';   // Set the CSS display size
+        gameCanvas.style.height = height + 'px'; // Set the CSS display size
+
+        console.log(`Window resized. Canvas size set to: ${width}x${height}. Style size: ${gameCanvas.style.width}x${gameCanvas.style.height}`);
+        calculateDimensions(); // This updates playableHeight using the new gameCanvas.height
+        updateBatteryUI();
+        updateScoreUI();
+
+        if (!gameRunning && ctx) {
+            console.log("Redrawing background on resize (game not running).");
+            ctx.fillStyle = '#050510';
+            ctx.fillRect(0,0, width, height);
+            if (swarmVehicles?.length) {
+                drawSwarmBackground();
+            }
+        }
+        if (gameRunning && playerControlEnabled) {
+            carX = Math.max(MIN_CAR_X, Math.min(carX, MAX_CAR_X));
+            // Ensure carY stays within new playableHeight boundaries
+            carY = Math.max(0, Math.min(carY, playableHeight - CAR_HEIGHT));
+        }
+    }
+    let resizeTimeout;
+    window.addEventListener('resize', () => { clearTimeout(resizeTimeout); resizeTimeout = setTimeout(resizeGame, 100); });
+    window.addEventListener('orientationchange', () => { console.log("Orientation changed."); clearTimeout(resizeTimeout); resizeTimeout = setTimeout(resizeGame, 150); });
+    document.addEventListener('visibilitychange', () => {
+        if (!audioCtx) return;
+        if (document.hidden) {
+            console.log("Page hidden. Stopping music loop checker."); stopBackgroundMusic();
+        } else {
+            console.log("Page visible.");
+            if (audioCtx.state === 'suspended') {
+                 console.warn("Page visible but AudioContext is suspended. Trying to resume...");
+                 audioCtx.resume().then(() => {
+                     console.log("AudioContext resumed on visibility change.");
+                     if(!audioInitialized) { console.log("Attempting audio re-initialization after resume."); initAudio(); }
+                     if (gameRunning && musicShouldBePlaying && audioInitialized && !musicLoopIntervalId && !isChargingSequence && !isCaptured) { console.log("Restarting background music loop checker after visibility change + resume."); startMusicLoopChecker(); }
+                 }).catch(err => { console.error("Failed to resume AudioContext on visibility change:", err); });
+            } else if (audioCtx.state === 'running') {
+                 console.log("AudioContext is running on visibility change.");
+                 if (!audioInitialized) { console.log("Attempting audio initialization as context is running but flag was false."); initAudio(); }
+                 if (gameRunning && musicShouldBePlaying && audioInitialized && !musicLoopIntervalId && !isChargingSequence && !isCaptured) { console.log("Restarting background music loop checker after visibility change (context was running)."); startMusicLoopChecker(); }
+            }
+        }
+    });
+
+    // --- Initialization ---
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log("DOM Content Loaded.");
+        resizeGame(); // Call resizeGame early to set initial dimensions correctly
+        updateBatteryUI();
+        updateScoreUI();
+
+        for(let i=0; i<20; i++) spawnSwarmVehicle();
+        let initialSwarmLoopId = null;
+        function initialSwarmLoop() {
+            if (gameRunning) { if (initialSwarmLoopId) cancelAnimationFrame(initialSwarmLoopId); initialSwarmLoopId = null; return; }
+            if (ctx && gameCanvas.width > 0 && gameCanvas.height > 0) {
+                ctx.fillStyle = '#050510'; ctx.fillRect(0,0, gameCanvas.width, gameCanvas.height);
+                updateSwarmVehicles(); drawSwarmBackground();
+                initialSwarmLoopId = requestAnimationFrame(initialSwarmLoop);
+            } else { console.warn("Cannot run initial swarm loop: Context or canvas dimensions invalid."); }
+        }
+        requestAnimationFrame(() => { // Ensure DOM is painted and dimensions are available
+           if (gameCanvas.width === 0 || gameCanvas.height === 0) {
+               console.warn("Canvas size 0x0 on first frame, attempting resize again.");
+               resizeGame();
+            }
+           if (gameCanvas.width > 0 && gameCanvas.height > 0) {
+               initialSwarmLoop();
+            }
+           else { console.error("Failed to get valid canvas dimensions for initial swarm loop."); }
+        });
+        startScreen.style.display = 'flex';
+        console.log("Initial setup complete. Start screen active. Audio interaction required to unlock sound.");
+    });
+
+  </script></body>
 </html>
