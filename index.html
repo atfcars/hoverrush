@@ -1213,5 +1213,47 @@ document.addEventListener('visibilitychange', () => {
   }
 });
 </script>
-</body>
+<script>
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && typeof audioCtx !== 'undefined') {
+    audioCtx.resume().then(() => {
+      if (typeof backgroundMusic !== 'undefined' && backgroundMusic.paused) {
+        backgroundMusic.play().then(() => {
+          console.log("🎵 Background music resumed after tab visibility.");
+        }).catch(err => {
+          console.warn("⚠️ Music resume blocked by browser:", err);
+        });
+      }
+    });
+  }
+});
+</script><script>
+// Ensure backgroundMusic is global
+window.backgroundMusic = backgroundMusic;
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && typeof audioCtx !== 'undefined') {
+    audioCtx.resume().then(() => {
+      if (typeof window.backgroundMusic !== 'undefined' && window.backgroundMusic.paused) {
+        setTimeout(() => {
+          window.backgroundMusic.play().then(() => {
+            console.log("🎵 Background music resumed after tab visibility.");
+          }).catch(err => {
+            console.warn("⚠️ Music resume blocked, will retry on next interaction:", err);
+          });
+        }, 200); // slight delay to ensure context resumes
+      }
+    });
+  }
+});
+
+// Optional: retry music resume on next user gesture
+document.addEventListener('click', () => {
+  if (typeof window.backgroundMusic !== 'undefined' && window.backgroundMusic.paused) {
+    window.backgroundMusic.play().then(() => {
+      console.log("🎵 Background music resumed on user click.");
+    }).catch(() => {});
+  }
+});
+</script></body>
 </html>
