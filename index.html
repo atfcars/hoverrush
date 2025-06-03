@@ -399,7 +399,8 @@
 <div class="mobile-button" id="touch-left">←</div>
 <div class="mobile-button" id="touch-right">→</div>
 </div>
-<script>
+<script>let backgroundMusic;
+
     // Canvas & Context
     const gameCanvas = document.getElementById('gameCanvas');
     const ctx = gameCanvas.getContext('2d');
@@ -1211,8 +1212,7 @@ document.addEventListener('visibilitychange', () => {
       console.log("✅ Audio resumed after tab visibility change.");
     });
   }
-});
-</script>
+});</script>
 <script>
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible' && typeof audioCtx !== 'undefined') {
@@ -1253,6 +1253,20 @@ document.addEventListener('click', () => {
     window.backgroundMusic.play().then(() => {
       console.log("🎵 Background music resumed on user click.");
     }).catch(() => {});
+  }
+});
+</script><script>
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && typeof audioCtx !== 'undefined') {
+    audioCtx.resume().then(() => {
+      if (typeof window.backgroundMusic !== 'undefined' && window.backgroundMusic.paused) {
+        window.backgroundMusic.play().then(() => {
+          console.log("🎵 Background music resumed after tab visibility.");
+        }).catch(err => {
+          console.warn("⚠️ Music resume blocked, will retry on next interaction:", err);
+        });
+      }
+    });
   }
 });
 </script></body>
