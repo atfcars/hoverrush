@@ -1,9 +1,10 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-12NWYQB668"></script>
-  <script>
+<!-- Google tag (gtag.js) -->
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-12NWYQB668"></script>
+<script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){
       dataLayer.push(arguments);
@@ -11,10 +12,10 @@
     gtag('js', new Date());
     gtag('config', 'G-12NWYQB668');
   </script>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>HoverRush by ATFCars</title>
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>HoverRush by ATFCars</title>
+<style>
     html, body {
       margin: 0;
       padding: 0;
@@ -411,58 +412,85 @@
       from { box-shadow: 0 0 8px #00ff00, 0 0 0px #00ff00; }
       to { box-shadow: 0 0 16px #00ff00, 0 0 24px #00ff00; }
     }
-  </style>
+  
+/* ✅ Animated Background + Flying Cars */
+#animatedBackground {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(to bottom, #0a0a14 0%, #1c1c2e 100%);
+}
+.flyingCar {
+  position: absolute;
+  width: 80px;
+  height: 40px;
+  background: linear-gradient(to right, #00f, #0ff);
+  transform: translateX(-100px);
+  animation: flyAcross 10s linear infinite;
+  opacity: 0.8;
+}
+.car1 { top: 10%; animation-delay: 0s; }
+.car2 { top: 30%; animation-delay: 2s; }
+.car3 { top: 50%; animation-delay: 4s; }
+.car4 { top: 70%; animation-delay: 6s; }
+
+@keyframes flyAcross {
+  0% { transform: translateX(-100px); }
+  100% { transform: translateX(110vw); }
+}
+</style>
 </head>
 <body>
-  <a href="#about" class="cta-button">Learn More</a>
-  <canvas id="gameCanvas"></canvas>
-  <img src="https://via.placeholder.com/800x400" id="branding-watermark" alt="HoverRush Logo" style="display: none;" />
-
-  <!-- Animated Background Layer -->
-  <div id="animatedBackground">
-    <div class="flyingCar car1"></div>
-    <div class="flyingCar car2"></div>
-    <div class="flyingCar car3"></div>
-    <div class="flyingCar car4"></div> <!-- ✅ REMOVED: Inline style attribute, now controlled by CSS keyframes -->
-  </div>
-  <!-- End Animated Background Layer -->
-
-  <div id="start-screen">
-    <h1>HoverRush</h1>
-    <p>A Flying Car Adventure on the Skyway</p>
-    <p class="tagline">Dodge buildings, catch boosts, and feel the pulse of the sky.</p>
-    <div id="start-instructions">
-        <h3>🎯 How to Play:</h3>
-        <ul><li>Dodge flying obstacles like:</li><ul style="padding-left:20px;margin-top:5px"><li>🍗 Chicken legs</li><li>🌽 Corn cobs</li><li>🐦 Birds</li><li>🎈 Balloons</li></ul><li>💥 Hitting anything drains battery.</li><li>🟥 Battery zero = game over.</li></ul>
-        <h3>🟩 What to Grab:</h3>
-        <ul><li>🟢 Floating batteries</li><li>🔋 Recharge zones</li></ul>
-        <h3>🕹️ Controls:</h3>
-        <ul><li>⌨️ Arrow keys</li><li>☝️ Tap arrows</li></ul>
-    </div>
-    <div id="haptic-toggle-container">
-      <input type="checkbox" id="haptic-toggle">
-      <label for="haptic-toggle">Enable Haptic Feedback</label>
-    </div>
-    <button id="startButton">Start Game</button>
-  </div>
-
-  <div id="ui-overlay">
-      <div class="ui-element"><span id="score-label">Score: 0</span></div>
-      <div class="ui-element"><span id="battery-label">Battery</span><div id="battery"><div id="battery-level"></div></div></div>
-  </div>
-
-  <div id="game-over-screen">
-      <img src="https://via.placeholder.com/800x400" id="game-over-branding" alt="HoverRush Logo" />
-      <h2>Game Over!</h2>
-      <p id="final-score">Final Score: 0</p>
-      <p class="branding-message">🚀 Want to keep flying? <br/> Visit <a href="https://AllThingsFlyingCars.com" target="_blank">AllThingsFlyingCars.com</a> and ride the skyway of the future!</p>
-      <button id="replayButton">Replay</button>
-   </div>
-
-   <div id="mobile-controls-left"><div class="mobile-button" id="touch-up">↑</div><div class="mobile-button" id="touch-down">↓</div></div>
-   <div id="mobile-controls-right"><div class="mobile-button" id="touch-left">←</div><div class="mobile-button" id="touch-right">→</div></div>
-
-  <script>
+<a class="cta-button" href="#about">Learn More</a>
+<div id="animatedBackground">
+<div class="flyingCar car1"></div>
+<div class="flyingCar car2"></div>
+<div class="flyingCar car3"></div>
+<div class="flyingCar car4"></div>
+</div>
+<canvas id="gameCanvas"></canvas>
+<img alt="HoverRush Logo" id="branding-watermark" src="https://via.placeholder.com/800x400" style="display: none;"/>
+<!-- Animated Background Layer -->
+<div id="animatedBackground">
+<div class="flyingCar car1"></div>
+<div class="flyingCar car2"></div>
+<div class="flyingCar car3"></div>
+<div class="flyingCar car4"></div> <!-- ✅ REMOVED: Inline style attribute, now controlled by CSS keyframes -->
+</div>
+<!-- End Animated Background Layer -->
+<div id="start-screen">
+<h1>HoverRush</h1>
+<p>A Flying Car Adventure on the Skyway</p>
+<p class="tagline">Dodge buildings, catch boosts, and feel the pulse of the sky.</p>
+<div id="start-instructions">
+<h3>🎯 How to Play:</h3>
+<ul><li>Dodge flying obstacles like:</li><ul style="padding-left:20px;margin-top:5px"><li>🍗 Chicken legs</li><li>🌽 Corn cobs</li><li>🐦 Birds</li><li>🎈 Balloons</li></ul><li>💥 Hitting anything drains battery.</li><li>🟥 Battery zero = game over.</li></ul>
+<h3>🟩 What to Grab:</h3>
+<ul><li>🟢 Floating batteries</li><li>🔋 Recharge zones</li></ul>
+<h3>🕹️ Controls:</h3>
+<ul><li>⌨️ Arrow keys</li><li>☝️ Tap arrows</li></ul>
+</div>
+<div id="haptic-toggle-container">
+<input id="haptic-toggle" type="checkbox"/>
+<label for="haptic-toggle">Enable Haptic Feedback</label>
+</div>
+<button id="startButton">Start Game</button>
+</div>
+<div id="ui-overlay">
+<div class="ui-element"><span id="score-label">Score: 0</span></div>
+<div class="ui-element"><span id="battery-label">Battery</span><div id="battery"><div id="battery-level"></div></div></div>
+</div>
+<div id="game-over-screen">
+<img alt="HoverRush Logo" id="game-over-branding" src="https://via.placeholder.com/800x400"/>
+<h2>Game Over!</h2>
+<p id="final-score">Final Score: 0</p>
+<p class="branding-message">🚀 Want to keep flying? <br/> Visit <a href="https://AllThingsFlyingCars.com" target="_blank">AllThingsFlyingCars.com</a> and ride the skyway of the future!</p>
+<button id="replayButton">Replay</button>
+</div>
+<div id="mobile-controls-left"><div class="mobile-button" id="touch-up">↑</div><div class="mobile-button" id="touch-down">↓</div></div>
+<div id="mobile-controls-right"><div class="mobile-button" id="touch-left">←</div><div class="mobile-button" id="touch-right">→</div></div>
+<script>
     let animationFrameId = null; // Used to store the ID of the requestAnimationFrame
     let frameCount = 0; // Global frame counter for animation logic
     // Removed global declarations for startButton, replayButton, hapticToggle here
@@ -1657,6 +1685,22 @@
     });
 
   </script>
-
-</body>
+<script>
+// ✅ Restored handleStartOrReplay to fix game start functionality
+function handleStartOrReplay() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  audioCtx.resume().then(() => {
+    if (!audioInitialized) initAudio();
+    document.getElementById('start-screen').style.display = 'none';
+    document.getElementById('animatedBackground').style.display = 'none';
+    document.getElementById('gameCanvas').style.display = 'block';
+    document.getElementById('ui-overlay').style.display = 'block';
+    startGame();
+  }).catch(err => {
+    console.error("❌ Failed to resume AudioContext:", err);
+  });
+}
+</script></body>
 </html>
