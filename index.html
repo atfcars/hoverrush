@@ -16,6 +16,16 @@
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>HoverRush by ATFCars</title>
 <style>
+
+#backgroundCanvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+}
+
     html, body {
       margin: 0;
       padding: 0;
@@ -452,6 +462,9 @@
 </style>
 </head>
 <body>
+
+<canvas id="backgroundCanvas"></canvas>
+
 <a class="cta-button" href="#about">Learn More</a>
 <div id="animatedBackground">
 <div class="flyingCar car1"></div>
@@ -1712,5 +1725,58 @@ function handleStartOrReplay() {
     console.error("❌ Failed to resume AudioContext:", err);
   });
 }
-</script></body>
+</script>
+<script>
+// Background canvas for flying car silhouettes
+const backgroundCanvas = document.getElementById('backgroundCanvas');
+const bgCtx = backgroundCanvas.getContext('2d');
+
+let bgSwarm = [];
+
+function resizeBackgroundCanvas() {
+  backgroundCanvas.width = window.innerWidth;
+  backgroundCanvas.height = window.innerHeight;
+}
+
+function spawnSwarmVehicleBG() {
+  const size = 5 + Math.random() * 15;
+  bgSwarm.push({
+    x: Math.random() * backgroundCanvas.width,
+    y: Math.random() * backgroundCanvas.height * 0.9,
+    width: size * (1.5 + Math.random() * 0.5),
+    height: size,
+    speed: 0.2 + Math.random() * 0.5,
+    color: `rgba(180, 200, 220, ${0.1 + Math.random() * 0.2})`,
+    bobPhase: Math.random() * Math.PI * 2,
+    bobSpeed: 0.01 + Math.random() * 0.02,
+    bobAmplitude: 2 + Math.random() * 5
+  });
+}
+
+function updateAndDrawBackground() {
+  if (!bgCtx) return;
+  bgCtx.clearRect(0, 0, backgroundCanvas.width, backgroundCanvas.height);
+  for (let vehicle of bgSwarm) {
+    vehicle.x -= vehicle.speed;
+    vehicle.bobPhase += vehicle.bobSpeed;
+    const y = vehicle.y + Math.sin(vehicle.bobPhase) * vehicle.bobAmplitude;
+    bgCtx.fillStyle = vehicle.color;
+    bgCtx.fillRect(vehicle.x, y, vehicle.width, vehicle.height * 0.6);
+    bgCtx.fillRect(vehicle.x - vehicle.width * 0.1, y - vehicle.height * 0.2, vehicle.width * 0.3, vehicle.height * 0.3);
+    bgCtx.fillRect(vehicle.x + vehicle.width * 0.8, y - vehicle.height * 0.2, vehicle.width * 0.3, vehicle.height * 0.3);
+  }
+  bgSwarm = bgSwarm.filter(v => v.x + v.width > 0);
+  if (bgSwarm.length < 40 && Math.random() < 0.2) spawnSwarmVehicleBG();
+  requestAnimationFrame(updateAndDrawBackground);
+}
+
+window.addEventListener('resize', resizeBackgroundCanvas);
+document.addEventListener('DOMContentLoaded', () => {
+  resizeBackgroundCanvas();
+  for (let i = 0; i < 30; i++) spawnSwarmVehicleBG();
+  updateAndDrawBackground();
+});
+</script>
+
+</body>
 </html>
