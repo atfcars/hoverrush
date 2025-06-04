@@ -1261,6 +1261,44 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+
+    let resumeOverlay = document.getElementById("resume-overlay");
+    let overlayShown = false;
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") {
+        if (audioCtx && audioCtx.state !== "running") {
+          if (!overlayShown) {
+            resumeOverlay.style.display = "flex";
+            overlayShown = true;
+          }
+        }
+      }
+    });
+
+    resumeOverlay.addEventListener("click", () => {
+      if (audioCtx && audioCtx.state === "suspended") {
+        audioCtx.resume().then(() => {
+          if (audioCtx.state === "running") {
+            resumeOverlay.style.display = "none";
+            overlayShown = false;
+            // Trigger music resume
+            if (!backgroundMusicSource.current && musicShouldBePlaying) {
+              startBackgroundMusic();
+            }
+          }
+        });
+      } else {
+        resumeOverlay.style.display = "none";
+        overlayShown = false;
+      }
+    });
+
+    // Hide overlay at startup
+    window.addEventListener("load", () => {
+      resumeOverlay.style.display = "none";
+    });
+
 </script>
 <script>
 document.addEventListener('visibilitychange', () => {
@@ -1276,6 +1314,44 @@ document.addEventListener('visibilitychange', () => {
     });
   }
 });
+
+    let resumeOverlay = document.getElementById("resume-overlay");
+    let overlayShown = false;
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") {
+        if (audioCtx && audioCtx.state !== "running") {
+          if (!overlayShown) {
+            resumeOverlay.style.display = "flex";
+            overlayShown = true;
+          }
+        }
+      }
+    });
+
+    resumeOverlay.addEventListener("click", () => {
+      if (audioCtx && audioCtx.state === "suspended") {
+        audioCtx.resume().then(() => {
+          if (audioCtx.state === "running") {
+            resumeOverlay.style.display = "none";
+            overlayShown = false;
+            // Trigger music resume
+            if (!backgroundMusicSource.current && musicShouldBePlaying) {
+              startBackgroundMusic();
+            }
+          }
+        });
+      } else {
+        resumeOverlay.style.display = "none";
+        overlayShown = false;
+      }
+    });
+
+    // Hide overlay at startup
+    window.addEventListener("load", () => {
+      resumeOverlay.style.display = "none";
+    });
+
 </script><script>
 // Ensure backgroundMusic is global
 window.backgroundMusic = backgroundMusic;
@@ -1304,6 +1380,44 @@ document.addEventListener('click', () => {
     }).catch(() => {});
   }
 });
+
+    let resumeOverlay = document.getElementById("resume-overlay");
+    let overlayShown = false;
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") {
+        if (audioCtx && audioCtx.state !== "running") {
+          if (!overlayShown) {
+            resumeOverlay.style.display = "flex";
+            overlayShown = true;
+          }
+        }
+      }
+    });
+
+    resumeOverlay.addEventListener("click", () => {
+      if (audioCtx && audioCtx.state === "suspended") {
+        audioCtx.resume().then(() => {
+          if (audioCtx.state === "running") {
+            resumeOverlay.style.display = "none";
+            overlayShown = false;
+            // Trigger music resume
+            if (!backgroundMusicSource.current && musicShouldBePlaying) {
+              startBackgroundMusic();
+            }
+          }
+        });
+      } else {
+        resumeOverlay.style.display = "none";
+        overlayShown = false;
+      }
+    });
+
+    // Hide overlay at startup
+    window.addEventListener("load", () => {
+      resumeOverlay.style.display = "none";
+    });
+
 </script><script>
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible' && typeof audioCtx !== 'undefined') {
@@ -1318,6 +1432,44 @@ document.addEventListener('visibilitychange', () => {
     });
   }
 });
+
+    let resumeOverlay = document.getElementById("resume-overlay");
+    let overlayShown = false;
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") {
+        if (audioCtx && audioCtx.state !== "running") {
+          if (!overlayShown) {
+            resumeOverlay.style.display = "flex";
+            overlayShown = true;
+          }
+        }
+      }
+    });
+
+    resumeOverlay.addEventListener("click", () => {
+      if (audioCtx && audioCtx.state === "suspended") {
+        audioCtx.resume().then(() => {
+          if (audioCtx.state === "running") {
+            resumeOverlay.style.display = "none";
+            overlayShown = false;
+            // Trigger music resume
+            if (!backgroundMusicSource.current && musicShouldBePlaying) {
+              startBackgroundMusic();
+            }
+          }
+        });
+      } else {
+        resumeOverlay.style.display = "none";
+        overlayShown = false;
+      }
+    });
+
+    // Hide overlay at startup
+    window.addEventListener("load", () => {
+      resumeOverlay.style.display = "none";
+    });
+
 </script><script>
 window.addEventListener('focus', () => {
   if (typeof audioCtx !== 'undefined' && audioCtx.state === 'suspended') {
@@ -1354,6 +1506,44 @@ document.addEventListener('touchstart', () => {
     window.backgroundMusic.play().catch(() => {});
   }
 });
+
+    let resumeOverlay = document.getElementById("resume-overlay");
+    let overlayShown = false;
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") {
+        if (audioCtx && audioCtx.state !== "running") {
+          if (!overlayShown) {
+            resumeOverlay.style.display = "flex";
+            overlayShown = true;
+          }
+        }
+      }
+    });
+
+    resumeOverlay.addEventListener("click", () => {
+      if (audioCtx && audioCtx.state === "suspended") {
+        audioCtx.resume().then(() => {
+          if (audioCtx.state === "running") {
+            resumeOverlay.style.display = "none";
+            overlayShown = false;
+            // Trigger music resume
+            if (!backgroundMusicSource.current && musicShouldBePlaying) {
+              startBackgroundMusic();
+            }
+          }
+        });
+      } else {
+        resumeOverlay.style.display = "none";
+        overlayShown = false;
+      }
+    });
+
+    // Hide overlay at startup
+    window.addEventListener("load", () => {
+      resumeOverlay.style.display = "none";
+    });
+
 </script><script>
 function showMusicOverlay() {
   const overlay = document.getElementById('music-resume-overlay');
@@ -1417,5 +1607,43 @@ document.getElementById('music-resume-overlay').addEventListener('click', () => 
     }).catch(() => {});
   }
 });
+
+    let resumeOverlay = document.getElementById("resume-overlay");
+    let overlayShown = false;
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") {
+        if (audioCtx && audioCtx.state !== "running") {
+          if (!overlayShown) {
+            resumeOverlay.style.display = "flex";
+            overlayShown = true;
+          }
+        }
+      }
+    });
+
+    resumeOverlay.addEventListener("click", () => {
+      if (audioCtx && audioCtx.state === "suspended") {
+        audioCtx.resume().then(() => {
+          if (audioCtx.state === "running") {
+            resumeOverlay.style.display = "none";
+            overlayShown = false;
+            // Trigger music resume
+            if (!backgroundMusicSource.current && musicShouldBePlaying) {
+              startBackgroundMusic();
+            }
+          }
+        });
+      } else {
+        resumeOverlay.style.display = "none";
+        overlayShown = false;
+      }
+    });
+
+    // Hide overlay at startup
+    window.addEventListener("load", () => {
+      resumeOverlay.style.display = "none";
+    });
+
 </script></body>
 </html>
