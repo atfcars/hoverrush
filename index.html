@@ -360,6 +360,8 @@
 padding:12px 24px; font-size:16px; z-index:10000; background:#222; color:#fff; border:none; border-radius:8px; cursor:pointer;">
 🔊 Tap to Resume Music
 </button>
+
+
 <div id="music-resume-overlay">🔊 Tap to resume background music</div>
 <canvas id="gameCanvas"></canvas>
 <!-- *** MOVED WATERMARK HERE *** -->
@@ -1677,6 +1679,34 @@ document.getElementById("resume-audio-button").addEventListener("click", () => {
     });
   }
   button.style.display = "none";
+});
+</script><script>
+window.addEventListener("visibilitychange", () => {
+  const button = document.getElementById("resume-audio-button");
+  if (document.visibilityState === "visible") {
+    if (typeof audioCtx !== "undefined" && audioCtx.state !== "running") {
+      button.style.display = "block";
+    }
+  }
+});
+
+document.getElementById("resume-audio-button").addEventListener("click", async () => {
+  const button = document.getElementById("resume-audio-button");
+  try {
+    if (typeof audioCtx !== "undefined" && audioCtx.state !== "running") {
+      await audioCtx.resume();
+      console.log("✅ AudioContext resumed");
+    }
+
+    if (typeof startBackgroundMusic === "function") {
+      startBackgroundMusic(); // Ensure the function handles idempotency
+      console.log("✅ Background music restarted via function call");
+    }
+
+    button.style.display = "none";
+  } catch (e) {
+    console.warn("❌ Music resume failed:", e);
+  }
 });
 </script></body>
 </html>
