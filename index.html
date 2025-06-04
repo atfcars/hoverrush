@@ -1233,7 +1233,35 @@ document.addEventListener('visibilitychange', () => {
       console.log("✅ Audio resumed after tab visibility change.");
     });
   }
-});</script>
+});
+let hasInteracted = false;
+
+window.addEventListener("click", () => {
+  hasInteracted = true;
+});
+
+window.addEventListener("focus", () => {
+  if (hasInteracted) {
+    const overlay = document.getElementById("resumeOverlay");
+    if (overlay) overlay.style.display = "block";
+  }
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  const overlay = document.getElementById("resumeOverlay");
+  if (overlay) {
+    overlay.addEventListener("click", () => {
+      if (typeof audioCtx !== "undefined" && audioCtx.state !== "running") {
+        audioCtx.resume().then(() => {
+          console.log("AudioContext resumed by overlay click.");
+        });
+      }
+      overlay.style.display = "none";
+    });
+  }
+});
+
+</script>
 <script>
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible' && typeof audioCtx !== 'undefined') {
