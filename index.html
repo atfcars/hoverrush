@@ -316,11 +316,6 @@
 </head>
 <body>
 
-<button id="resume-audio-button" style="display:none; position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
-padding:12px 24px; font-size:16px; z-index:10000; background:#222; color:#fff; border:none; border-radius:8px; cursor:pointer;">
-🔊 Tap to Resume Music
-</button>
-
 <canvas id="gameCanvas"></canvas>
 <img src="https://via.placeholder.com/800x400" id="branding-watermark" alt="HoverRush Logo" style="display: none;" />
 
@@ -453,7 +448,7 @@ padding:12px 24px; font-size:16px; z-index:10000; background:#222; color:#fff; b
                 console.log("AudioContext resumed automatically. Re-initialization might be needed for nodes.");
                 if (initAudio()) { 
                     console.log("Audio re-initialized (nodes checked/created) automatically on state change to running.");
-                    if (gameRunning && !musicIsPlaying && !isChargingSequence && !isCaptured) { // musicIsPlaying instead of !musicLoopIntervalId
+                    if (gameRunning && !musicIsPlaying && !isChargingSequence && !isCaptured) { 
                         console.log("Restarting music loop checker due to automatic context resume and game state.");
                         startMusicLoopChecker(); 
                     }
@@ -469,10 +464,8 @@ padding:12px 24px; font-size:16px; z-index:10000; background:#222; color:#fff; b
     let chargingSoundNodes = [], captureSoundNodes = [];
     let musicGainNode = null, musicLowPassFilter = null, reverbNode = null;
     
-    let musicShouldBePlaying = false; // Intent to play music (already existed and used)
-    let musicIsPlaying = false;       // NEW: Tracks if the music loop/generation is actively running
-    // backgroundMusicSource & storedMusicBuffer from prompt are not directly applicable to procedural audio
-    // The procedural system creates oscillators on the fly.
+    let musicShouldBePlaying = false; 
+    let musicIsPlaying = false;       
 
     let musicLoopIntervalId = null;
     let nextMusicScheduleTime = 0;
@@ -607,8 +600,7 @@ padding:12px 24px; font-size:16px; z-index:10000; background:#222; color:#fff; b
 
     function checkMusicSchedule() {
         if (!gameRunning || !audioInitialized || !audioCtx || audioCtx.state !== 'running' || !musicShouldBePlaying || isChargingSequence || isCaptured) {
-            // musicIsPlaying should also be false if any of these conditions lead to stopping.
-            if (musicIsPlaying) stopBackgroundMusic(); // Ensure flags are consistent
+            if (musicIsPlaying) stopBackgroundMusic(); 
             return;
         }
         const currentTime = audioCtx.currentTime;
@@ -847,7 +839,7 @@ padding:12px 24px; font-size:16px; z-index:10000; background:#222; color:#fff; b
                  if (musicLowPassFilter) musicLowPassFilter.frequency.setValueAtTime(20000, audioCtx.currentTime);
                  startMusicLoopChecker(); 
              } else {
-                 console.warn(`startGame: Audio not fully ready after timeout (State: ${audioCtx?.state}, Initialized: ${audioInitialized}). Music might not start. Fallback button may be needed.`);
+                 console.warn(`startGame: Audio not fully ready after timeout (State: ${audioCtx?.state}, Initialized: ${audioInitialized}). Music might not start.`);
              }
              gameRunning = true; 
              if (animationFrameId) cancelAnimationFrame(animationFrameId); 
@@ -958,9 +950,10 @@ padding:12px 24px; font-size:16px; z-index:10000; background:#222; color:#fff; b
 
         if (document.hidden) {
             console.log("Main visibilitychange: Page hidden.");
-            if (musicIsPlaying) { 
+            if (musicIsPlaying) { // Only stop the main music loop
                 stopBackgroundMusic(); 
             }
+            // Engine hum and other ambient sounds managed by their own logic / game state, not stopped here.
         } else { 
             console.log("Main visibilitychange: Page visible. Attempting auto-resume.");
             if (audioCtx.state === "suspended") {
@@ -968,8 +961,9 @@ padding:12px 24px; font-size:16px; z-index:10000; background:#222; color:#fff; b
                     console.log(`Main visibilitychange: AudioContext auto-resumed. New state: ${audioCtx.state}`);
                     if (!audioInitialized) {
                         console.log("Main visibilitychange: Attempting audio re-initialization after auto-resume.");
-                        initAudio();
+                        initAudio(); // Sets audioInitialized if successful
                     }
+                    // Check if music should be restarted
                     if (audioCtx.state === 'running' && audioInitialized && gameRunning && !musicIsPlaying && !isChargingSequence && !isCaptured) {
                         console.log("Main visibilitychange: Restarting background music loop (context was suspended).");
                         startMusicLoopChecker();
@@ -977,8 +971,9 @@ padding:12px 24px; font-size:16px; z-index:10000; background:#222; color:#fff; b
                 }).catch(err => {
                     console.error("Main visibilitychange: Error during AudioContext auto-resume:", err);
                 });
-            } else if (audioCtx.state === "running") {
-                if (!audioInitialized) { initAudio(); }
+            } else if (audioCtx.state === "running") { // Context already running
+                if (!audioInitialized) { initAudio(); } // Initialize nodes if not done
+                // Check if music should be restarted
                 if (audioInitialized && gameRunning && !musicIsPlaying && !isChargingSequence && !isCaptured) {
                     console.log("Main visibilitychange: Restarting background music loop (context already running).");
                     startMusicLoopChecker();
@@ -1007,115 +1002,5 @@ padding:12px 24px; font-size:16px; z-index:10000; background:#222; color:#fff; b
     });
 </script>
 
-<script>
-// Fallback Audio Resume Button Logic
-document.addEventListener('DOMContentLoaded', () => {
-    const resumeButton = document.getElementById('resume-audio-button');
-
-    const getGameAudioState = () => {
-        return {
-            audioCtx: typeof audioCtx !== 'undefined' ? audioCtx : null,
-            audioInitialized: typeof audioInitialized !== 'undefined' ? audioInitialized : false,
-            gameRunning: typeof gameRunning !== 'undefined' ? gameRunning : false,
-            musicIsPlaying: typeof musicIsPlaying !== 'undefined' ? musicIsPlaying : false, // Use this flag
-            isChargingSequence: typeof isChargingSequence !== 'undefined' ? isChargingSequence : false,
-            isCaptured: typeof isCaptured !== 'undefined' ? isCaptured : false,
-            startMusicLoopChecker: typeof startMusicLoopChecker === 'function' ? startMusicLoopChecker : null,
-            initAudio: typeof initAudio === 'function' ? initAudio : null
-        };
-    };
-
-    if (resumeButton) {
-        resumeButton.addEventListener('click', async () => {
-            console.log("[FallbackButton] Resume button clicked.");
-            const state = getGameAudioState();
-            if (state.audioCtx) {
-                try {
-                    if (state.audioCtx.state !== 'running') {
-                        await state.audioCtx.resume();
-                        console.log(`[FallbackButton] ✅ AudioContext resumed by button. New state: ${state.audioCtx.state}`);
-                    }
-
-                    if (state.audioCtx.state === 'running') {
-                        if (!state.audioInitialized && state.initAudio) {
-                            console.log("[FallbackButton] Attempting to initialize audio systems (nodes) via button.");
-                            state.initAudio(); 
-                        }
-                        
-                        const freshStateAfterInit = getGameAudioState(); 
-
-                        if (freshStateAfterInit.audioInitialized && 
-                            freshStateAfterInit.gameRunning && 
-                            !freshStateAfterInit.musicIsPlaying &&  // Use musicIsPlaying
-                            freshStateAfterInit.startMusicLoopChecker && 
-                            !freshStateAfterInit.isChargingSequence && 
-                            !freshStateAfterInit.isCaptured) {
-                            console.log("[FallbackButton] ✅ Attempting to restart music loop.");
-                            freshStateAfterInit.startMusicLoopChecker();
-                        } else {
-                             console.log("[FallbackButton] Conditions not met to restart music loop:", {
-                                gameRunning: freshStateAfterInit.gameRunning,
-                                musicIsPlaying: freshStateAfterInit.musicIsPlaying,
-                                audioInitialized: freshStateAfterInit.audioInitialized
-                            });
-                        }
-                        resumeButton.style.display = 'none';
-                    } else {
-                        console.warn("[FallbackButton] ❌ AudioContext still not running after resume attempt.");
-                    }
-                } catch (e) {
-                    console.error("[FallbackButton] ❌ Error during audio resume:", e);
-                }
-            } else {
-                console.error("[FallbackButton] ❌ audioCtx not found.");
-            }
-        });
-    }
-
-    const checkAndShowResumeButton = () => {
-        if (!resumeButton) return;
-        const state = getGameAudioState();
-        if (!state.audioCtx) { return; }
-
-        let showButton = false;
-        if (state.audioCtx.state !== 'running') {
-            console.log("[FallbackCheck] AudioContext not running. Will show button.");
-            showButton = true;
-        } else if (state.audioCtx.state === 'running' &&
-                   state.audioInitialized &&
-                   state.gameRunning && 
-                   !state.musicIsPlaying && // Use musicIsPlaying
-                   !state.isChargingSequence && 
-                   !state.isCaptured) {
-            console.log("[FallbackCheck] Music loop not active despite conditions met. Will show button.");
-            showButton = true;
-        }
-
-        if (showButton) {
-            resumeButton.style.display = 'block';
-        } else {
-            resumeButton.style.display = 'none';
-        }
-    };
-
-    document.addEventListener('visibilitychange', () => {
-        if (document.hidden) {
-            if (resumeButton) resumeButton.style.display = 'none';
-        } else { 
-            setTimeout(checkAndShowResumeButton, 750); 
-        }
-    });
-
-    window.addEventListener('focus', () => {
-        setTimeout(checkAndShowResumeButton, 750); 
-    });
-
-    setTimeout(() => {
-        if (document.visibilityState === 'visible' && document.hasFocus()) {
-            checkAndShowResumeButton();
-        }
-    }, 1500); 
-});
-</script>
 </body>
 </html>
