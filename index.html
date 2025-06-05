@@ -9,7 +9,7 @@
       margin: 0;
       padding: 0;
       background: black;
-      overflow: hidden; 
+      overflow: hidden;
       touch-action: none;
       font-family: 'Courier New', Courier, monospace;
       color: white;
@@ -39,7 +39,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center; 
+      justify-content: center;
       position: absolute;
       top: 0;
       left: 0;
@@ -48,39 +48,39 @@
       background: rgba(10, 10, 20, 0.85);
       z-index: 10;
       text-align: center;
-      padding: 20px; 
+      padding: 20px;
       box-sizing: border-box;
       border: 3px solid #0ff;
       box-shadow: 0 0 15px #0ff;
-      overflow-y: auto; 
-      max-height: 100vh; 
+      overflow-y: auto;
+      max-height: 100vh;
     }
 
     #start-screen h1 {
       font-size: clamp(1.8em, 5vw, 2.5em);
       color: #ff0;
       text-shadow: 2px 2px #f0f;
-      margin-top: 10px; 
-      margin-bottom: 10px; 
+      margin-top: 10px;
+      margin-bottom: 10px;
     }
 
     #start-screen p {
       font-size: clamp(0.9em, 3vw, 1.1em);
-      margin: 8px 0; 
-      line-height: 1.3; 
+      margin: 8px 0;
+      line-height: 1.3;
     }
 
     #start-screen p.tagline {
       font-style: italic;
       max-width: 500px;
-      margin: 10px auto 8px auto; 
+      margin: 10px auto 8px auto;
     }
 
     #start-instructions {
-        margin-top: 10px; 
-        margin-bottom: 10px; 
+        margin-top: 10px;
+        margin-bottom: 10px;
         border: 1px solid #555;
-        padding: 8px 12px; 
+        padding: 8px 12px;
         border-radius: 5px;
         background-color: rgba(0,0,0,0.2);
         max-width: 90%;
@@ -89,7 +89,7 @@
         color: #ccc;
     }
     #start-instructions h3 {
-        margin: 8px 0 4px 0; 
+        margin: 8px 0 4px 0;
         font-size: clamp(1em, 3vw, 1.1em);
         color: #0ff;
         text-transform: uppercase;
@@ -99,16 +99,16 @@
     #start-instructions ul {
         list-style: none;
         padding-left: 5px;
-        margin: 4px 0; 
+        margin: 4px 0;
         text-align: left;
     }
     #start-instructions li {
-        margin-bottom: 3px; 
-        line-height: 1.2; 
+        margin-bottom: 3px;
+        line-height: 1.2;
     }
     #start-instructions ul ul {
         padding-left: 15px;
-        margin-top: 2px; 
+        margin-top: 2px;
     }
     #start-instructions .keys {
         font-size: clamp(1.4em, 3.5vw, 1.7em);
@@ -135,17 +135,17 @@
       justify-content: center;
       background: #ff0;
       color: black;
-      border: 3px solid #f0f; 
-      box-shadow: 0 0 8px #ff0, 0 0 15px #f0f; 
+      border: 3px solid #f0f;
+      box-shadow: 0 0 8px #ff0, 0 0 15px #f0f;
       font-weight: bold;
       cursor: pointer;
       transition: background-color 0.2s, transform 0.1s, box-shadow 0.3s ease;
       -webkit-tap-highlight-color: transparent;
-      animation: pulse 2s infinite ease-in-out; 
+      animation: pulse 2s infinite ease-in-out;
       text-align: center;
-      padding: 0; 
-      margin: 15px auto 0 auto; 
-      flex-shrink: 0; 
+      padding: 0;
+      margin: 15px auto 0 auto;
+      flex-shrink: 0;
       width: clamp(100px, 25vw, 150px);
       height: clamp(100px, 25vw, 150px);
       border-radius: 50%;
@@ -154,17 +154,17 @@
 
     @media (max-width: 768px) {
        #start-screen {
-          padding-top: 10px; 
-          padding-bottom: 10px; 
-          justify-content: flex-start; 
+          padding-top: 10px;
+          padding-bottom: 10px;
+          justify-content: flex-start;
        }
       #startButton {
-        width: clamp(180px, 60vw, 280px); 
-        height: clamp(55px, 9vh, 70px); 
-        border-radius: 8px !important; 
-        font-size: clamp(1.1em, 4.5vw, 1.5em); 
-        margin-top: auto; 
-        margin-bottom: max(10px, env(safe-area-inset-bottom)); 
+        width: clamp(180px, 60vw, 280px);
+        height: clamp(55px, 9vh, 70px);
+        border-radius: 8px !important;
+        font-size: clamp(1.1em, 4.5vw, 1.5em);
+        margin-top: auto;
+        margin-bottom: max(10px, env(safe-area-inset-bottom));
       }
     }
 
@@ -176,15 +176,15 @@
 
     #startButton:hover {
        background-color: #fff;
-       box-shadow: 0 0 15px #ff0, 0 0 30px #f0f; 
-       animation-play-state: paused; 
+       box-shadow: 0 0 15px #ff0, 0 0 30px #f0f;
+       animation-play-state: paused;
     }
     #startButton:active {
-      transform: scale(0.97); 
-      animation: none; 
+      transform: scale(0.97);
+      animation: none;
     }
 
-    #game-over-screen button { 
+    #game-over-screen button {
       padding: 12px 25px;
       font-size: clamp(1em, 3.5vw, 1.2em);
       background: #ff0;
@@ -210,10 +210,10 @@
       top: 15px;
       right: 15px;
       z-index: 5;
-      display: none; 
+      display: none;
       font-size: 14px;
       text-align: right;
-      pointer-events: none; 
+      pointer-events: none;
     }
 
     #branding-watermark {
@@ -417,42 +417,46 @@
     const VERTIPORT_SPAWN_CHANCE = 0.01;
     let buildings = [], pedestrians = [], projectiles = [], bonuses = [], birds = [], clouds = [], swarmVehicles = [];
     let cityHeight = 450, playableHeight = 450;
-    const PROJECTILE_GRAVITY = 0.15; 
-    let difficultyMultiplier = 1.0; 
+    const PROJECTILE_GRAVITY = 0.15;
+    let difficultyMultiplier = 1.0;
 
     // --- Blimp Variables ---
     let blimp = null;
     let nextBlimpScoreTarget = 10000;
-    const BLIMP_SCORE_INTERVAL_MIN = 3500; 
-    const BLIMP_SCORE_INTERVAL_MAX = 5000; 
+    const BLIMP_SCORE_INTERVAL_MIN = 3500;
+    const BLIMP_SCORE_INTERVAL_MAX = 5000;
     const BLIMP_COLLISION_DAMAGE = 25;
 
     // --- Blimp Theme Audio Variables ---
     let blimpThemeGainNode = null;
-    let blimpThemeNodes = []; 
+    let blimpThemeNodes = [];
     let blimpThemeLoopTimeoutId = null;
     let blimpThemeIsPlaying = false;
-    const BLIMP_THEME_VOLUME = 0.15; 
-    const BLIMP_THEME_FADE_DURATION = 1.5; 
+    const BLIMP_THEME_VOLUME = 0.15;
+    const BLIMP_THEME_FADE_DURATION = 1.5;
+    let blimpThemeNextPlayTime = 0; // Earliest time the theme can play again
+    const BLIMP_THEME_REPLAY_MIN_DELAY = 15000; // 15 seconds
+    const BLIMP_THEME_REPLAY_MAX_DELAY = 30000; // 30 seconds
+
 
     // --- Blimp Class ---
     class Blimp {
         constructor(canvas, playableHeight) {
             this.canvas = canvas;
             this.playableHeight = playableHeight;
-            this.width = 220 + Math.random() * 80; 
-            this.height = this.width * 0.35; 
+            this.width = 220 + Math.random() * 80;
+            this.height = this.width * 0.35;
             this.x = this.canvas.width;
-            this.y = this.playableHeight * 0.1 + Math.random() * (this.playableHeight * 0.15); 
-            this.vx = -0.25 - Math.random() * 0.3; 
+            this.y = this.playableHeight * 0.1 + Math.random() * (this.playableHeight * 0.15);
+            this.vx = -0.25 - Math.random() * 0.3;
             this.bannerLogo = 'TEMP_B64_LOGO_BANNER_PLACEHOLDER';
             this.collisionDamage = BLIMP_COLLISION_DAMAGE;
             this.bannerWavePhase = Math.random() * Math.PI * 2;
             this.bannerWaveSpeed = 0.04 + Math.random() * 0.02;
-            this.bannerWaveAmplitude = 3 + Math.random() * 3; 
+            this.bannerWaveAmplitude = 4 + Math.random() * 2; // Waving banner amplitude: 4-6px
             this.windowPulsePhase = Math.random() * Math.PI * 2;
             this.windowPulseSpeed = 0.05 + Math.random() * 0.03;
-            this.ribPhase = Math.random() * Math.PI * 2; 
+            this.ribPhase = Math.random() * Math.PI * 2;
             this.ribSpeed = 0.02 + Math.random() * 0.01;
         }
 
@@ -468,75 +472,137 @@
             const centerY = this.y + this.height / 2;
 
             // Blimp Body (Yellow with Gradient)
-            const bodyGradient = ctx.createLinearGradient(centerX, centerY - this.height / 2, centerX, centerY + this.height / 2);
-            bodyGradient.addColorStop(0, '#FFFACD'); // LemonChiffon (lighter top)
+            const bodyGradient = ctx.createLinearGradient(centerX - this.width * 0.2, centerY - this.height * 0.3, centerX + this.width * 0.2, centerY + this.height * 0.3); // Top-left to bottom-right
+            bodyGradient.addColorStop(0, '#FFFDE7'); // Lighter yellow (almost white)
             bodyGradient.addColorStop(0.5, '#FFDB58'); // Mustard Yellow
-            bodyGradient.addColorStop(1, '#B8860B');   // DarkGoldenRod (darker bottom)
+            bodyGradient.addColorStop(1, '#B8860B');   // Darker GoldenRod
             ctx.fillStyle = bodyGradient;
             ctx.beginPath();
             ctx.ellipse(centerX, centerY, this.width / 2, this.height / 2, 0, 0, Math.PI * 2);
             ctx.fill();
-            
+
             // Curved Rib Lines
-            ctx.strokeStyle = 'rgba(139, 69, 19, 0.3)'; // SaddleBrown, slightly transparent
-            ctx.lineWidth = 1.5;
-            const numRibs = 5; 
+            ctx.strokeStyle = 'rgba(100, 80, 30, 0.35)'; // Darker, more subtle rib color
+            ctx.lineWidth = 2; // Slightly thicker ribs
+            const numRibs = 6;
             for (let i = 1; i <= numRibs; i++) {
                 const ribProgress = i / (numRibs + 1);
-                const xOffset = (ribProgress - 0.5) * this.width * 0.8; 
-                const yRadius = this.height / 2 * Math.sqrt(1 - Math.pow(xOffset / (this.width / 2), 2)); 
-                const shimmer = Math.sin(this.ribPhase + i * 0.5) * 2;
+                const xOffset = (ribProgress - 0.5) * this.width * 0.9;
+                const yRadius = this.height / 2 * Math.sqrt(1 - Math.pow(xOffset / (this.width / 2 * 0.95), 2)); // Ensure ellipse bounds
+
+                const shimmer = Math.sin(this.ribPhase + i * 0.6) * 1.5; // Reduced shimmer
+
                 ctx.beginPath();
                 ctx.moveTo(centerX + xOffset, centerY - yRadius + shimmer);
-                ctx.quadraticCurveTo(centerX + xOffset + (Math.random()-0.5)*5 , centerY, centerX + xOffset, centerY + yRadius + shimmer);
+                ctx.quadraticCurveTo(centerX + xOffset + (Math.random()-0.5)*3 , centerY, centerX + xOffset, centerY + yRadius + shimmer);
                 ctx.stroke();
             }
             // Nose cone line
+            ctx.strokeStyle = 'rgba(139, 69, 19, 0.4)';
             ctx.beginPath();
-            ctx.moveTo(centerX - this.width * 0.48, centerY - this.height * 0.2); 
-            ctx.quadraticCurveTo(centerX - this.width * 0.52, centerY, centerX - this.width * 0.48, centerY + this.height * 0.2); 
+            ctx.moveTo(centerX - this.width * 0.48, centerY - this.height * 0.2);
+            ctx.quadraticCurveTo(centerX - this.width * 0.52, centerY, centerX - this.width * 0.48, centerY + this.height * 0.2);
             ctx.stroke();
 
 
             // Main Body Outline
-            ctx.strokeStyle = '#8B4513'; 
+            ctx.strokeStyle = '#8B4513';
             ctx.lineWidth = 2.5;
             ctx.beginPath();
             ctx.ellipse(centerX, centerY, this.width / 2, this.height / 2, 0, 0, Math.PI * 2);
             ctx.stroke();
-            
-            // Tail Fins (Softer Orange)
-            ctx.fillStyle = '#FF8C00'; 
+
+             // Gondola (Dark Gray with Shadow)
+            const gondolaWidth = this.width * 0.3;
+            const gondolaHeight = this.height * 0.25;
+            const gondolaX = centerX - gondolaWidth / 2;
+            const gondolaY = centerY + this.height * 0.35; // Lowered slightly
+
+            ctx.save(); // Save context for shadow
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+            ctx.shadowBlur = 8;
+            ctx.shadowOffsetX = 2;
+            ctx.shadowOffsetY = 4;
+            ctx.fillStyle = '#555'; // Darker gondola
+            ctx.fillRect(gondolaX, gondolaY, gondolaWidth, gondolaHeight);
+            ctx.restore(); // Restore context to remove shadow for other elements
+
+            ctx.strokeStyle = '#333'; // Darker outline for gondola
+            ctx.strokeRect(gondolaX, gondolaY, gondolaWidth, gondolaHeight);
+
+
+            // Animated Gondola Windows
+            const numWindows = 3;
+            const windowWidth = gondolaWidth / (numWindows + 2);
+            const windowHeight = gondolaHeight * 0.4;
+            const windowSpacing = (gondolaWidth - (numWindows * windowWidth)) / (numWindows + 1);
+            const windowBaseY = gondolaY + gondolaHeight * 0.25;
+
+            const pulseBrightness = 0.6 + Math.sin(this.windowPulsePhase) * 0.4; // Range 0.2 to 1.0
+            const windowGlowColor = `rgba(173, 216, 230, ${pulseBrightness * 0.7})`; // #aaddff with alpha
+            const windowCoreColor = `rgba(220, 240, 255, ${pulseBrightness})`;
+
+            for (let i = 0; i < numWindows; i++) {
+                const currentWindowX = gondolaX + windowSpacing + (i * (windowWidth + windowSpacing));
+                // Draw glow first
+                ctx.fillStyle = windowGlowColor;
+                ctx.shadowColor = windowGlowColor;
+                ctx.shadowBlur = 6 * pulseBrightness; // Subtle glow
+                ctx.beginPath();
+                ctx.ellipse(currentWindowX + windowWidth/2, windowBaseY + windowHeight/2, windowWidth/2, windowHeight/2, 0, 0, Math.PI*2);
+                ctx.fill();
+                ctx.shadowBlur = 0; // Reset shadow for core window
+
+                // Draw core window
+                ctx.fillStyle = windowCoreColor;
+                 ctx.beginPath();
+                ctx.ellipse(currentWindowX + windowWidth/2, windowBaseY + windowHeight/2, windowWidth/2.5, windowHeight/2.5, 0, 0, Math.PI*2); // Slightly smaller core
+                ctx.fill();
+            }
+
+
+            // Tail Fins (Softer Orange with Shadow)
+            ctx.save();
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+            ctx.shadowBlur = 5;
+            ctx.shadowOffsetX = -2;
+            ctx.shadowOffsetY = 2;
+            ctx.fillStyle = '#FF8C00';
             const finBaseX = centerX + this.width * 0.35;
-            const finTipX = centerX + this.width * 0.50; 
-            const finWidth = this.width * 0.15; 
-            const finHeight = this.height * 0.45; 
+            const finTipX = centerX + this.width * 0.50;
+            const finW = this.width * 0.15;
+            const finH = this.height * 0.45;
             // Top fin
             ctx.beginPath();
-            ctx.moveTo(finBaseX - finWidth, centerY - this.height * 0.1);
-            ctx.quadraticCurveTo(finBaseX + finWidth * 0.2, centerY - finHeight * 0.8, finTipX, centerY - finHeight/2);
-            ctx.quadraticCurveTo(finBaseX + finWidth * 0.3, centerY, finBaseX, centerY + this.height * 0.1);
+            ctx.moveTo(finBaseX - finW, centerY - this.height * 0.1);
+            ctx.quadraticCurveTo(finBaseX + finW * 0.2, centerY - finH * 0.8, finTipX, centerY - finH/2);
+            ctx.quadraticCurveTo(finBaseX + finW * 0.3, centerY, finBaseX, centerY + this.height * 0.1);
             ctx.closePath();
             ctx.fill();
-            
-            // Horizontal fins remain
-             const hFinWidth = this.width * 0.15; 
-             const hFinHeight = this.height * 0.7; 
+
+            // Horizontal fins
+             const hFinW = this.width * 0.15;
+             const hFinH = this.height * 0.7;
              ctx.beginPath();
-             ctx.moveTo(centerX + this.width * 0.30, centerY - hFinHeight/2 * 0.8); 
-             ctx.lineTo(centerX + this.width * 0.45, centerY - hFinHeight/2 * 0.7);
-             ctx.lineTo(centerX + this.width * 0.45, centerY + hFinHeight/2 * 0.7);
-             ctx.lineTo(centerX + this.width * 0.30, centerY + hFinHeight/2 * 0.8);
+             ctx.moveTo(centerX + this.width * 0.30, centerY - hFinH/2 * 0.8);
+             ctx.lineTo(centerX + this.width * 0.45, centerY - hFinH/2 * 0.7);
+             ctx.lineTo(centerX + this.width * 0.45, centerY + hFinH/2 * 0.7);
+             ctx.lineTo(centerX + this.width * 0.30, centerY + hFinH/2 * 0.8);
              ctx.closePath();
              ctx.fill();
+            ctx.restore(); // Restore context from shadow
 
-            
-            // Air Rudder (Vertical Fin) - More pronounced
+            // Air Rudder (Vertical Fin)
+            ctx.save();
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+            ctx.shadowBlur = 4;
+            ctx.shadowOffsetX = -1;
+            ctx.shadowOffsetY = 1;
             ctx.fillStyle = '#FF8C00';
             const rudderBaseYTop = centerY - this.height * 0.1;
             const rudderBaseYBottom = centerY + this.height * 0.1;
-            const rudderTipY = centerY; 
-            const rudderBackX = centerX + this.width * 0.52; 
+            const rudderTipY = centerY;
+            const rudderBackX = centerX + this.width * 0.52;
             const rudderFrontX = centerX + this.width * 0.38;
             ctx.beginPath();
             ctx.moveTo(rudderFrontX, rudderBaseYTop);
@@ -545,65 +611,32 @@
             ctx.lineTo(rudderFrontX, rudderBaseYBottom);
             ctx.closePath();
             ctx.fill();
-
+            ctx.restore();
 
             // Horizontal Center Line (Reinforced)
-            ctx.strokeStyle = '#A0522D'; // Sienna
+            ctx.strokeStyle = '#A0522D';
             ctx.lineWidth = 1.5;
             ctx.beginPath();
             ctx.moveTo(centerX - this.width/2 * 0.75, centerY);
             ctx.lineTo(centerX + this.width/2 * 0.7, centerY);
             ctx.stroke();
 
-            // Optional faint logo silhouette on body (simple circle for placeholder)
-            ctx.fillStyle = 'rgba(100, 100, 100, 0.1)'; // Very faint gray
+            // Optional faint logo silhouette on body
+            ctx.fillStyle = 'rgba(100, 100, 100, 0.1)';
             ctx.beginPath();
             ctx.arc(centerX - this.width * 0.1, centerY, this.height * 0.2, 0, Math.PI * 2);
             ctx.fill();
 
-
-            // Gondola (Dark Gray)
-            const gondolaWidth = this.width * 0.3;
-            const gondolaHeight = this.height * 0.25;
-            const gondolaX = centerX - gondolaWidth / 2;
-            const gondolaY = centerY + this.height / 2 - gondolaHeight * 0.4; 
-            ctx.fillStyle = '#696969'; // DimGray
-            ctx.fillRect(gondolaX, gondolaY, gondolaWidth, gondolaHeight);
-            ctx.strokeStyle = '#2F4F4F'; // DarkSlateGray
-            ctx.strokeRect(gondolaX, gondolaY, gondolaWidth, gondolaHeight);
-
-            // Animated Gondola Windows
-            const numWindows = 3;
-            const windowWidth = gondolaWidth / (numWindows + 2); 
-            const windowHeight = gondolaHeight * 0.35;
-            const windowSpacing = (gondolaWidth - (numWindows * windowWidth)) / (numWindows + 1);
-            const windowBaseY = gondolaY + gondolaHeight * 0.2; 
-            
-            const pulseBrightness = 0.7 + Math.sin(this.windowPulsePhase) * 0.3; 
-            const windowColor = `rgba(204, 255, 255, ${pulseBrightness})`; // Pulsing Cyan: #ccffff
-            
-            for (let i = 0; i < numWindows; i++) {
-                const currentWindowX = gondolaX + windowSpacing + (i * (windowWidth + windowSpacing));
-                ctx.fillStyle = windowColor;
-                ctx.beginPath();
-                ctx.ellipse(currentWindowX + windowWidth/2, windowBaseY + windowHeight/2, windowWidth/2.2, windowHeight/2.2, 0, 0, Math.PI*2);
-                ctx.fill();
-                ctx.shadowColor = `rgba(204, 255, 255, ${pulseBrightness * 0.5})`; // Glow effect
-                ctx.shadowBlur = 4 * pulseBrightness;
-                ctx.fill(); 
-                ctx.shadowBlur = 0; 
-            }
-
             // Banner (trailing to the right with wave effect)
-            const bannerHeight = this.height * 0.3; 
+            const bannerHeight = this.height * 0.3;
             const bannerWidth = this.width * 0.7;
-            const bannerAttachX = centerX + this.width * 0.45; 
+            const bannerAttachX = centerX + this.width * 0.45;
             const bannerAttachY = centerY;
-            const bannerStartX = this.x + this.width + 20; 
-            const bannerSegments = 10; 
+            const bannerStartX = this.x + this.width + 20;
+            const bannerSegments = 10;
             const segmentWidth = bannerWidth / bannerSegments;
 
-            const perfNow = performance.now(); 
+            const perfNow = performance.now();
 
             const staticWaveOffsetYForAttach = Math.sin(this.bannerWavePhase) * this.bannerWaveAmplitude;
             const bannerBaseYForAttach = this.y + this.height / 2 - bannerHeight / 2 + staticWaveOffsetYForAttach;
@@ -617,25 +650,23 @@
             ctx.moveTo(bannerAttachX, bannerAttachY + this.height * 0.05);
             ctx.lineTo(bannerStartX, bannerBaseYForAttach + bannerHeight * 0.8);
             ctx.stroke();
-            
-            ctx.fillStyle = '#FFF'; 
+
+            ctx.fillStyle = '#FFF';
             ctx.strokeStyle = '#555';
             ctx.lineWidth = 1;
             ctx.beginPath();
-            let firstY = 0;
             for (let i = 0; i <= bannerSegments; i++) {
-                const waveOffset = Math.sin(perfNow / 200 + i * 0.5) * 3; 
+                const waveOffset = Math.sin(perfNow / 200 + i * 0.5) * this.bannerWaveAmplitude * (i / bannerSegments); // Amplitude increases towards end
                 const currentBannerX = bannerStartX + i * segmentWidth;
                 const currentBannerTopY = this.y + this.height / 2 - bannerHeight / 2 + waveOffset;
                 if (i === 0) {
                     ctx.moveTo(currentBannerX, currentBannerTopY);
-                    firstY = currentBannerTopY;
                 } else {
                     ctx.lineTo(currentBannerX, currentBannerTopY);
                 }
             }
             for (let i = bannerSegments; i >= 0; i--) {
-                 const waveOffset = Math.sin(perfNow / 200 + i * 0.5) * 3;
+                 const waveOffset = Math.sin(perfNow / 200 + i * 0.5) * this.bannerWaveAmplitude * (i / bannerSegments);
                  const currentBannerX = bannerStartX + i * segmentWidth;
                  const currentBannerBottomY = this.y + this.height / 2 + bannerHeight / 2 + waveOffset;
                  ctx.lineTo(currentBannerX, currentBannerBottomY);
@@ -644,21 +675,21 @@
             ctx.fill();
             ctx.stroke();
 
-            const avgBannerY = this.y + this.height / 2; 
-            ctx.fillStyle = '#d9534f'; 
-            const fontSize = Math.max(8, Math.min(16, bannerHeight * 0.35)); 
+            const avgBannerY = this.y + this.height / 2;
+            ctx.fillStyle = '#d9534f';
+            const fontSize = Math.max(8, Math.min(16, bannerHeight * 0.35));
             ctx.font = `bold ${fontSize}px 'Courier New', Courier, monospace`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(this.bannerLogo, bannerStartX + bannerWidth / 2, avgBannerY);
-            ctx.textAlign = 'left'; 
+            ctx.textAlign = 'left';
             ctx.textBaseline = 'alphabetic';
         }
 
         collidesWith(rect) {
             return rect.x < this.x + this.width &&
                    rect.x + rect.width > this.x &&
-                   rect.y < this.y + this.height && 
+                   rect.y < this.y + this.height &&
                    rect.y + rect.height > this.y;
         }
     }
@@ -673,18 +704,18 @@
          audioCtx.onstatechange = () => {
              console.log("AudioContext state changed to:", audioCtx.state);
              if (audioCtx.state !== 'running') {
-                audioInitialized = false; 
-                stopAllSounds(); 
+                audioInitialized = false;
+                stopAllSounds();
                 console.warn("AudioContext state changed to non-running. Audio features may be disabled until next interaction.");
              } else if (audioCtx.state === 'running' && !audioInitialized) {
                 console.log("AudioContext resumed automatically. Re-initialization might be needed for nodes.");
-                if (initAudio()) { 
+                if (initAudio()) {
                     console.log("Audio re-initialized (nodes checked/created) automatically on state change to running.");
-                    if (gameRunning && !musicIsPlaying && !isChargingSequence && !isCaptured) { 
+                    if (gameRunning && !musicIsPlaying && !isChargingSequence && !isCaptured) {
                         console.log("Restarting music loop checker due to automatic context resume and game state.");
-                        startMusicLoopChecker(); 
+                        startMusicLoopChecker();
                     }
-                     if (blimp && gameRunning && !blimpThemeIsPlaying) { // If blimp was on screen
+                     if (blimp && gameRunning && !blimpThemeIsPlaying && audioCtx.currentTime >= blimpThemeNextPlayTime) {
                         playBlimpTheme();
                     }
                 }
@@ -698,9 +729,9 @@
     let musicOscillators = [], engineHumNodes = null;
     let chargingSoundNodes = [], captureSoundNodes = [];
     let musicGainNode = null, musicLowPassFilter = null, reverbNode = null;
-    
-    let musicShouldBePlaying = false; 
-    let musicIsPlaying = false;       
+
+    let musicShouldBePlaying = false;
+    let musicIsPlaying = false;
 
     let musicLoopIntervalId = null;
     let nextMusicScheduleTime = 0;
@@ -714,13 +745,13 @@
             console.warn("initAudio: Context suspended, attempting resume...");
             audioCtx.resume().then(() => {
                  console.log("initAudio: Context resumed successfully during init attempt. Current state:", audioCtx.state);
-                 if (audioCtx.state === 'running' && !audioInitialized) { 
-                     return initAudioInternal(); 
+                 if (audioCtx.state === 'running' && !audioInitialized) {
+                     return initAudioInternal();
                  }
             }).catch(err => { console.error("initAudio: Error resuming suspended context:", err); return false; });
-            return false; 
+            return false;
         }
-        if (audioCtx.state === 'running') { return initAudioInternal(); } 
+        if (audioCtx.state === 'running') { return initAudioInternal(); }
         console.warn(`initAudio: Unexpected state ${audioCtx.state}. Cannot initialize.`); return false;
     }
 
@@ -747,7 +778,7 @@
                 const reverbDelay = audioCtx.createDelay(0.5); reverbDelay.delayTime.value = 0.15; const reverbFeedback = audioCtx.createGain(); reverbFeedback.gain.value = 0.35; const reverbFilter = audioCtx.createBiquadFilter(); reverbFilter.type = 'lowpass'; reverbFilter.frequency.value = 2500; reverbDelay.connect(reverbFeedback).connect(reverbFilter).connect(reverbDelay); reverbNode = { input: reverbDelay, output: reverbFilter };
                 musicGainNode.connect(musicLowPassFilter).connect(audioCtx.destination);
                 const reverbOutputGain = audioCtx.createGain(); reverbOutputGain.gain.value = 0.25; reverbNode.output.connect(reverbOutputGain).connect(audioCtx.destination);
-                musicGainNode.gain.value = 0.45; 
+                musicGainNode.gain.value = 0.45;
                 console.log("setupMasterAudioNodes: Master audio nodes created successfully."); return true;
             } catch (error) { console.error("setupMasterAudioNodes: Error creating master audio nodes:", error); musicGainNode = null; musicLowPassFilter = null; reverbNode = null; return false; }
         } else {
@@ -769,22 +800,22 @@
             osc.type = type;
             if (options.detune) osc.detune.setValueAtTime(options.detune, startTime);
             if (options.frequency instanceof AudioParam) { options.frequency.cancelScheduledValues(startTime); options.frequency.setValueAtTime(options.frequency.value, startTime); options.frequency.connect(osc.frequency); } else { osc.frequency.setValueAtTime(freq, startTime); }
-            
+
             gain.gain.setValueAtTime(vol, startTime);
-            if (options.rampTo !== undefined && duration > 0) { 
-                gain.gain.linearRampToValueAtTime(options.rampTo, startTime + duration * 0.8); 
-                gain.gain.linearRampToValueAtTime(0.001, startTime + duration); 
-            } else if (duration > 0) { 
-                gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration); 
+            if (options.rampTo !== undefined && duration > 0) {
+                gain.gain.linearRampToValueAtTime(options.rampTo, startTime + duration * 0.8);
+                gain.gain.linearRampToValueAtTime(0.001, startTime + duration);
+            } else if (duration > 0) {
+                gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
             }
-            
+
             osc.connect(gain).connect(outputNode);
             osc.start(startTime);
             const stopTime = startTime + duration;
-            if (duration > 0 && stopTime > audioCtx.currentTime) { osc.stop(stopTime); } 
+            if (duration > 0 && stopTime > audioCtx.currentTime) { osc.stop(stopTime); }
             else if (duration <= 0) { /* Indefinite tone, must be stopped manually or by parent node */ }
             else { try { osc.stop(); } catch (e) {} } // Stop if somehow scheduled in past for 0 duration
-            
+
             if (options.frequency instanceof AudioParam) { setTimeout(() => { try { options.frequency.disconnect(osc.frequency); } catch(e) {} }, duration * 1000 + 100); }
             return { osc, gain };
         } catch (error) { console.error("playTone Error:", error, {freq, duration, type, vol, when, options}); return null; }
@@ -807,25 +838,23 @@
     function playGameOverFanfare() { const now = audioCtx.currentTime; const vol = 0.25; const notes = [ { freq: 440.00, delay: 0.0, dur: 0.3 }, { freq: 349.23, delay: 0.3, dur: 0.3 }, { freq: 293.66, delay: 0.6, dur: 0.3 }, { freq: 261.63, delay: 0.9, dur: 0.6 }, ]; notes.forEach(n => playTone(n.freq, n.dur, 'triangle', vol, n.delay, { rampTo: 0.001 })); console.log("Playing soft game over fanfare"); }
     function playWaveBeamSound(building) { playTone(1500, 0.1, 'sine', 0.08, 0, { detune: 200 }); playTone(1800, 0.1, 'sine', 0.08, 0.05, { detune: -150 }); }
     function playLockOnSound() { playTone(523.25, 0.1, 'square', 0.35, 0); playTone(369.99, 0.1, 'square', 0.35, 0.05); }
-    
-    function playVertiportPowerDownSound() { // Restored "power-down" sine wave
+
+    function playVertiportPowerDownSound() {
         if (!audioInitialized || !audioCtx || audioCtx.state !== 'running') return;
-        
-        const startFreq = 440; 
-        const endFreq = 80;   
-        const rampDuration = 1.5; 
-        const soundDuration = rampDuration + 0.2; // Keep sound slightly longer than ramp for fade out
+
+        const startFreq = 440;
+        const endFreq = 80;
+        const rampDuration = 1.5;
+        const soundDuration = rampDuration + 0.2;
         const vol = 0.25;
 
-        const node = playTone(startFreq, soundDuration, 'sine', vol, 0, { rampTo: 0.001 }); 
+        const node = playTone(startFreq, soundDuration, 'sine', vol, 0, { rampTo: 0.001 });
 
         if (node && node.osc) {
-            // Add to captureSoundNodes so it can be stopped if sequence is interrupted
-            // or if another capture sound needs to override.
-            captureSoundNodes.push(node); 
+            captureSoundNodes.push(node);
             try {
                 const now = audioCtx.currentTime;
-                node.osc.frequency.setValueAtTime(startFreq, now); 
+                node.osc.frequency.setValueAtTime(startFreq, now);
                 node.osc.frequency.linearRampToValueAtTime(endFreq, now + rampDuration);
             } catch(e) {
                 console.error("Error ramping vertiport power down sound:", e);
@@ -870,7 +899,7 @@
 
     function checkMusicSchedule() {
         if (!gameRunning || !audioInitialized || !audioCtx || audioCtx.state !== 'running' || !musicShouldBePlaying || isChargingSequence || isCaptured) {
-            if (musicIsPlaying) stopBackgroundMusic(); 
+            if (musicIsPlaying) stopBackgroundMusic();
             return;
         }
         const currentTime = audioCtx.currentTime;
@@ -882,12 +911,12 @@
     function startMusicLoopChecker() {
         if (!audioInitialized || !audioCtx || audioCtx.state !== 'running') { console.warn("startMusicLoopChecker: Cannot start, audio not ready."); return; }
         if (musicLoopIntervalId !== null) { console.log("startMusicLoopChecker: Loop checker already running."); return; }
-        
-        musicShouldBePlaying = true; 
-        musicIsPlaying = true;      
+
+        musicShouldBePlaying = true;
+        musicIsPlaying = true;
         console.log(`startMusicLoopChecker: Starting. musicShouldBePlaying: ${musicShouldBePlaying}, musicIsPlaying: ${musicIsPlaying}`);
         nextMusicScheduleTime = audioCtx.currentTime;
-        scheduleMusicBlock(); 
+        scheduleMusicBlock();
         musicLoopIntervalId = setInterval(checkMusicSchedule, musicCheckIntervalMs);
     }
 
@@ -897,90 +926,156 @@
             musicLoopIntervalId = null;
         }
         musicOscillators.forEach(item => { if (item && item.osc && typeof item.osc.stop === 'function') { try { if(item.gain && typeof item.gain.gain.cancelScheduledValues === 'function') { item.gain.gain.cancelScheduledValues(audioCtx.currentTime); item.gain.gain.setTargetAtTime(0.0001, audioCtx.currentTime, 0.005); } item.osc.stop(audioCtx.currentTime + 0.02); } catch (e) {} } }); musicOscillators = [];
-        
-        musicIsPlaying = false;       
-        musicShouldBePlaying = false; 
+
+        musicIsPlaying = false;
+        musicShouldBePlaying = false;
         console.log(`stopBackgroundMusic: Stopped. musicShouldBePlaying: ${musicShouldBePlaying}, musicIsPlaying: ${musicIsPlaying}, Cleared Interval ID.`);
         nextMusicScheduleTime = 0; currentLoopLengthSeconds = 0;
     }
 
-    function playBlimpTheme() { 
-        if (!audioInitialized || !audioCtx || audioCtx.state !== 'running' || blimpThemeIsPlaying) return;
-        
-        blimpThemeIsPlaying = true;
-        try {
-            blimpThemeGainNode = audioCtx.createGain();
-            blimpThemeGainNode.connect(audioCtx.destination);
-            blimpThemeGainNode.gain.setValueAtTime(0, audioCtx.currentTime);
-            blimpThemeGainNode.gain.linearRampToValueAtTime(BLIMP_THEME_VOLUME, audioCtx.currentTime + BLIMP_THEME_FADE_DURATION);
+    function playBlimpTheme() {
+        if (!audioInitialized || !audioCtx || audioCtx.state !== 'running') return;
 
-            scheduleBlimpArpeggio();
-        } catch (e) {
-            console.error("Error playing new blimp theme:", e);
-            blimpThemeIsPlaying = false;
-            if (blimpThemeGainNode) try { blimpThemeGainNode.disconnect(); } catch(_) {}
-            blimpThemeGainNode = null;
-        }
-    }
-
-    function scheduleBlimpArpeggio() {
-        if (!blimpThemeIsPlaying || !blimpThemeGainNode || !audioCtx || audioCtx.state !== 'running') {
-            stopBlimpTheme(true); 
+        // PRIMARY GATE: Has enough time passed for ANY blimp theme to play?
+        // This check now correctly gates new theme initiations even if blimpThemeIsPlaying was false previously.
+        if (audioCtx.currentTime < blimpThemeNextPlayTime) {
+            // console.log(`Blimp theme: Play attempted at ${audioCtx.currentTime.toFixed(2)} but cooldown active until ${blimpThemeNextPlayTime.toFixed(2)}. No new theme started.`);
+            // If a theme is already considered "playing" (blimpThemeIsPlaying is true),
+            // its own loop (via setTimeout in scheduleBlimpArpeggio calling this function)
+            // will handle re-triggering if conditions (blimp still exists, etc.) are met.
+            // We don't need to reschedule a check here explicitly.
+            // If no theme is "playing" (blimpThemeIsPlaying is false), it means this call
+            // is likely from a new blimp spawning during cooldown. We simply return, and no theme starts.
             return;
         }
 
+        // If we reach here, the global cooldown has passed.
+        // A blimp theme sequence (either new or a loop of an existing one) can now proceed.
+        blimpThemeIsPlaying = true; // Mark that a blimp theme audio sequence is now active or continuing.
+
+        try {
+            if (!blimpThemeGainNode) {
+                blimpThemeGainNode = audioCtx.createGain();
+                blimpThemeGainNode.connect(audioCtx.destination);
+                blimpThemeGainNode.gain.setValueAtTime(0, audioCtx.currentTime); // Start silent for fade-in
+            }
+            // Ensure gain is at current value before ramping, to avoid jumps if already fading in/out
+            blimpThemeGainNode.gain.cancelScheduledValues(audioCtx.currentTime);
+            blimpThemeGainNode.gain.setValueAtTime(blimpThemeGainNode.gain.value, audioCtx.currentTime); // Set to current value
+            blimpThemeGainNode.gain.linearRampToValueAtTime(BLIMP_THEME_VOLUME, audioCtx.currentTime + BLIMP_THEME_FADE_DURATION);
+
+            scheduleBlimpArpeggio(); // This will play the arpeggio and importantly set the *next* blimpThemeNextPlayTime.
+        } catch (e) {
+            console.error("Error in playBlimpTheme setup:", e);
+            blimpThemeIsPlaying = false; // Reset on error
+            if (blimpThemeGainNode) {
+                try { blimpThemeGainNode.disconnect(); } catch(_) {}
+                blimpThemeGainNode = null; // Allow recreation
+            }
+        }
+    }
+
+
+    function scheduleBlimpArpeggio() {
+        if (!blimpThemeIsPlaying || !blimpThemeGainNode || !audioCtx || audioCtx.state !== 'running' || !blimp) {
+            // console.log("scheduleBlimpArpeggio: Conditions not met (blimp gone, theme stopped, or audio issue). Stopping.");
+            stopBlimpTheme(true);
+            return;
+        }
+
+        // Clean up previous notes related to this theme instance
         blimpThemeNodes.forEach(item => {
             if (item && item.osc) try { item.osc.stop(audioCtx.currentTime); } catch (e) {}
         });
         blimpThemeNodes = [];
 
         const arpSequence = [
-            { freq: 659.25, dur: 0.15, type: 'sine', vol: 0.7 },  // E5
-            { freq: 783.99, dur: 0.15, type: 'sine', vol: 0.6 },  // G5
-            { freq: 1046.50, dur: 0.15, type: 'sine', vol: 0.5 }, // C6
-            { freq: 783.99, dur: 0.15, type: 'sine', vol: 0.6 },  // G5
+            { freq: 783.99, dur: 0.12, type: 'triangle', vol: 0.8 }, // G5
+            { freq: 1046.50, dur: 0.12, type: 'sine', vol: 0.7 },   // C6
+            { freq: 932.33, dur: 0.12, type: 'triangle', vol: 0.6 },// A#5/Bb5
+            { freq: 783.99, dur: 0.12, type: 'sine', vol: 0.7 },   // G5
+            { freq: 659.25, dur: 0.18, type: 'triangle', vol: 0.8 }, // E5 (longer hold)
         ];
-        const arpPatternLength = arpSequence.reduce((sum, note) => sum + note.dur + 0.05, 0); 
-        const loopDuration = arpPatternLength * 2; 
-        
-        let accumulatedDelay = 0;
-        const arpStartTime = audioCtx.currentTime;
+        const shortPauseBetweenNotes = 0.04;
 
-        for (let repeat = 0; repeat < 2; repeat++) { 
-            for (let i = 0; i < arpSequence.length; i++) {
-                const note = arpSequence[i];
-                const node = playTone(note.freq, note.dur, note.type, note.vol, 
-                                    accumulatedDelay, 
-                                    { outputNode: blimpThemeGainNode, 
-                                      absoluteTime: arpStartTime + accumulatedDelay,
-                                      rampTo: 0.01 
-                                    });
-                if (node) blimpThemeNodes.push(node);
-                accumulatedDelay += note.dur + 0.05; 
-            }
+        let currentArpeggioPlayDuration = 0;
+        const arpPlayStartTime = audioCtx.currentTime; // Base time for this specific arpeggio sequence
+
+        for (let i = 0; i < arpSequence.length; i++) {
+            const note = arpSequence[i];
+            const node = playTone(note.freq, note.dur, note.type, note.vol,
+                                0, // 'when' is relative to absoluteTime if provided
+                                {
+                                  outputNode: blimpThemeGainNode,
+                                  absoluteTime: arpPlayStartTime + currentArpeggioPlayDuration, // Schedule precisely
+                                  rampTo: 0.005
+                                });
+            if (node) blimpThemeNodes.push(node);
+            currentArpeggioPlayDuration += note.dur + shortPauseBetweenNotes;
         }
-        
-        blimpThemeLoopTimeoutId = setTimeout(scheduleBlimpArpeggio, loopDuration * 1000);
+        // currentArpeggioPlayDuration now holds the total time for this arpeggio to play out (notes + pauses).
+
+        // Calculate when the NEXT theme play (either loop of current, or new blimp) can happen.
+        const randomCooldownDurationSeconds = (BLIMP_THEME_REPLAY_MIN_DELAY + Math.random() * (BLIMP_THEME_REPLAY_MAX_DELAY - BLIMP_THEME_REPLAY_MIN_DELAY)) / 1000;
+        // The next global play time is after the current arpeggio finishes AND the cooldown passes.
+        blimpThemeNextPlayTime = arpPlayStartTime + currentArpeggioPlayDuration + randomCooldownDurationSeconds;
+        // console.log(`Arpeggio scheduled. Start: ${arpPlayStartTime.toFixed(2)}, Duration: ${currentArpeggioPlayDuration.toFixed(2)}. Next theme play allowed globally at: ${blimpThemeNextPlayTime.toFixed(2)}`);
+
+        if (blimpThemeLoopTimeoutId) clearTimeout(blimpThemeLoopTimeoutId);
+
+        // This timeout is for the *current* blimp's theme to attempt to loop.
+        // It should try to play again after its current arpeggio + cooldown.
+        const delayForThisLoopIterationSeconds = currentArpeggioPlayDuration + randomCooldownDurationSeconds;
+
+        blimpThemeLoopTimeoutId = setTimeout(() => {
+            if (blimp && blimpThemeIsPlaying && audioCtx.state === 'running') {
+                // When this timeout fires, it means *this specific blimp's theme* wants to play its next arpeggio.
+                // Call playBlimpTheme(), which contains the master gate (audioCtx.currentTime < blimpThemeNextPlayTime).
+                // This ensures that even if this blimp's theme wants to loop, it won't if another
+                // blimp theme (or even this one, if logic was slightly different) has recently played
+                // and set a future blimpThemeNextPlayTime.
+                // console.log(`Blimp theme loop for current blimp: Attempting next arpeggio via playBlimpTheme() at ${audioCtx.currentTime.toFixed(2)}`);
+                playBlimpTheme();
+            } else {
+                // console.log("Blimp theme loop: Conditions not met for replay (blimp gone or theme stopped by stopBlimpTheme).");
+            }
+        }, delayForThisLoopIterationSeconds * 1000);
     }
 
 
     function stopBlimpTheme(immediate = false) {
-        if (!blimpThemeIsPlaying && !blimpThemeGainNode) return; 
+        if (!blimpThemeIsPlaying && !blimpThemeGainNode) {
+            // console.log("stopBlimpTheme: Called when theme not playing or no gain node. Already effectively stopped.");
+            return;
+        }
 
-        blimpThemeIsPlaying = false; 
-        if (blimpThemeLoopTimeoutId) { 
+        blimpThemeIsPlaying = false; // This is the master switch to stop loops/replays.
+
+        if (blimpThemeLoopTimeoutId) {
             clearTimeout(blimpThemeLoopTimeoutId);
             blimpThemeLoopTimeoutId = null;
+            // console.log("stopBlimpTheme: Cleared blimp theme loop timeout.");
         }
-        
-        if (!blimpThemeGainNode) return; 
+
+        if (!audioCtx || audioCtx.state !== 'running' || !blimpThemeGainNode) {
+            // console.log("stopBlimpTheme: No gain node to fade out or audio context not running.");
+             blimpThemeNodes.forEach(item => {
+                if (item && item.osc) try { item.osc.stop(); } catch(_) {}
+            });
+            blimpThemeNodes = [];
+            if (blimpThemeGainNode) { // If gain node exists but context isn't running, try to disconnect.
+                try { blimpThemeGainNode.disconnect(); } catch(_) {}
+                blimpThemeGainNode = null;
+            }
+            return;
+        }
 
         const fadeDuration = immediate ? 0.05 : BLIMP_THEME_FADE_DURATION;
         const now = audioCtx.currentTime;
 
         try {
             blimpThemeGainNode.gain.cancelScheduledValues(now);
-            blimpThemeGainNode.gain.setValueAtTime(blimpThemeGainNode.gain.value, now); 
+            blimpThemeGainNode.gain.setValueAtTime(blimpThemeGainNode.gain.value, now);
             blimpThemeGainNode.gain.linearRampToValueAtTime(0.0001, now + fadeDuration);
 
             const cleanupTime = (fadeDuration + 0.2) * 1000;
@@ -989,27 +1084,34 @@
                     if (item && item.osc) try { item.osc.stop(); } catch(_) {}
                 });
                 blimpThemeNodes = [];
-                if (blimpThemeGainNode) try { blimpThemeGainNode.disconnect(); } catch(_) {}
-                blimpThemeGainNode = null;
+                if (blimpThemeGainNode) {
+                    try {
+                        blimpThemeGainNode.disconnect();
+                    } catch(_) {}
+                    blimpThemeGainNode = null;
+                }
+                // console.log("stopBlimpTheme: Blimp theme fully stopped and cleaned up.");
             }, cleanupTime);
         } catch(e) {
-            console.error("Error stopping blimp theme:", e);
+            console.error("Error stopping blimp theme audio components:", e);
             blimpThemeNodes.forEach(item => {
                  if (item && item.osc) try { item.osc.stop(); } catch(_) {}
             });
             blimpThemeNodes = [];
-            if (blimpThemeGainNode) try { blimpThemeGainNode.disconnect(); } catch(_) {}
-            blimpThemeGainNode = null;
+            if (blimpThemeGainNode) {
+                try { blimpThemeGainNode.disconnect(); } catch(_) {}
+                blimpThemeGainNode = null;
+            }
         }
     }
 
     function stopAllSounds() {
         console.log("Stopping all sounds...");
-        stopBackgroundMusic(); 
-        stopEngineHum(); 
-        stopChargingSound(); 
+        stopBackgroundMusic();
+        stopEngineHum();
+        stopChargingSound();
         stopCaptureSounds();
-        stopBlimpTheme(true); 
+        stopBlimpTheme(true); // Immediate stop for blimp theme
         if (musicGainNode && audioCtx && audioCtx.state === 'running') { musicGainNode.gain.cancelScheduledValues(audioCtx.currentTime); musicGainNode.gain.setValueAtTime(0.45, audioCtx.currentTime); }
         if (musicLowPassFilter && audioCtx && audioCtx.state === 'running') { musicLowPassFilter.frequency.cancelScheduledValues(audioCtx.currentTime); musicLowPassFilter.frequency.setValueAtTime(20000, audioCtx.currentTime); musicLowPassFilter.Q.cancelScheduledValues(audioCtx.currentTime); musicLowPassFilter.Q.setValueAtTime(1, audioCtx.currentTime); }
     }
@@ -1018,49 +1120,48 @@
     function updateScoreUI() { scoreLabel.textContent = `Score: ${score}`; }
     function triggerShake(duration = 5) { carShake = duration; }
     function calculateDimensions() { playableHeight = gameCanvas.height - SIDEWALK_HEIGHT; cityHeight = playableHeight; MAX_CAR_X = gameCanvas.width * 0.4; }
-    
+
     function spawnBuilding(forceX = null) { const isVertiport = Math.random() < VERTIPORT_SPAWN_CHANCE && !buildings.some(b => b.isVertiport); const minWidth = isVertiport ? 100 : 60; const maxWidth = isVertiport ? 150 : 180; const minHeight = isVertiport ? playableHeight * 0.7 : 100; const maxHeight = isVertiport ? playableHeight * 0.85 : playableHeight * 0.65; const gap = 40 + Math.random() * 60; const lastBuilding = buildings[buildings.length - 1]; let nextX = forceX !== null ? forceX : (lastBuilding ? lastBuilding.x + lastBuilding.width + gap : gameCanvas.width + 50); const height = minHeight + Math.random() * (maxHeight - minHeight); buildings.push({ x: nextX, y: gameCanvas.height - height, width: minWidth + Math.random() * (maxWidth - minWidth), height: height, color: isVertiport ? '#607D8B' : `hsl(${190 + Math.random()*50}, 25%, ${15 + Math.random()*15}%)`, isVertiport: isVertiport, wavePhase: Math.random() * Math.PI * 2 }); }
     function updateBuildings() { for (let i = buildings.length - 1; i >= 0; i--) { const b = buildings[i]; b.x -= currentScrollSpeed; if (b.isVertiport) b.wavePhase += 0.1; if (b.x + b.width < 0) buildings.splice(i, 1); } const lastBuilding = buildings[buildings.length - 1]; if (!lastBuilding || lastBuilding.x + lastBuilding.width < gameCanvas.width + 100) { spawnBuilding(); } }
     function drawBuildings() { buildings.forEach(b => { ctx.fillStyle = b.color; ctx.fillRect(b.x, b.y, b.width, b.height); if (b.isVertiport) { const platformY = b.y - 15; ctx.fillStyle = '#455A64'; ctx.fillRect(b.x - 10, platformY, b.width + 20, 15); ctx.fillStyle = '#B0BEC5'; ctx.beginPath(); ctx.arc(b.x + b.width / 2, platformY + 7.5, b.width * 0.3, 0, Math.PI * 2); ctx.fill(); const lightColor = (Math.sin(b.wavePhase * 2) > 0) ? '#0ff' : '#ff0'; ctx.fillStyle = lightColor; ctx.fillRect(b.x, platformY + 5, 10, 5); ctx.fillRect(b.x + b.width - 10, platformY + 5, 10, 5); const waveWidth = b.width * 0.6; const waveX = b.x + (b.width - waveWidth) / 2; const waveSegmentHeight = 20; const numSegments = Math.ceil(platformY / waveSegmentHeight); for(let i=0; i<numSegments; i++) { const segmentY = platformY - (i + 1) * waveSegmentHeight; const alpha = 0.1 + Math.abs(Math.sin(b.wavePhase + i * 0.5)) * 0.2; const hue = 180 + Math.sin(b.wavePhase + i*0.3) * 20; ctx.fillStyle = `hsla(${hue}, 100%, 70%, ${alpha})`; ctx.fillRect(waveX, segmentY, waveWidth, waveSegmentHeight - 2); } } else { ctx.fillStyle = 'rgba(255, 255, 180, 0.2)'; for(let wy = b.y + 10; wy < b.y + b.height - 10; wy += 25) { for(let wx = b.x + 10; wx < b.x + b.width - 10; wx += 25) { if(Math.random() > 0.4) { ctx.fillRect(wx, wy, 10, 15); } } } } }); }
     function spawnPedestrian() { const type = Math.random() > 0.4 ? 'OldLady' : 'BalloonPerson'; pedestrians.push({ x: gameCanvas.width + 50 + Math.random() * 100, y: gameCanvas.height - SIDEWALK_HEIGHT + 5 + Math.random() * (SIDEWALK_HEIGHT - 20), type: type, size: type === 'OldLady' ? {w: 8, h: 16} : {w: 10, h: 18}, color: type === 'OldLady' ? 'pink' : `hsl(${Math.random()*360}, 60%, 70%)`, throwCooldown: 60 + Math.random() * 120, speed: currentScrollSpeed * PEDESTRIAN_SPEED_MULTIPLIER * (0.8 + Math.random() * 0.4), lastActionFrame: 0 }); }
-    
+
     function updatePedestriansAndProjectiles() {
         const currentPedestrianSpawnChance = BASE_PEDESTRIAN_SPAWN_CHANCE * difficultyMultiplier;
-        const currentProjectileThrowChance = BASE_PROJECTILE_THROW_CHANCE * difficultyMultiplier; 
+        const currentProjectileThrowChance = BASE_PROJECTILE_THROW_CHANCE * difficultyMultiplier;
         for (let i = pedestrians.length - 1; i >= 0; i--) {
             const p = pedestrians[i]; p.x -= p.speed; p.throwCooldown = Math.max(0, p.throwCooldown - 1);
             if (p.throwCooldown === 0 && Math.random() < currentProjectileThrowChance) {
                 if (p.type === 'OldLady') {
                     const itemType = Math.random() < 0.5 ? 'ChickenLeg' : 'CornCob';
-                    
-                    // PROJECTILE SPAWN HEIGHT RANDOMIZATION
+
                     let spawnY;
-                    if (Math.random() < 0.2) { // 20% chance for high arc
-                        spawnY = gameCanvas.height * 0.1 + Math.random() * 20; 
-                    } else { // 80% chance for mid-air arc
+                    if (Math.random() < 0.2) {
+                        spawnY = gameCanvas.height * 0.1 + Math.random() * 20;
+                    } else {
                         spawnY = gameCanvas.height * 0.5 + Math.random() * 50;
                     }
-                    
-                    let initialVy = -7 - Math.random() * 3; 
-                    let initialVx = -1.0 - Math.random() * 1.0; 
 
-                    projectiles.push({ 
-                        type: itemType, 
-                        x: p.x, 
-                        y: spawnY, 
-                        vx: initialVx, 
-                        vy: initialVy, 
-                        size: {w: 4, h: (itemType === 'CornCob' ? 8 : 6)}, 
-                        maxSize: 30 + Math.random() * 15, 
-                        currentSize: 4, 
-                        growthRate: 0.3 + Math.random() * 0.2, 
-                        color: itemType === 'ChickenLeg' ? 'orange' : '#FFC107', 
-                        rotation: 0, 
-                        rotationSpeed: (Math.random() - 0.5) * 0.8, 
-                        stuckFrames: 0, 
-                        removeAfterFrames: -1 
+                    let initialVy = -7 - Math.random() * 3;
+                    let initialVx = -1.0 - Math.random() * 1.0;
+
+                    projectiles.push({
+                        type: itemType,
+                        x: p.x,
+                        y: spawnY,
+                        vx: initialVx,
+                        vy: initialVy,
+                        size: {w: 4, h: (itemType === 'CornCob' ? 8 : 6)},
+                        maxSize: 30 + Math.random() * 15,
+                        currentSize: 4,
+                        growthRate: 0.3 + Math.random() * 0.2,
+                        color: itemType === 'ChickenLeg' ? 'orange' : '#FFC107',
+                        rotation: 0,
+                        rotationSpeed: (Math.random() - 0.5) * 0.8,
+                        stuckFrames: 0,
+                        removeAfterFrames: -1
                     });
-                } else { 
+                } else {
                     const projectileBaseSpeedX = -currentScrollSpeed * PROJECTILE_SPEED_MULTIPLIER;
                     projectiles.push({ type: 'Balloon', x: p.x, y: p.y - 15, vx: projectileBaseSpeedX * (0.6 + Math.random() * 0.3), vy: -(1.5 + Math.random() * 1.8), size: {w: 12 + Math.random()*6, h: 16 + Math.random()*8}, color: `hsl(${Math.random()*360}, 80%, 70%)` });
                 }
@@ -1068,21 +1169,21 @@
             }
             if (p.x + p.size.w < 0) { pedestrians.splice(i, 1); }
         }
-        const maxPedestrians = 3 + Math.floor(difficultyMultiplier * 4); 
+        const maxPedestrians = 3 + Math.floor(difficultyMultiplier * 4);
         if (pedestrians.length < maxPedestrians && Math.random() < currentPedestrianSpawnChance) { spawnPedestrian(); }
-        
+
         for (let i = projectiles.length - 1; i >= 0; i--) {
             const proj = projectiles[i]; proj.x += proj.vx; proj.y += proj.vy;
             if (proj.type === 'ChickenLeg' || proj.type === 'CornCob') {
-                proj.vy += PROJECTILE_GRAVITY; proj.rotation += proj.rotationSpeed; 
+                proj.vy += PROJECTILE_GRAVITY; proj.rotation += proj.rotationSpeed;
                 if (proj.vy < 0 && proj.currentSize < proj.maxSize) { proj.currentSize += proj.growthRate; proj.size.w = proj.currentSize * (proj.type === 'CornCob' ? 0.6 : 1.0); proj.size.h = proj.currentSize * (proj.type === 'CornCob' ? 1.2 : 1.5); }
-                
-                if (proj.y < 0 && proj.vy < 0) { 
+
+                if (proj.y < 0 && proj.vy < 0) {
                     proj.y = 0;
-                    proj.vy *= -0.3; 
+                    proj.vy *= -0.3;
                 }
 
-                const groundLevel = playableHeight - proj.size.h; 
+                const groundLevel = playableHeight - proj.size.h;
                 if (proj.y >= groundLevel - 5) { if (Math.abs(proj.vy) < 0.5) { if (proj.stuckFrames !== undefined) { proj.stuckFrames++; }} else { proj.stuckFrames = 0; } if (proj.y >= groundLevel && proj.removeAfterFrames === -1) { proj.removeAfterFrames = 3; } proj.y = Math.min(proj.y, groundLevel); } else { proj.stuckFrames = 0; }
                 if (proj.removeAfterFrames !== undefined && proj.removeAfterFrames > 0) { proj.removeAfterFrames--;}
                 if ((proj.stuckFrames !== undefined && proj.stuckFrames > 50) || (proj.removeAfterFrames !== undefined && proj.removeAfterFrames === 0)) { projectiles.splice(i, 1); continue; }
@@ -1098,20 +1199,20 @@
     function spawnBird() { const currentBirdSpawnChance = BASE_BIRD_SPAWN_CHANCE * difficultyMultiplier; if (birds.length < (4 + Math.floor(difficultyMultiplier * 6)) && Math.random() < currentBirdSpawnChance) { const isLarge = Math.random() < 0.3; const size = isLarge ? 25 + Math.random() * 10 : 12 + Math.random() * 8; const baseY = playableHeight * (isLarge ? 0.3 : 0.15) + Math.random() * playableHeight * (isLarge ? 0.4 : 0.7); let baseSpeed = currentScrollSpeed * BIRD_SPEED_MULTIPLIER * 1.1; let ampMultiplier = 1.2; let freqMultiplier = 1.2; if (score > 3000) { ampMultiplier = 1.5 + (difficultyMultiplier - 1.15) * 1.2; freqMultiplier = 1.5 + (difficultyMultiplier - 1.15) * 1.0; } birds.push({ x: gameCanvas.width + 50 + Math.random() * 100, y: baseY, baseY: baseY, size: size, type: isLarge ? 'large' : 'small', speed: baseSpeed * (isLarge ? (0.8 + Math.random() * 0.1) : (1.0 + Math.random() * 0.2)), color: `hsl(30, ${15+Math.random()*10}%, ${isLarge ? 40 : 60 + Math.random() * 20}%)`, wingPhase: Math.random() * Math.PI * 2, wingSpeed: (isLarge ? 0.15 : 0.25) + Math.random() * 0.08, wanderAmplitudeY: (25 + Math.random() * 50) * (isLarge ? 1.3 : 1.0) * ampMultiplier, wanderFrequencyY: (0.025 + Math.random() * 0.035) * (isLarge ? 0.8 : 1.0) * freqMultiplier, wanderPhaseOffsetY: Math.random() * Math.PI * 2, wanderAmplitudeX: (40 + Math.random() * 70) * (isLarge ? 0.8 : 1.0) * ampMultiplier, wanderFrequencyX: (0.02 + Math.random() * 0.025) * (isLarge ? 0.9 : 1.0) * freqMultiplier, wanderPhaseOffsetX: Math.random() * Math.PI * 2, baseXOffset: 0 }); } }
     function updateBirds() { const maxBirds = 4 + Math.floor(difficultyMultiplier * 6); for (let i = birds.length - 1; i >= 0; i--) { const bird = birds[i]; const timeFactorY = frameCount * bird.wanderFrequencyY + bird.wanderPhaseOffsetY; const timeFactorX = frameCount * bird.wanderFrequencyX + bird.wanderPhaseOffsetX; const offsetY = Math.sin(timeFactorY) * bird.wanderAmplitudeY; const offsetX = Math.cos(timeFactorX) * bird.wanderAmplitudeX; bird.baseXOffset -= bird.speed; bird.x = (gameCanvas.width + bird.baseXOffset) + offsetX; bird.y = bird.baseY + offsetY; bird.wingPhase += bird.wingSpeed; bird.y = Math.max(0, Math.min(bird.y, playableHeight - bird.size)); if (bird.x + bird.size < -150) { birds.splice(i, 1); }} spawnBird(); }
     function drawBirds() { birds.forEach(bird => { ctx.save(); ctx.translate(bird.x + bird.size / 2, bird.y + bird.size / 2); ctx.fillStyle = bird.color; ctx.beginPath(); ctx.ellipse(0, 0, bird.size * 0.4, bird.size * 0.25, 0, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.arc(bird.size * 0.35, -bird.size * 0.1, bird.size * 0.15, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.moveTo(bird.size * 0.5, -bird.size * 0.1); ctx.lineTo(bird.size * 0.6, -bird.size * 0.15); ctx.lineTo(bird.size * 0.6, -bird.size * 0.05); ctx.closePath(); ctx.fill(); const wingY = Math.sin(bird.wingPhase) * (bird.size * 0.35); const wingAngle = Math.sin(bird.wingPhase) * 0.8; const wingLength = bird.size * 0.9; const wingWidth = bird.size * 0.4; ctx.save(); ctx.translate(-bird.size * 0.15, 0); ctx.rotate(-wingAngle); ctx.beginPath(); ctx.moveTo(0, 0); ctx.bezierCurveTo(-wingLength * 0.4, -wingY - wingWidth * 0.5, -wingLength * 0.8, -wingY - wingWidth * 0.2, -wingLength, -wingY + wingWidth * 0.1); ctx.bezierCurveTo(-wingLength * 0.9, -wingY + wingWidth * 0.5, -wingLength * 0.5, -wingY + wingWidth * 0.7, 0, 0); ctx.closePath(); ctx.fill(); ctx.restore(); ctx.save(); ctx.translate(bird.size * 0.15, 0); ctx.rotate(wingAngle); ctx.beginPath(); ctx.moveTo(0, 0); ctx.bezierCurveTo(wingLength * 0.4, -wingY - wingWidth * 0.5, wingLength * 0.8, -wingY - wingWidth * 0.2, wingLength, -wingY + wingWidth * 0.1); ctx.bezierCurveTo(wingLength * 0.9, -wingY + wingWidth * 0.5, wingLength * 0.5, -wingY + wingWidth * 0.7, 0, 0); ctx.closePath(); ctx.fill(); ctx.restore(); ctx.restore(); }); }
-    function checkCollisions() { 
-        if (isChargingSequence || isCaptured) return; 
-        const carRect = { x: carX, y: carY, width: CAR_WIDTH, height: CAR_HEIGHT }; 
-        buildings.forEach(b => { if (b.isVertiport) { const waveWidth = b.width * 0.6; const waveX = b.x + (b.width - waveWidth) / 2; const waveRect = { x: waveX, y: 0, width: waveWidth, height: b.y - 15 }; if (isColliding(carRect, waveRect)) { startCaptureSequence(b); return; } } if (b.x < carRect.x + carRect.width && b.x + b.width > carRect.x) { if (isColliding(carRect, { x: b.x, y: b.y, width: b.width, height: b.height })) { handleCollision(b); } } }); 
-        if (isCaptured) return; 
-        for (let i = projectiles.length - 1; i >= 0; i--) { const p = projectiles[i]; if (isColliding(carRect, { x: p.x, y: p.y, width: p.size.w, height: p.size.h })) { handleCollision(p); projectiles.splice(i, 1); } } 
-        for (let i = birds.length - 1; i >= 0; i--) { const bird = birds[i]; const birdRect = { x: bird.x, y: bird.y, width: bird.size, height: bird.size }; if (isColliding(carRect, birdRect)) { handleCollision(bird); birds.splice(i, 1); } } 
+    function checkCollisions() {
+        if (isChargingSequence || isCaptured) return;
+        const carRect = { x: carX, y: carY, width: CAR_WIDTH, height: CAR_HEIGHT };
+        buildings.forEach(b => { if (b.isVertiport) { const waveWidth = b.width * 0.6; const waveX = b.x + (b.width - waveWidth) / 2; const waveRect = { x: waveX, y: 0, width: waveWidth, height: b.y - 15 }; if (isColliding(carRect, waveRect)) { startCaptureSequence(b); return; } } if (b.x < carRect.x + carRect.width && b.x + b.width > carRect.x) { if (isColliding(carRect, { x: b.x, y: b.y, width: b.width, height: b.height })) { handleCollision(b); } } });
+        if (isCaptured) return;
+        for (let i = projectiles.length - 1; i >= 0; i--) { const p = projectiles[i]; if (isColliding(carRect, { x: p.x, y: p.y, width: p.size.w, height: p.size.h })) { handleCollision(p); projectiles.splice(i, 1); } }
+        for (let i = birds.length - 1; i >= 0; i--) { const bird = birds[i]; const birdRect = { x: bird.x, y: bird.y, width: bird.size, height: bird.size }; if (isColliding(carRect, birdRect)) { handleCollision(bird); birds.splice(i, 1); } }
         for (let i = bonuses.length - 1; i >= 0; i--) { const b = bonuses[i]; if (isColliding(carRect, { x: b.x, y: b.y, width: b.size, height: b.size })) { if (b.type === 'ChargingTrigger') { startChargingSequence(b); } else { handleBonusPickup(b); } bonuses.splice(i, 1); break; } }
-        
+
         if (blimp) {
             if (blimp.collidesWith(carRect)) {
                 battery -= blimp.collisionDamage;
-                triggerShake(20); 
-                playCollisionSound(); 
+                triggerShake(20);
+                playCollisionSound();
                 playCollisionDissonance();
                 updateBatteryUI();
             }
@@ -1135,7 +1236,7 @@
         isChargingSequence = true; chargingPhase = 'descending'; playerControlEnabled = false; targetChargeStation = findChargingStationSpot(trigger.x); autoPilotStartY = carY; autoPilotProgress = 0;
         stopEngineHum(); playPullDownSound();
         if (musicGainNode) musicGainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.5);
-        stopBackgroundMusic(); 
+        stopBackgroundMusic();
     }
     function updateChargingSequence() {
         const descentSpeed = 0.015; const blastOffSpeed = 0.05;
@@ -1151,30 +1252,27 @@
                  isChargingSequence = false; chargingPhase = null; playerControlEnabled = true; targetChargeStation = null;
                  playEngineHum();
                  if (musicGainNode) musicGainNode.gain.linearRampToValueAtTime(0.45, audioCtx.currentTime + 0.5);
-                 if (gameRunning && !musicIsPlaying) { startMusicLoopChecker(); } 
+                 if (gameRunning && !musicIsPlaying) { startMusicLoopChecker(); }
             }
         }
     }
-    function startCaptureSequence(building) { // Vertiport capture
+    function startCaptureSequence(building) {
         if (isCaptured || isChargingSequence) return;
         isCaptured = true; capturePhase = 'descending'; playerControlEnabled = false; captureTargetBuilding = building; autoPilotStartY = carY; autoPilotProgress = 0;
-        stopEngineHum(); 
-        playLockOnSound(); 
-        playVertiportRefuelSound(); // This is more of an ambient/effect sound
-        playVertiportPowerDownSound(); // This is the restored "power-down" sine wave
-        stopBackgroundMusic(); 
+        stopEngineHum();
+        playLockOnSound();
+        playVertiportRefuelSound();
+        playVertiportPowerDownSound();
+        stopBackgroundMusic();
         if (musicGainNode) musicGainNode.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + 0.5);
     }
     function updateCaptureSequence() {
         const descentSpeed = 0.01; const releaseSpeed = 0.04; const targetY = captureTargetBuilding.y - CAR_HEIGHT * 0.8;
         if (capturePhase === 'descending') {
             autoPilotProgress = Math.min(1, autoPilotProgress + descentSpeed); const easedProgress = 0.5 * (1 - Math.cos(autoPilotProgress * Math.PI)); carY = autoPilotStartY + (targetY - autoPilotStartY) * easedProgress; const targetX = captureTargetBuilding.x + captureTargetBuilding.width / 2 - CAR_WIDTH / 2; carX += (targetX - carX) * 0.03;
-            if (autoPilotProgress >= 1) { 
-                capturePhase = 'holding'; 
-                captureStartTime = performance.now(); 
-                // Stop the powerDown sound if it's still going, or ensure it's short enough
-                // stopCaptureSounds(); // This might be too aggressive if other holding sounds are planned.
-                                    // playVertiportPowerDownSound is now timed by playTone.
+            if (autoPilotProgress >= 1) {
+                capturePhase = 'holding';
+                captureStartTime = performance.now();
             }
         } else if (capturePhase === 'holding') {
             const elapsed = performance.now() - captureStartTime; const drainProgress = Math.min(1, elapsed / CAPTURE_HOLD_DURATION_MS); battery = Math.max(0, 100 - Math.floor(drainProgress * CAPTURE_BATTERY_DRAIN)); updateBatteryUI(); if (frameCount % 30 === 0) playCaptureHoldingPulse();
@@ -1204,18 +1302,17 @@
            modulateEngineHum(battery, vertDelta, horzDelta);
        }
        updateBuildings(); updatePedestriansAndProjectiles(); updateBonuses(); updateBirds(); updateClouds(); updateSwarmVehicles();
-       
-       if (blimp) { 
+
+       if (blimp) {
             blimp.update();
             if (blimp.x + blimp.width + (blimp.width * 0.7 + 20) < 0) { // Check if blimp + banner are off-screen
-                blimp = null; 
+                blimp = null;
                 stopBlimpTheme();
-                // console.log("Blimp off-screen.");
             }
         }
 
        if (playerControlEnabled) checkCollisions();
-       
+
        if (playerControlEnabled) {
            battery -= BATTERY_DRAIN_RATE; score++;
 
@@ -1228,27 +1325,25 @@
             difficultyMultiplier = baseDifficultyMultiplier;
 
             if (score > 13000) {
-                const chaosFactor = Math.min(2.5, 1.0 + (score - 13000) * 0.00005); 
-                difficultyMultiplier *= chaosFactor; 
+                const chaosFactor = Math.min(2.5, 1.0 + (score - 13000) * 0.00005);
+                difficultyMultiplier *= chaosFactor;
             }
-            
-            const difficultyProgress = Math.min(1, Math.max(0, (score - 1000) / 8000)); 
-            
-            currentScrollSpeed = BASE_SCROLL_SPEED + (MAX_SCROLL_SPEED - BASE_SCROLL_SPEED) * difficultyProgress * difficultyMultiplier; 
+
+            const difficultyProgress = Math.min(1, Math.max(0, (score - 1000) / 8000));
+
+            currentScrollSpeed = BASE_SCROLL_SPEED + (MAX_SCROLL_SPEED - BASE_SCROLL_SPEED) * difficultyProgress * difficultyMultiplier;
             currentMusicTempo = BASE_MUSIC_TEMPO + (MAX_MUSIC_TEMPO - BASE_MUSIC_TEMPO) * difficultyProgress * difficultyMultiplier;
 
             const speedCapMultiplier = (score > 13000 ? 1.8 : 1.2);
-            currentScrollSpeed = Math.min(MAX_SCROLL_SPEED * speedCapMultiplier , currentScrollSpeed); 
+            currentScrollSpeed = Math.min(MAX_SCROLL_SPEED * speedCapMultiplier , currentScrollSpeed);
             currentMusicTempo = Math.min(MAX_MUSIC_TEMPO * speedCapMultiplier, currentMusicTempo);
        }
 
         if (gameRunning && playerControlEnabled && !blimp) {
             if (score >= nextBlimpScoreTarget) {
                 blimp = new Blimp(gameCanvas, playableHeight);
-                playBlimpTheme(); 
-                // console.log(`Blimp spawned at score ${score}.`);
+                playBlimpTheme();
                 nextBlimpScoreTarget = score + BLIMP_SCORE_INTERVAL_MIN + Math.random() * (BLIMP_SCORE_INTERVAL_MAX - BLIMP_SCORE_INTERVAL_MIN);
-                // console.log(`Next blimp consideration score: ${nextBlimpScoreTarget}`);
             }
         }
 
@@ -1260,14 +1355,14 @@
         frameCount++;
         if (isChargingSequence) { updateChargingSequence(); updateBuildings(); updateClouds(); updateSwarmVehicles(); }
         else if (isCaptured)    { updateCaptureSequence(); updateBuildings(); updateClouds(); updateSwarmVehicles(); }
-        else                    { updateGameState(); } 
-        
+        else                    { updateGameState(); }
+
         ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
-        drawGameBackground(); 
-        if (blimp) blimp.draw(ctx); 
-        drawPedestriansAndProjectiles(); 
-        drawBonuses(); 
-        drawBirds(); 
+        drawGameBackground();
+        if (blimp) blimp.draw(ctx);
+        drawPedestriansAndProjectiles();
+        drawBonuses();
+        drawBirds();
         drawCar();
         updateBatteryUI(); updateScoreUI();
         prevCarX = carX; prevCarY = carY; prevKeys = { ...keys };
@@ -1275,67 +1370,68 @@
     }
 
     function startGame() {
-        gameRunning = false; 
+        gameRunning = false;
         if (animationFrameId) cancelAnimationFrame(animationFrameId); animationFrameId = null;
-        stopAllSounds(); 
+        stopAllSounds();
 
         battery = 100; score = 0; calculateDimensions(); carY = playableHeight / 2; carX = 80; carColor = 'white'; keys = {}; prevKeys = {}; buildings = []; pedestrians = []; projectiles = []; bonuses = []; birds = []; clouds = []; swarmVehicles = []; carShake = 0; frameCount = 0; lowBatteryWarningPlayed = false; isChargingSequence = false; chargingPhase = null; targetChargeStation = null; isCaptured = false; capturePhase = null; captureTargetBuilding = null; playerControlEnabled = true; prevCarX = carX; prevCarY = carY;
         spawnBuilding(gameCanvas.width * 0.6); spawnBuilding(); for(let i=0; i<5; i++) spawnCloud(); for(let i=0; i<20; i++) spawnSwarmVehicle();
         currentScrollSpeed = BASE_SCROLL_SPEED; currentMusicTempo = BASE_MUSIC_TEMPO;
-        difficultyMultiplier = 1.0; 
-        
-        blimp = null; 
+        difficultyMultiplier = 1.0;
+
+        blimp = null;
         nextBlimpScoreTarget = 10000;
-        blimpThemeIsPlaying = false; // Ensure theme flag is reset
+        blimpThemeIsPlaying = false;
+        blimpThemeNextPlayTime = 0; // Reset global blimp theme cooldown on new game
 
         startScreen.style.display = 'none';
         gameCanvas.style.display = 'block';
-        uiOverlay.style.display = 'block'; 
-        brandingWatermark.style.display = 'block'; 
+        uiOverlay.style.display = 'block';
+        brandingWatermark.style.display = 'block';
         gameOverScreen.style.display = 'none';
         updateBatteryUI(); updateScoreUI();
 
         const isMobileDevice = window.matchMedia('(pointer: coarse)').matches;
         if (isMobileDevice) {
-            if (mobileControlsLeft) mobileControlsLeft.style.display = 'block'; 
+            if (mobileControlsLeft) mobileControlsLeft.style.display = 'block';
             if (mobileControlsRight) mobileControlsRight.style.display = 'flex';
         } else {
              if (mobileControlsLeft) mobileControlsLeft.style.display = 'none';
             if (mobileControlsRight) mobileControlsRight.style.display = 'none';
         }
-        
+
         setTimeout(() => {
-             if (!audioInitialized) { 
-                console.warn("startGame: Audio not initialized. Will attempt init via initAudio()."); 
+             if (!audioInitialized) {
+                console.warn("startGame: Audio not initialized. Will attempt init via initAudio().");
                 if (!initAudio()) {
                     console.error("startGame: Audio initialization failed during game start sequence. Music/sounds may not play.");
                 }
              }
-             
-             if (audioInitialized && audioCtx && audioCtx.state === 'running') { 
+
+             if (audioInitialized && audioCtx && audioCtx.state === 'running') {
                  console.log("startGame: Audio ready, playing sounds/music.");
                  playStartJingle(); playEngineHum();
                  if (musicGainNode) musicGainNode.gain.setValueAtTime(0.45, audioCtx.currentTime);
                  if (musicLowPassFilter) musicLowPassFilter.frequency.setValueAtTime(20000, audioCtx.currentTime);
-                 startMusicLoopChecker(); 
+                 startMusicLoopChecker();
              } else {
                  console.warn(`startGame: Audio not fully ready after timeout (State: ${audioCtx?.state}, Initialized: ${audioInitialized}). Music might not start.`);
              }
-             gameRunning = true; 
-             if (animationFrameId) cancelAnimationFrame(animationFrameId); 
-             animationFrameId = requestAnimationFrame(gameLoop); 
+             gameRunning = true;
+             if (animationFrameId) cancelAnimationFrame(animationFrameId);
+             animationFrameId = requestAnimationFrame(gameLoop);
              console.log("Game started. GameRunning:", gameRunning);
-        }, 50); 
+        }, 50);
     }
 
     function gameOver() {
       if (!gameRunning) return;
       gameRunning = false; playerControlEnabled = false;
-      stopAllSounds(); 
+      stopAllSounds();
       if (animationFrameId) cancelAnimationFrame(animationFrameId); animationFrameId = null;
 
-      uiOverlay.style.display = 'none'; 
-      brandingWatermark.style.display = 'none'; 
+      uiOverlay.style.display = 'none';
+      brandingWatermark.style.display = 'none';
       if (mobileControlsLeft) mobileControlsLeft.style.display = 'none';
       if (mobileControlsRight) mobileControlsRight.style.display = 'none';
 
@@ -1356,7 +1452,7 @@
         }
 
         const attemptStartGame = () => {
-            if (initAudio() || (audioCtx.state === 'running' && audioInitialized)) { 
+            if (initAudio() || (audioCtx.state === 'running' && audioInitialized)) {
                 console.log(`${buttonId}: Audio ready, starting game.`);
                 startGame();
             } else {
@@ -1407,9 +1503,9 @@
     });
 
     function resizeGame() {
-        const width = window.innerWidth; const height = window.innerHeight; 
-        gameCanvas.width = width; gameCanvas.height = height;  
-        gameCanvas.style.width = width + 'px'; gameCanvas.style.height = height + 'px'; 
+        const width = window.innerWidth; const height = window.innerHeight;
+        gameCanvas.width = width; gameCanvas.height = height;
+        gameCanvas.style.width = width + 'px'; gameCanvas.style.height = height + 'px';
         calculateDimensions(); updateBatteryUI(); updateScoreUI();
         if (!gameRunning && ctx) {
             ctx.fillStyle = '#050510'; ctx.fillRect(0,0, width, height);
@@ -1423,44 +1519,49 @@
     let resizeTimeout;
     window.addEventListener('resize', () => { clearTimeout(resizeTimeout); resizeTimeout = setTimeout(resizeGame, 100); });
     window.addEventListener('orientationchange', () => { clearTimeout(resizeTimeout); resizeTimeout = setTimeout(resizeGame, 150); });
-    
+
     document.addEventListener('visibilitychange', () => {
         if (!audioCtx) return;
 
         if (document.hidden) {
             console.log("Main visibilitychange: Page hidden.");
-            if (musicIsPlaying) { 
-                stopBackgroundMusic(); 
+            if (musicIsPlaying) {
+                stopBackgroundMusic();
             }
-            if (blimpThemeIsPlaying) {
-                stopBlimpTheme(true); 
+            if (blimpThemeIsPlaying) { // If blimp theme system was active
+                stopBlimpTheme(true); // Stop it immediately
             }
-        } else { 
+        } else {
             console.log("Main visibilitychange: Page visible. Attempting auto-resume.");
             if (audioCtx.state === "suspended") {
                 audioCtx.resume().then(() => {
                     console.log(`Main visibilitychange: AudioContext auto-resumed. New state: ${audioCtx.state}`);
                     if (!audioInitialized) {
                         console.log("Main visibilitychange: Attempting audio re-initialization after auto-resume.");
-                        initAudio(); 
+                        initAudio();
                     }
                     if (audioCtx.state === 'running' && audioInitialized && gameRunning && !musicIsPlaying && !isChargingSequence && !isCaptured) {
                         console.log("Main visibilitychange: Restarting background music loop (context was suspended).");
                         startMusicLoopChecker();
                     }
-                    if (blimp && audioCtx.state === 'running' && audioInitialized && gameRunning && !blimpThemeIsPlaying) {
+                    if (blimp && audioCtx.state === 'running' && audioInitialized && gameRunning) {
+                        console.log("Main visibilitychange: Page visible, blimp exists. Re-evaluating blimp theme.");
+                        // Re-assert that theme system is active; playBlimpTheme will respect cooldowns.
+                        blimpThemeIsPlaying = true;
                         playBlimpTheme();
                     }
                 }).catch(err => {
                     console.error("Main visibilitychange: Error during AudioContext auto-resume:", err);
                 });
-            } else if (audioCtx.state === "running") { 
-                if (!audioInitialized) { initAudio(); } 
+            } else if (audioCtx.state === "running") {
+                if (!audioInitialized) { initAudio(); }
                 if (audioInitialized && gameRunning && !musicIsPlaying && !isChargingSequence && !isCaptured) {
                     console.log("Main visibilitychange: Restarting background music loop (context already running).");
                     startMusicLoopChecker();
                 }
-                if (blimp && audioInitialized && gameRunning && !blimpThemeIsPlaying) {
+                 if (blimp && audioInitialized && gameRunning) {
+                     console.log("Main visibilitychange: Page visible, blimp exists, context running. Re-evaluating blimp theme.");
+                     blimpThemeIsPlaying = true;
                      playBlimpTheme();
                 }
             }
@@ -1479,7 +1580,7 @@
                 initialSwarmLoopId = requestAnimationFrame(initialSwarmLoop);
             }
         }
-        requestAnimationFrame(() => { 
+        requestAnimationFrame(() => {
            if (gameCanvas.width === 0 || gameCanvas.height === 0) { resizeGame(); }
            if (gameCanvas.width > 0 && gameCanvas.height > 0) { initialSwarmLoop(); }
         });
