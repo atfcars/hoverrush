@@ -1,17 +1,6 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-<!-- Google tag (gtag.js) -->
-<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-12NWYQB668"></script>
-<script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){
-      dataLayer.push(arguments);
-    }
-    gtag('js', new Date());
-    gtag('config', 'G-12NWYQB668');
-  </script>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>HoverRush by ATFCars</title>
@@ -20,136 +9,78 @@
       margin: 0;
       padding: 0;
       background: black;
-      overflow: hidden; /* Prevent scrolling */
-      /* Prevent gestures like pull-to-refresh, overscroll */
+      overflow: hidden; 
       touch-action: none;
-      font-family: Arial, Helvetica, sans-serif; /* Changed font */
+      font-family: 'Courier New', Courier, monospace;
       color: white;
-      /* Prevent text selection */
       user-select: none;
       -webkit-user-select: none;
       -moz-user-select: none;
       -ms-user-select: none;
-      /* Disable tap highlighting */
-      -webkit-tap-highlight-color: transparent;
-      text-align: center; /* Center all content horizontally */
+       -webkit-tap-highlight-color: transparent;
     }
-
-    /* CTA Button Style */
-    .cta-button {
-      background-color: #007bff; /* Distinct background color */
-      color: white;
-      padding: 10px 20px; /* Padding */
-      border: none;
-      border-radius: 5px; /* Border radius */
-      text-decoration: none;
-      font-size: 1.2em;
-      cursor: pointer;
-      display: inline-block;
-      margin: 20px auto; /* Centering and margin */
-    }
-    .cta-button:hover {
-      background-color: #0056b3;
-    }
-
 
     canvas {
       display: block;
       width: 100vw;
       height: 100vh;
-      margin: 0 auto; /* Ensure canvas itself is centered if body text-align doesn't catch it */
     }
 
     #gameCanvas {
-      background: transparent !important; /* ✅ CONFIRMED: Transparent initially and forcefully to show animated background */
-      position: absolute; /* ✅ RETAINED: 'absolute' is crucial for full viewport coverage, contrary to prompt's 'relative' suggestion */
+      background: #050510;
+      position: absolute;
       top: 0;
       left: 0;
-      z-index: 1; /* ✅ CONFIRMED: z-index 1, as per requirement */
+      z-index: 1;
       cursor: none;
     }
-
-    /* --- Animated Background Styles --- */
-    #animatedBackground {
-      position: fixed; /* ✅ MODIFIED: Use fixed for full viewport coverage consistently */
-      top: 0; left: 0; right: 0; bottom: 0; /* ✅ MODIFIED: Replaced width/height with top/left/right/bottom for fixed positioning */
-      overflow: hidden;
-      z-index: 0; /* Ensures it's at the very back */
-      pointer-events: none; /* ✅ ADDED: Prevent interactions with background elements */
-      background: linear-gradient(to bottom, #0a0a14 0%, #1c1c2e 100%); /* ✅ MODIFIED: New gradient colors and direction */
-    }
-
-    .flyingCar {
-  position: absolute;
-  width: 40px;
-  height: 20px;
-  background-color: #ccc;
-  border-radius: 4px;
-  box-shadow:
-    0 6px 0 #ccc,
-    -8px 4px 0 #666,
-    8px 4px 0 #666;
-  animation: flyAcross 20s linear infinite;
-  opacity: 0.3;
-}
-
-    .flyingCar.car1 { top: 20%; left: -100px; animation-delay: 0s; } /* Original positions/delays, now just providing starting points */
-    .flyingCar.car2 { top: 50%; left: -120px; animation-delay: 4s; }
-    .flyingCar.car3 { top: 70%; left: -80px; animation-delay: 8s; }
-    .flyingCar.car4 { top: 35%; left: -90px; animation-delay: 2s; } /* Original positions/delays, now just providing starting points */
-
-    @keyframes flyAcross {
-      0% { left: -100px; top: 10%; } /* ✅ MODIFIED: New starting position */
-      100% { left: 110%; top: 90%; } /* ✅ MODIFIED: New ending position */
-    }
-    /* --- End Animated Background Styles --- */
 
     #start-screen {
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center; /* Default centering */
+      justify-content: center; 
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(10, 10, 20, 0.85); /* Slightly transparent to see background */
-      z-index: 10; /* Ensures it's above gameCanvas and animatedBackground */
+      background: rgba(10, 10, 20, 0.85);
+      z-index: 10;
       text-align: center;
-      padding: 20px; /* Default padding */
+      padding: 20px; 
       box-sizing: border-box;
       border: 3px solid #0ff;
       box-shadow: 0 0 15px #0ff;
-      overflow-y: auto; /* Allow scroll if content overflows */
-      max-height: 100vh; /* Explicit max height */
+      overflow-y: auto; 
+      max-height: 100vh; 
     }
 
     #start-screen h1 {
       font-size: clamp(1.8em, 5vw, 2.5em);
       color: #ff0;
       text-shadow: 2px 2px #f0f;
-      margin-top: 10px; /* Reduced default */
-      margin-bottom: 10px; /* Reduced default */
+      margin-top: 10px; 
+      margin-bottom: 10px; 
     }
 
     #start-screen p {
       font-size: clamp(0.9em, 3vw, 1.1em);
-      margin: 8px 0; /* Reduced default */
-      line-height: 1.3; /* Slightly reduced */
+      margin: 8px 0; 
+      line-height: 1.3; 
     }
 
     #start-screen p.tagline {
       font-style: italic;
       max-width: 500px;
-      margin: 10px auto 8px auto; /* Reduced default */
+      margin: 10px auto 8px auto; 
     }
 
     #start-instructions {
-        margin-top: 10px; /* Reduced default */
-        margin-bottom: 10px; /* Reduced default */
+        margin-top: 10px; 
+        margin-bottom: 10px; 
         border: 1px solid #555;
-        padding: 8px 12px; /* Reduced default */
+        padding: 8px 12px; 
         border-radius: 5px;
         background-color: rgba(0,0,0,0.2);
         max-width: 90%;
@@ -158,7 +89,7 @@
         color: #ccc;
     }
     #start-instructions h3 {
-        margin: 8px 0 4px 0; /* Reduced default */
+        margin: 8px 0 4px 0; 
         font-size: clamp(1em, 3vw, 1.1em);
         color: #0ff;
         text-transform: uppercase;
@@ -168,16 +99,16 @@
     #start-instructions ul {
         list-style: none;
         padding-left: 5px;
-        margin: 4px 0; /* Reduced default */
+        margin: 4px 0; 
         text-align: left;
     }
     #start-instructions li {
-        margin-bottom: 3px; /* Reduced default */
-        line-height: 1.2; /* Slightly reduced */
+        margin-bottom: 3px; 
+        line-height: 1.2; 
     }
     #start-instructions ul ul {
         padding-left: 15px;
-        margin-top: 2px; /* Reduced default */
+        margin-top: 2px; 
     }
     #start-instructions .keys {
         font-size: clamp(1.4em, 3.5vw, 1.7em);
@@ -198,27 +129,23 @@
         background: rgba(255,255,255,0.1);
     }
 
-    /* --- START BUTTON STYLES --- */
     #startButton {
-      /* COMMON STYLES */
       display: flex;
       align-items: center;
       justify-content: center;
       background: #ff0;
       color: black;
-      border: 3px solid #f0f; /* Cyberpunk-ish border */
-      box-shadow: 0 0 8px #ff0, 0 0 15px #f0f; /* Glowing effect */
+      border: 3px solid #f0f; 
+      box-shadow: 0 0 8px #ff0, 0 0 15px #f0f; 
       font-weight: bold;
       cursor: pointer;
       transition: background-color 0.2s, transform 0.1s, box-shadow 0.3s ease;
       -webkit-tap-highlight-color: transparent;
-      animation: pulse 2s infinite ease-in-out; /* Keep pulse */
+      animation: pulse 2s infinite ease-in-out; 
       text-align: center;
-      padding: 0; /* Remove padding for flex centering */
-      margin: 15px auto 0 auto; /* Reduced default top margin */
-      flex-shrink: 0; /* Prevent button from shrinking if container is tight */
-
-      /* DESKTOP STYLES (default, circular) */
+      padding: 0; 
+      margin: 15px auto 0 auto; 
+      flex-shrink: 0; 
       width: clamp(100px, 25vw, 150px);
       height: clamp(100px, 25vw, 150px);
       border-radius: 50%;
@@ -226,21 +153,18 @@
     }
 
     @media (max-width: 768px) {
-      /* Fix: Adjust start screen padding and justification */
        #start-screen {
-          padding-top: 10px; /* Reduced */
-          padding-bottom: 10px; /* Reduced */
-          justify-content: flex-start; /* Align content to top to make space below */
+          padding-top: 10px; 
+          padding-bottom: 10px; 
+          justify-content: flex-start; 
        }
-
-      /* Fix: MOBILE START BUTTON STYLES (Rectangular, raised) */
       #startButton {
-        width: clamp(180px, 60vw, 280px); /* Responsive width */
-        height: clamp(55px, 9vh, 70px); /* Adjusted height slightly */
-        border-radius: 8px !important; /* Rectangular - Force override */
-        font-size: clamp(1.1em, 4.5vw, 1.5em); /* Adjust font size for rectangle */
-        margin-top: auto; /* Push to bottom of flex container after other content */
-        margin-bottom: max(10px, env(safe-area-inset-bottom)); /* Ensure space from bottom, respecting safe area, reduced min margin */
+        width: clamp(180px, 60vw, 280px); 
+        height: clamp(55px, 9vh, 70px); 
+        border-radius: 8px !important; 
+        font-size: clamp(1.1em, 4.5vw, 1.5em); 
+        margin-top: auto; 
+        margin-bottom: max(10px, env(safe-area-inset-bottom)); 
       }
     }
 
@@ -252,16 +176,15 @@
 
     #startButton:hover {
        background-color: #fff;
-       box-shadow: 0 0 15px #ff0, 0 0 30px #f0f; /* Brighter glow on hover */
-       animation-play-state: paused; /* Optional: pause pulse on hover */
+       box-shadow: 0 0 15px #ff0, 0 0 30px #f0f; 
+       animation-play-state: paused; 
     }
     #startButton:active {
-      transform: scale(0.97); /* Consistent scale */
-      animation: none; /* Disable pulse on active */
+      transform: scale(0.97); 
+      animation: none; 
     }
-    /* --- End Start Button Style --- */
 
-    #game-over-screen button { /* Style for Replay button */
+    #game-over-screen button { 
       padding: 12px 25px;
       font-size: clamp(1em, 3.5vw, 1.2em);
       background: #ff0;
@@ -286,244 +209,191 @@
       position: absolute;
       top: 15px;
       right: 15px;
-      z-index: 5; /* Above gameCanvas's z-index:1 and animatedBackground's z-index:0 */
-      display: none; /* Controlled by JS for gameplay only */
+      z-index: 5;
+      display: none; 
       font-size: 14px;
       text-align: right;
-      pointer-events: none; /* Interactions pass through */
+      pointer-events: none; 
     }
 
     #branding-watermark {
         position: absolute;
         top: 15px;
-        right: 215px;  
-        height: 55px;  
-        width: auto;   
-        opacity: 0.22; 
+        right: 215px;
+        height: 55px;
+        width: auto;
+        opacity: 0.22;
         pointer-events: none;
-        z-index: 4; /* Above gameCanvas, below UI overlay */
-        display: none; 
+        z-index: 4;
+        display: none;
     }
+
 
     .ui-element { margin-bottom: 10px; }
     #battery { width: 80px; height: 25px; border: 2px solid white; background-color: #333; display: inline-block; vertical-align: middle; }
     #battery-level { height: 100%; background-color: #4CAF50; width: 100%; transition: width 0.2s ease-out, background-color 0.3s linear; }
     #score-label, #battery-label { display: inline-block; vertical-align: middle; margin-right: 8px; }
 
-    #game-over-screen { display: none; flex-direction: column; align-items: center; justify-content: center; position: absolute; top: 0; left: 0; width: 100%;
-      height: 100%; background: rgba(0, 0, 0, 0.9); z-index: 20; text-align: center; padding: 20px; box-sizing: border-box; }
+    #game-over-screen { display: none; flex-direction: column; align-items: center; justify-content: center; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); z-index: 20; text-align: center; padding: 20px; box-sizing: border-box; }
 
-    #game-over-branding { display: block; width: 70vw; max-width: 550px; height: auto; margin: 0 auto 20px auto; opacity: 1.0; image-rendering: auto; pointer-events: none; }
+    #game-over-branding {
+        display: block;
+        width: 70vw;
+        max-width: 550px;
+        height: auto;
+        margin: 0 auto 20px auto;
+        opacity: 1.0;
+        image-rendering: auto;
+        pointer-events: none;
+    }
+
     #game-over-screen h2 { font-size: clamp(1.5em, 4vw, 2em); color: #f44336; text-shadow: 1px 1px #fff; margin-bottom: 20px; }
     #game-over-screen p { font-size: clamp(1em, 3vw, 1.2em); margin-bottom: 15px; }
-    #game-over-screen .branding-message { font-size: clamp(0.8em, 2.5vw, 1.0em); color: #bbb; margin: 25px 0; line-height: 1.5; }
-    #game-over-screen .branding-message a { color: #0ff; text-decoration: none; font-weight: bold; }
-    #game-over-screen .branding-message a:hover { text-decoration: underline; }
 
-    #mobile-controls-left, #mobile-controls-right { position: absolute; bottom: clamp(15px, 3vh, 30px); z-index: 15; display: none; user-select: none; -webkit-user-select: none; }
+    #game-over-screen .branding-message {
+        font-size: clamp(0.8em, 2.5vw, 1.0em);
+        color: #bbb;
+        margin: 25px 0;
+        line-height: 1.5;
+    }
+    #game-over-screen .branding-message a {
+        color: #0ff;
+        text-decoration: none;
+        font-weight: bold;
+    }
+    #game-over-screen .branding-message a:hover {
+        text-decoration: underline;
+    }
+
+    #mobile-controls-left, #mobile-controls-right {
+        position: absolute;
+        bottom: clamp(15px, 3vh, 30px);
+        z-index: 15;
+        display: none;
+        user-select: none;
+        -webkit-user-select: none;
+    }
     #mobile-controls-left { left: clamp(15px, 3vw, 30px); }
-    #mobile-controls-right { right: clamp(15px, 3vw, 30px); flex-direction: row; align-items: center; }
-    .mobile-button { display: block; width: clamp(80px, 18vw, 100px); height: clamp(80px, 18vw, 100px); background-color: rgba(200, 200, 200, 0.3); border: 2px solid rgba(255, 255, 255, 0.5); border-radius: 50%; font-size: clamp(28px, 7vw, 40px); color: rgba(255, 255, 255, 0.7); text-align: center; line-height: clamp(80px, 18vw, 100px); cursor: pointer; pointer-events: auto; -webkit-tap-highlight-color: transparent; }
+    #mobile-controls-right {
+        right: clamp(15px, 3vw, 30px);
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .mobile-button {
+        display: block;
+        width: clamp(80px, 18vw, 100px);
+        height: clamp(80px, 18vw, 100px);
+        background-color: rgba(200, 200, 200, 0.3);
+        border: 2px solid rgba(255, 255, 255, 0.5);
+        border-radius: 50%;
+        font-size: clamp(28px, 7vw, 40px);
+        color: rgba(255, 255, 255, 0.7);
+        text-align: center;
+        line-height: clamp(80px, 18vw, 100px);
+        cursor: pointer;
+        pointer-events: auto;
+        -webkit-tap-highlight-color: transparent;
+    }
     #mobile-controls-left .mobile-button { margin-bottom: clamp(12px, 2.5vh, 18px); }
     #mobile-controls-left .mobile-button:last-child { margin-bottom: 0; }
     #mobile-controls-right .mobile-button { margin-left: clamp(12px, 2.5vw, 18px); }
     #mobile-controls-right .mobile-button:first-child { margin-left: 0; }
     .mobile-button:active { background-color: rgba(255, 255, 255, 0.5); }
-
-    /* Custom styles for haptic toggle */
-    #haptic-toggle-container {
-      margin-top: 15px;
-      font-size: 0.9em;
-      color: #ccc;
-    }
-    #haptic-toggle-container input[type="checkbox"] {
-      margin-right: 5px;
-    }
-
-    /* Custom styles for audio issue notice */
-    #audio-error-banner, #start-failure-banner { /* Combined for similar styling */
-        position: fixed;
-        /* Corrected to bottom-centered as per new requirements */
-        bottom: 20px; 
-        left: 50%;
-        transform: translateX(-50%);
-        width: 80%;
-        max-width: 400px;
-        padding: 12px 24px; /* Increased padding */
-        text-align: center;
-        background: rgba(255, 20, 147, 0.85); /* Cyberpunk pink */
-        color: #fff;
-        font-family: Arial, Helvetica, sans-serif; /* Consistent font */
-        font-size: 16px;
-        border: 1px solid #ff00ff; /* Magenta border */
-        border-radius: 8px;
-        box-shadow: 0 0 8px #ff00ff; /* Soft glow */
-        z-index: 9999;
-        animation: pulse-error 1s infinite alternate; /* Apply the pulse animation */
-    }
-
-    /* CSS Animation for neon-glow for error */
-    @keyframes pulse-error {
-      from { box-shadow: 0 0 8px #ff00ff, 0 0 0px #ff00ff; }
-      to { box-shadow: 0 0 16px #ff00ff, 0 0 24px #ff00ff; }
-    }
-
-    /* Custom styles for audio unlock prompt */
-    #audio-unlock-prompt {
-        position: fixed;
-        top: 0; left: 0; right: 0;
-        background: #00ffff; color: #000;
-        padding: 10px; text-align: center;
-        font-family: Arial, Helvetica, sans-serif; 
-        z-index: 999;
-    }
-    /* Style for the retry button inside the error banner */
-    #audio-error-banner button, #start-failure-banner button { /* Combined for similar styling */
-        background-color: #00ffff; /* Cyan button */
-        color: #1a1a1a; /* Dark text */
-        border: 1px solid #00ffff;
-        padding: 8px 15px;
-        border-radius: 4px;
-        margin-top: 10px;
-        font-weight: bold;
-        cursor: pointer;
-        transition: background-color 0.2s, color 0.2s;
-    }
-    #audio-error-banner button:hover, #start-failure-banner button:hover {
-        background-color: #fff;
-    }
-
-    /* New style for audio restored notice */
-    #audio-restored-banner {
-        position: fixed;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 80%;
-        max-width: 400px;
-        padding: 12px 24px;
-        text-align: center;
-        background: rgba(0, 150, 0, 0.85); /* Greenish for success */
-        color: #fff;
-        font-family: Arial, Helvetica, sans-serif;
-        font-size: 16px;
-        border: 1px solid #00ff00; /* Bright green border */
-        border-radius: 8px;
-        box-shadow: 0 0 8px #00ff00;
-        z-index: 9999;
-        animation: pulse-green 1s infinite alternate; /* Custom pulse for green */
-    }
-
-    @keyframes pulse-green {
-      from { box-shadow: 0 0 8px #00ff00, 0 0 0px #00ff00; }
-      to { box-shadow: 0 0 16px #00ff00, 0 0 24px #00ff00; }
-    }
-  
-/* ✅ Animated Background + Flying Cars */
-#animatedBackground {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  z-index: 0;
-  pointer-events: none;
-  background: linear-gradient(to bottom, #0a0a14 0%, #1c1c2e 100%);
-}
-.flyingCar {
-  position: absolute;
-  width: 40px;
-  height: 20px;
-  background-color: #ccc;
-  border-radius: 4px;
-  box-shadow:
-    0 6px 0 #ccc,
-    -8px 4px 0 #666,
-    8px 4px 0 #666;
-  animation: flyAcross 20s linear infinite;
-  opacity: 0.3;
-}
-.car1 { top: 10%; animation-delay: 0s; }
-.car2 { top: 30%; animation-delay: 2s; }
-.car3 { top: 50%; animation-delay: 4s; }
-.car4 { top: 70%; animation-delay: 6s; }
-
-@keyframes flyAcross {
-  0% { transform: translateX(-100px); }
-  100% { transform: translateX(110vw); }
-}
 </style>
 </head>
 <body>
-<a class="cta-button" href="#about">Learn More</a>
-<div id="animatedBackground">
-<div class="flyingCar car1"></div>
-<div class="flyingCar car2"></div>
-<div class="flyingCar car3"></div>
-<div class="flyingCar car4"></div>
-</div>
+
 <canvas id="gameCanvas"></canvas>
-<img alt="HoverRush Logo" id="branding-watermark" src="https://via.placeholder.com/800x400" style="display: none;"/>
-<!-- Animated Background Layer -->
-<div id="animatedBackground">
-<div class="flyingCar car1"></div>
-<div class="flyingCar car2"></div>
-<div class="flyingCar car3"></div>
-<div class="flyingCar car4"></div> <!-- ✅ REMOVED: Inline style attribute, now controlled by CSS keyframes -->
-</div>
-<!-- End Animated Background Layer -->
+<img src="https://via.placeholder.com/800x400" id="branding-watermark" alt="HoverRush Logo" style="display: none;" />
+
 <div id="start-screen">
 <h1>HoverRush</h1>
 <p>A Flying Car Adventure on the Skyway</p>
 <p class="tagline">Dodge buildings, catch boosts, and feel the pulse of the sky.</p>
 <div id="start-instructions">
 <h3>🎯 How to Play:</h3>
-<ul><li>Dodge flying obstacles like:</li><ul style="padding-left:20px;margin-top:5px"><li>🍗 Chicken legs</li><li>🌽 Corn cobs</li><li>🐦 Birds</li><li>🎈 Balloons</li></ul><li>💥 Hitting anything drains battery.</li><li>🟥 Battery zero = game over.</li></ul>
+<ul style="text-align:left; padding-left: 0;">
+<li>Dodge flying obstacles like:</li>
+<ul style="padding-left: 20px; margin-top: 5px;">
+<li>🍗 Chicken legs tossed by feisty sky-street vendors</li>
+<li>🌽 Corn cobs: Because the sky's not safe from snacks!</li>
+<li>🐦 Birds doing wild loop-de-loops</li>
+<li>🎈 Balloons rising from the streets</li>
+</ul>
+<li>💥 Hitting anything drains your battery.</li>
+<li>🟥 If your battery hits zero, it’s game over.</li>
+</ul>
 <h3>🟩 What to Grab:</h3>
-<ul><li>🟢 Floating batteries</li><li>🔋 Recharge zones</li></ul>
+<ul style="text-align:left; padding-left: 0;">
+<li>🟢 Floating batteries to recharge</li>
+<li>🔋 Enter recharge zones (auto land and refuel)</li>
+</ul>
 <h3>🕹️ Controls:</h3>
-<ul><li>⌨️ Arrow keys</li><li>☝️ Tap arrows</li></ul>
-</div>
-<div id="haptic-toggle-container">
-<input id="haptic-toggle" type="checkbox"/>
-<label for="haptic-toggle">Enable Haptic Feedback</label>
+<ul style="text-align:left; padding-left: 0;">
+<li>⌨️ Arrow keys (desktop)</li>
+<li>☝️ Tap arrows (mobile)</li>
+</ul>
 </div>
 <button id="startButton">Start Game</button>
 </div>
 <div id="ui-overlay">
-<div class="ui-element"><span id="score-label">Score: 0</span></div>
-<div class="ui-element"><span id="battery-label">Battery</span><div id="battery"><div id="battery-level"></div></div></div>
+<div class="ui-element">
+<span id="score-label">Score: 0</span>
+</div>
+<div class="ui-element">
+<span id="battery-label">Battery</span>
+<div id="battery">
+<div id="battery-level"></div>
+</div>
+</div>
 </div>
 <div id="game-over-screen">
-<img alt="HoverRush Logo" id="game-over-branding" src="https://via.placeholder.com/800x400"/>
+<img alt="HoverRush Logo" id="game-over-branding" src="https://via.placeholder.com/550x200"/>
 <h2>Game Over!</h2>
 <p id="final-score">Final Score: 0</p>
 <p class="branding-message">🚀 Want to keep flying? <br/> Visit <a href="https://AllThingsFlyingCars.com" target="_blank">AllThingsFlyingCars.com</a> and ride the skyway of the future!</p>
 <button id="replayButton">Replay</button>
 </div>
-<div id="mobile-controls-left"><div class="mobile-button" id="touch-up">↑</div><div class="mobile-button" id="touch-down">↓</div></div>
-<div id="mobile-controls-right"><div class="mobile-button" id="touch-left">←</div><div class="mobile-button" id="touch-right">→</div></div>
+<div id="mobile-controls-left">
+<div class="mobile-button" id="touch-up">↑</div>
+<div class="mobile-button" id="touch-down">↓</div>
+</div>
+<div id="mobile-controls-right">
+<div class="mobile-button" id="touch-left">←</div>
+<div class="mobile-button" id="touch-right">→</div>
+</div>
 <script>
-    let animationFrameId = null; // Used to store the ID of the requestAnimationFrame
-    let frameCount = 0; // Global frame counter for animation logic
-    // Removed global declarations for startButton, replayButton, hapticToggle here
-    // as they are now declared within DOMContentLoaded for better scope management.
+    // Canvas & Context
     const gameCanvas = document.getElementById('gameCanvas');
     const ctx = gameCanvas.getContext('2d');
+
+    // UI Elements
     const startScreen = document.getElementById('start-screen');
+    const startButton = document.getElementById('startButton');
     const uiOverlay = document.getElementById('ui-overlay');
     const batteryLevelUI = document.getElementById('battery-level');
     const scoreLabel = document.getElementById('score-label');
     const gameOverScreen = document.getElementById('game-over-screen');
     const finalScoreLabel = document.getElementById('final-score');
+    const replayButton = document.getElementById('replayButton');
     const mobileControlsLeft = document.getElementById('mobile-controls-left');
     const mobileControlsRight = document.getElementById('mobile-controls-right');
+    const touchUpButton = document.getElementById('touch-up');
+    const touchDownButton = document.getElementById('touch-down');
+    const touchLeftButton = document.getElementById('touch-left');
+    const touchRightButton = document.getElementById('touch-right');
     const brandingWatermark = document.getElementById('branding-watermark');
     const gameOverBranding = document.getElementById('game-over-branding');
 
+
+    // Game State
     let carX = 80, carY = 300, prevCarX = 80, prevCarY = 300;
     let carColor = 'white', carShake = 0;
     let battery = 100, score = 0;
     let keys = {}, prevKeys = {};
     let gameRunning = false, playerControlEnabled = true;
-    let lowBatteryWarningPlayed = false;
+    let animationFrameId = null, frameCount = 0, lowBatteryWarningPlayed = false;
     const BASE_SCROLL_SPEED = 4.0, MAX_SCROLL_SPEED = 7.5, SCROLL_SPEED_INCREMENT = 0.05;
     let currentScrollSpeed = BASE_SCROLL_SPEED;
     const BASE_MUSIC_TEMPO = 160, MAX_MUSIC_TEMPO = 230, MUSIC_TEMPO_INCREMENT = 3;
@@ -549,1168 +419,720 @@
     let cityHeight = 450, playableHeight = 450;
     const PROJECTILE_GRAVITY = 0.15; 
     let difficultyMultiplier = 1.0; 
-    let lastScoreHapticMilestone = 0; // For score milestone haptics
 
+    // --- Blimp Variables (from beta68, integrated into beta67) ---
+    let blimp = null;
+    let nextBlimpScoreTarget = 10000;
+    const BLIMP_SCORE_INTERVAL_MIN = 2000;
+    const BLIMP_SCORE_INTERVAL_MAX = 3000;
+    const BLIMP_COLLISION_DAMAGE = 25;
+
+    // --- Blimp Class (from beta68, integrated into beta67) ---
+    class Blimp {
+        constructor(canvas, playableHeight) {
+            this.canvas = canvas;
+            this.playableHeight = playableHeight;
+            this.width = 250 + Math.random() * 100; 
+            this.height = this.width * 0.4; 
+            this.x = this.canvas.width;
+            this.y = this.playableHeight * 0.15 + Math.random() * (this.playableHeight * 0.1); 
+            this.vx = -0.3 - Math.random() * 0.4; 
+            this.bannerLogo = 'TEMP_LOGO_OR_BASE64_PLACEHOLDER'; // As per requirement
+            this.collisionDamage = BLIMP_COLLISION_DAMAGE; 
+        }
+
+        update() {
+            this.x += this.vx;
+        }
+
+        draw(ctx) {
+            // Blimp body (simple ellipse)
+            ctx.fillStyle = '#b0c4de'; // Light steel blue
+            ctx.beginPath();
+            ctx.ellipse(this.x + this.width / 2, this.y + this.height / 2, this.width / 2, this.height / 2, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#708090'; // Slate gray
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Gondola
+            const gondolaWidth = this.width * 0.4;
+            const gondolaHeight = this.height * 0.3;
+            ctx.fillStyle = '#778899'; // Light slate gray
+            ctx.fillRect(this.x + this.width / 2 - gondolaWidth / 2, this.y + this.height * 0.8, gondolaWidth, gondolaHeight);
+            
+            // Banner
+            const bannerHeight = this.height * 0.5;
+            const bannerWidth = this.width * 0.9;
+            const bannerX = this.x + (this.width - bannerWidth) / 2;
+            const bannerY = this.y + this.height + 15; // Below blimp with a small gap
+
+            ctx.fillStyle = '#FFF'; // Banner background
+            ctx.fillRect(bannerX, bannerY, bannerWidth, bannerHeight);
+            ctx.strokeStyle = '#555';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(bannerX, bannerY, bannerWidth, bannerHeight);
+
+
+            // Placeholder text on banner
+            ctx.fillStyle = '#d9534f'; // Reddish text
+            ctx.font = `bold ${Math.max(16, bannerHeight * 0.5)}px 'Courier New', Courier, monospace`; // Use game's font family
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(this.bannerLogo, bannerX + bannerWidth / 2, bannerY + bannerHeight / 2);
+            ctx.textAlign = 'left'; // Reset
+            ctx.textBaseline = 'alphabetic'; // Reset
+        }
+
+        collidesWith(rect) {
+            return rect.x < this.x + this.width &&
+                   rect.x + rect.width > this.x &&
+                   rect.y < this.y + this.height + (this.height * 0.5 + 15) && // Include banner roughly
+                   rect.y + rect.height > this.y;
+        }
+    }
+
+
+    // --- Audio Engine (from beta67) ---
     let audioCtx;
     let audioInitialized = false;
-    
-    let backgroundBuffer = null; 
-    let engineBuffer = null; 
-    let uiBuffer = null; 
-    
-    // Global audio node references are now objects with a 'current' property to allow mutation by helper functions.
-    let backgroundMusicSource = { current: null };
-    let backgroundGain = { current: null };
-    let engineHumSource = { current: null };
-    let engineGain = { current: null };
-    let uiToneSource = { current: null };
-    let uiGain = { current: null };
-
-    const MAX_RETRIES = 6; // Max retries for audio buffer loading
-    let retryAttempts = 0; // Current retry attempt count
-    let audioContextUnlocked = false; 
-    let hapticsEnabled = (localStorage.getItem('hapticsEnabled') === 'true'); // Load from local storage
-
-
     try {
          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+         console.log("AudioContext created. Initial state:", audioCtx.state);
          audioCtx.onstatechange = () => {
-             if (audioCtx.state === 'closed') {
-                console.warn("AudioContext closed. No further audio possible.");
-                audioInitialized = false; stopAllSounds();
-             } else if (audioCtx.state !== 'running') {
-                audioInitialized = false; stopAllSounds(); 
-             } else if (audioCtx.state === 'running' && !audioInitialized) { 
+             console.log("AudioContext state changed to:", audioCtx.state);
+             if (audioCtx.state !== 'running') {
+                audioInitialized = false; 
+                stopAllSounds(); 
+                console.warn("AudioContext state changed to non-running. Audio features may be disabled until next interaction.");
+             } else if (audioCtx.state === 'running' && !audioInitialized) {
+                console.log("AudioContext resumed automatically. Re-initialization might be needed for nodes.");
                 if (initAudio()) { 
-                    if (gameRunning && document.visibilityState === 'visible') {
-                        console.log("AudioContext auto-resumed while game active & visible. Attempting sound restart.");
-                        safeResumeAudioWithFormalGiveUp(); 
+                    console.log("Audio re-initialized (nodes checked/created) automatically on state change to running.");
+                    if (gameRunning && !musicIsPlaying && !isChargingSequence && !isCaptured) { 
+                        console.log("Restarting music loop checker due to automatic context resume and game state.");
+                        startMusicLoopChecker(); 
                     }
                 }
              }
          };
-    } catch (e) { audioCtx = null; }
+    } catch (e) {
+        console.error("FATAL: Web Audio API is not supported in this browser.", e);
+        audioCtx = null;
+    }
 
-    let musicOscillators = [], engineHumNodes = null, chargingSoundNodes = [], captureSoundNodes = [];
-    let musicGainNode = null, musicLowPassFilter = null, reverbNode = null; 
-    let musicShouldBePlaying = false, musicLoopIntervalId = null, nextMusicScheduleTime = 0;
-    let wasPlayingMusic = false, wasPlayingEngine = false; 
-    const musicScheduleLookahead = 0.25, musicCheckIntervalMs = 200;
+    let musicOscillators = [], engineHumNodes = null;
+    let chargingSoundNodes = [], captureSoundNodes = [];
+    let musicGainNode = null, musicLowPassFilter = null, reverbNode = null;
+    
+    let musicShouldBePlaying = false; 
+    let musicIsPlaying = false;       
+
+    let musicLoopIntervalId = null;
+    let nextMusicScheduleTime = 0;
+    const musicScheduleLookahead = 0.25;
+    const musicCheckIntervalMs = 200;
     let currentLoopLengthSeconds = 0;
 
-    // Procedural background ambient pad specific nodes
-    let proceduralAmbientPadSource = { current: null };
-    let proceduralAmbientPadGain = { current: null };
-    
-    /**
-     * Safely stops and disconnects an AudioNode if it exists.
-     * It attempts to stop the node if it has a `stop` method and then disconnects it.
-     * Error handling is included to prevent crashes if the node is already stopped/disconnected.
-     * This function is crucial for preventing memory leaks and ensuring proper audio resource management
-     * across different game states and user interactions (e.g., tab switching, game over).
-     * @param {AudioNode|AudioBufferSourceNode|GainNode|BiquadFilterNode|OscillatorNode} node - The audio node to clean up.
-     */
-    function cleanupAudioNode(node) {
-      if (!node) return;
-      try {
-        if (node.stop && typeof node.stop === 'function') { // Check for stop method existence
-          node.stop();
-        }
-      } catch (e) { /* Node already stopped or not stoppable */ }
-      try {
-        if (node.disconnect && typeof node.disconnect === 'function') { // Check for disconnect method existence
-          node.disconnect();
-        }
-      } catch (e) { /* Node already disconnected */ }
-    }
-
-    /**
-     * Helper function to check if an AudioBuffer is ready for use.
-     * Logs a warning and sends a gtag event if the buffer is not ready.
-     * @param {AudioBuffer} buffer - The audio buffer to check.
-     * @param {string} bufferName - A descriptive name for the buffer (e.g., "Background Music").
-     * @returns {boolean} True if the buffer is an instance of AudioBuffer, false otherwise.
-     */
-    function isBufferReady(buffer, bufferName) {
-      if (!buffer || !(buffer instanceof AudioBuffer)) {
-        console.warn(`${bufferName} buffer is not ready.`);
-        if (typeof gtag === 'function') gtag('event', `${bufferName.toLowerCase().replace(/ /g, '_')}_buffer_missing`, { 'event_label': bufferName });
-        return false;
-      }
-      return true;
-    }
-
-    /**
-     * Checks if all given AudioBuffers in an array are ready for playback.
-     * This function is used to validate the integrity of multiple audio buffers
-     * before attempting to play or resume them, especially after loading or tab switches.
-     * @param {AudioBuffer[]} buffers - An array of audio buffers to check.
-     * @returns {boolean} True if all buffers are instances of AudioBuffer, false otherwise.
-     */
-    function areAudioBuffersReady(buffers) {
-        return buffers.every(buffer => buffer instanceof AudioBuffer);
-    }
-
-    function fadeInAudio(audioNode, duration = 2.0) {
-      if (!audioNode || !audioNode.gain || audioNode.gain.value >= 1) return; 
-      const now = audioCtx.currentTime;
-      audioNode.gain.setValueAtTime(0, now);
-      audioNode.gain.linearRampToValueAtTime(1, now + duration);
-    }
-
-    function fadeOutAudio(audioNode, duration = 1.0) { 
-      if (!audioNode || !audioNode.gain || audioNode.gain.value <= 0) return; 
-      const now = audioCtx.currentTime;
-      try { 
-        audioNode.gain.setValueAtTime(audioNode.gain.value, now);
-        audioNode.gain.linearRampToValueAtTime(0.0001, now + duration);
-      } catch(e) {
-        // Fallback for cases where setValueAtTime might fail on already scheduled values
-        try { audioNode.gain.setValueAtTime(0.0001, now + duration); } catch(e2) {}
-      }
-    }
-    
-    /**
-     * Generic function to set up and play an AudioBufferSourceNode.
-     * Handles buffer readiness, node cleanup, connection, start, and fade-in.
-     * Updates the provided source and gain reference objects.
-     * @param {AudioBuffer} buffer - The audio buffer to play.
-     * @param {object} gainNodeRef - An object `{ current: GainNode|null }` to store the created gain node.
-     * @param {object} sourceNodeRef - An object `{ current: AudioBufferSourceNode|null }` to store the created source node.
-     * @param {number} fadeDuration - Duration of the fade-in effect in seconds.
-     * @param {string} label - A descriptive label for logging/analytics (e.g., "Background Music").
-     * @param {boolean} loop - Whether the audio should loop.
-     */
-    function setupAndPlayBuffer(buffer, gainNodeRef, sourceNodeRef, fadeDuration, label = 'audio', loop = true) {
-      if (!isBufferReady(buffer, label) || !audioCtx || audioCtx.state !== 'running') {
-        // isBufferReady already handles gtag for missing buffer
-        return;
-      }
-
-      // Consolidating cleanup using the helper function.
-      cleanupAudioNode(sourceNodeRef.current);
-      cleanupAudioNode(gainNodeRef.current);
-
-      sourceNodeRef.current = audioCtx.createBufferSource();
-      sourceNodeRef.current.buffer = buffer;
-      sourceNodeRef.current.loop = loop;
-
-      gainNodeRef.current = audioCtx.createGain();
-      gainNodeRef.current.gain.value = 0; // Start at 0 for fade-in
-
-      sourceNodeRef.current.connect(gainNodeRef.current).connect(audioCtx.destination);
-      try {
-        sourceNodeRef.current.start();
-        fadeInAudio(gainNodeRef.current, fadeDuration);
-      } catch (e) {
-        console.error(`Playback failed for ${label}:`, e);
-        // Explicit cleanup on error
-        cleanupAudioNode(sourceNodeRef.current);
-        cleanupAudioNode(gainNodeRef.current);
-        sourceNodeRef.current = null; // Ensure references are nullified on error
-        gainNodeRef.current = null;
-        if (typeof gtag === 'function') gtag('event', `${label}_playback_failed`, { 'event_label': e.message });
-      }
-    }
-
-    /**
-     * Starts a subtle procedural ambient pad sound if the background music buffer is not available.
-     * This acts as a continuous background sound when the main music fails to load.
-     */
-    function startProceduralAmbientPad() {
-        if (proceduralAmbientPadSource.current && audioCtx && audioCtx.state === 'running') return; // Already playing
-        if (!audioInitialized || !audioCtx || audioCtx.state !== 'running') {
-            console.warn("Cannot start procedural ambient pad: audio not initialized or context not running.");
-            return;
-        }
-        console.log("Starting procedural ambient pad.");
-        const now = audioCtx.currentTime;
-        proceduralAmbientPadSource.current = audioCtx.createOscillator();
-        proceduralAmbientPadSource.current.type = 'sine';
-        proceduralAmbientPadSource.current.frequency.setValueAtTime(40, now); // Low frequency
-        proceduralAmbientPadGain.current = audioCtx.createGain();
-        proceduralAmbientPadGain.current.gain.setValueAtTime(0.0001, now); // Start very low for fade-in
-        proceduralAmbientPadGain.current.gain.linearRampToValueAtTime(0.15, now + 3); // Fade in over 3 seconds
-        proceduralAmbientPadSource.current.connect(proceduralAmbientPadGain.current).connect(audioCtx.destination);
-        proceduralAmbientPadSource.current.start(now);
-        // Keep it looping indefinitely, actual stop will be handled by stopProceduralAmbientPad
-        if (typeof gtag === 'function') gtag('event', 'background_music_procedural_fallback', { 'event_label': 'activated' });
-    }
-
-    /**
-     * Stops the procedural ambient pad sound.
-     * Fades out the sound and then cleans up the audio nodes.
-     */
-    function stopProceduralAmbientPad() {
-        if (proceduralAmbientPadSource.current) {
-            console.log("Stopping procedural ambient pad.");
-            if (proceduralAmbientPadGain.current) fadeOutAudio(proceduralAmbientPadGain.current, 1.0); // Fade out over 1 second
-            setTimeout(() => {
-                cleanupAudioNode(proceduralAmbientPadSource.current);
-                cleanupAudioNode(proceduralAmbientPadGain.current);
-                proceduralAmbientPadSource.current = null;
-                proceduralAmbientPadGain.current = null;
-            }, 1000); // Allow fade-out duration before cleanup
-        }
-    }
-
-
-    function startBackgroundMusic() {
-      // If background buffer is not ready, start the procedural ambient pad instead
-      if (!isBufferReady(backgroundBuffer, "Background Music") || !audioCtx || audioCtx.state !== 'running') {
-        console.warn("Background Music buffer not ready. Attempting procedural fallback.");
-        stopMusicLoopChecker(); // Stop existing procedural music composition
-        startProceduralAmbientPad(); // Start simple pad
-        return;
-      }
-
-      setupAndPlayBuffer(
-        backgroundBuffer,
-        backgroundGain, // gainNodeRef
-        backgroundMusicSource, // sourceNodeRef
-        2.0,
-        "Background Music",
-        true
-      );
-    }
-
-    function startEngineHum() {
-      // Procedural fallback logic is separate from buffer playback, so keep it.
-      if (!isBufferReady(engineBuffer, "Engine Hum") || !audioCtx || audioCtx.state !== 'running') {
-        console.warn("Cannot start engine hum: context not running.");
-        // Procedural fallback for engine hum when the buffer isn't loaded.
-        // It creates a basic sawtooth oscillator and detune LFO to simulate engine rumble.
-        if (!(engineBuffer instanceof AudioBuffer) && audioInitialized && audioCtx && audioCtx.state === 'running') {
-            if (engineHumNodes) {
-                cleanupAudioNode(engineHumNodes.osc);
-                cleanupAudioNode(engineHumNodes.gain);
-                if(engineHumNodes.masterGain) cleanupAudioNode(engineHumNodes.masterGain);
-                engineHumNodes = null;
-            }
-            try {
-                let proceduralMasterGain = audioCtx.createGain();
-                proceduralMasterGain.connect(audioCtx.destination);
-                const bf=60, hG=audioCtx.createGain(), p=audioCtx.createStereoPanner(), f=audioCtx.createBiquadFilter(); f.type='lowpass'; f.frequency.value=5000;
-                const hO=audioCtx.createOscillator(); hO.type='sawtooth'; hO.frequency.setValueAtTime(bf,audioCtx.currentTime);
-                const dO=audioCtx.createOscillator(); dO.frequency.value=5; const dGI=audioCtx.createGain(); dGI.gain.value=15;
-                dO.connect(dGI).connect(hO.detune);
-                hO.connect(f).connect(p).connect(hG).connect(proceduralMasterGain);
-                hO.start(); dO.start();
-                engineHumNodes={osc:hO,gain:hG,panner:p,filter:f,detuneOsc:dO,isProcedural:true, masterGain: proceduralMasterGain};
-                fadeInAudio(proceduralMasterGain, 1.5);
-                if (typeof gtag === 'function') gtag('event', 'engine_hum_procedural_fallback', { 'event_label': 'activated' });
-            } catch (e) {
-                engineHumNodes = null;
-                console.error("Procedural engine hum failed:", e);
-                if (typeof gtag === 'function') gtag('event', 'engine_hum_procedural_fallback_failed', { 'event_label': e.message });
-            }
-        }
-        return;
-      }
-      setupAndPlayBuffer(
-        engineBuffer,
-        engineGain, // gainNodeRef
-        engineHumSource, // sourceNodeRef
-        1.5,
-        "Engine Hum",
-        true
-      );
-    }
-
-    /**
-     * Plays a short, procedural sine blip for UI feedback when the UI tone buffer is unavailable.
-     * This acts as a fallback for simple UI sounds.
-     */
-    function playProceduralUiTone() {
-        if (!audioInitialized || !audioCtx || audioCtx.state !== 'running') {
-            console.warn("Cannot play procedural UI tone: audio not initialized or context not running.");
-            return;
-        }
-        console.log("Playing procedural UI tone.");
-        playTone(880, 0.05, 'sine', 0.2); // Simple blip
-        if (typeof gtag === 'function') gtag('event', 'ui_tone_procedural_fallback', { 'event_label': 'activated' });
-    }
-
-    function playUiTone() {
-      // If UI buffer is not ready, play procedural fallback instead.
-      if (!isBufferReady(uiBuffer, "UI Tone") || !audioCtx || audioCtx.state !== 'running') {
-        console.warn("UI Tone buffer not ready. Playing procedural fallback.");
-        playProceduralUiTone(); // Call fallback
-        return;
-      }
-
-      // Haptic feedback for UI tone playback.
-      if (hapticsEnabled) navigator.vibrate([20]); 
-
-      setupAndPlayBuffer(
-        uiBuffer,
-        uiGain, // gainNodeRef
-        uiToneSource, // sourceNodeRef
-        0.01, // UI tones usually don't fade, but setting a very small duration is fine.
-        "UI Tone",
-        false // UI tones typically don't loop
-      );
-    }
-
     function initAudio() {
-        if (!audioCtx) return false; 
-        if (audioCtx.state === 'closed') { console.warn("initAudio: AudioContext is closed."); return false; }
-        if (audioCtx.state === 'suspended') { 
-            console.warn("initAudio: AudioContext suspended. User gesture needed.");
+        if (!audioCtx) { console.warn("initAudio: No AudioContext."); return false; }
+        if (audioCtx.state === 'suspended') {
+            console.warn("initAudio: Context suspended, attempting resume...");
+            audioCtx.resume().then(() => {
+                 console.log("initAudio: Context resumed successfully during init attempt. Current state:", audioCtx.state);
+                 if (audioCtx.state === 'running' && !audioInitialized) { 
+                     return initAudioInternal(); 
+                 }
+            }).catch(err => { console.error("initAudio: Error resuming suspended context:", err); return false; });
             return false; 
         }
-        if (audioCtx.state === 'running') return initAudioInternal();
-        return false;
+        if (audioCtx.state === 'running') { return initAudioInternal(); } 
+        console.warn(`initAudio: Unexpected state ${audioCtx.state}. Cannot initialize.`); return false;
     }
 
     function initAudioInternal() {
-        if (!audioCtx || audioCtx.state !== 'running' || audioInitialized) return audioInitialized;
-        
-        if (!window.PROCEDURAL_UI_GAIN && audioCtx) { 
-            window.PROCEDURAL_UI_GAIN = audioCtx.createGain();
-            window.PROCEDURAL_UI_GAIN.connect(audioCtx.destination);
-            window.PROCEDURAL_UI_GAIN.gain.value = 1.0; 
+        if (!audioCtx || audioCtx.state !== 'running') { console.error("initAudioInternal: Context not ready. State:", audioCtx?.state); return false; }
+        if (audioInitialized) { console.log("initAudioInternal: Already initialized."); return true; }
+        console.log("initAudioInternal: Context running, initializing nodes...");
+        if (setupMasterAudioNodes()) {
+             audioInitialized = true;
+             console.log("initAudioInternal: Success. Audio system ready.");
+             return true;
+        } else {
+             console.error("initAudioInternal: setupMasterAudioNodes failed.");
+             return false;
         }
-
-        if(setupMasterAudioNodes()){ 
-            fetch('assets/music/background_loop.ogg').then(r=>r.arrayBuffer()).then(d=>audioCtx.decodeAudioData(d))
-              .then(b=>{backgroundBuffer=b;}).catch(e=>{});
-            fetch('assets/sfx/engine_loop.wav').then(r=>r.arrayBuffer()).then(d=>audioCtx.decodeAudioData(d))
-              .then(b=>{engineBuffer=b;}).catch(e=>{});
-            fetch('assets/sfx/collision.wav').then(r=>r.arrayBuffer()).then(d=>audioCtx.decodeAudioData(d))
-              .then(b=>{uiBuffer=b;}).catch(e=>{});
-            audioInitialized = true; return true;
-        }
-        return false;
     }
 
-    function setupMasterAudioNodes() { 
-        if (!audioCtx || audioCtx.state !== 'running') return false;
-        
-        if (!window.PROCEDURAL_UI_GAIN) { 
-            window.PROCEDURAL_UI_GAIN = audioCtx.createGain();
-            window.PROCEDURAL_UI_GAIN.gain.value = 1.0; 
-            window.PROCEDURAL_UI_GAIN.connect(audioCtx.destination);
-        }
-
-        if (!musicGainNode) { 
+    function setupMasterAudioNodes() {
+        if (!audioCtx || audioCtx.state !== 'running') { console.error("setupMasterAudioNodes: Context not ready. State:", audioCtx?.state); return false; }
+        if (!musicGainNode || !musicLowPassFilter || !reverbNode) {
             try {
-                musicGainNode = audioCtx.createGain(); musicGainNode.gain.value = 0.45; 
+                musicGainNode = audioCtx.createGain();
                 musicLowPassFilter = audioCtx.createBiquadFilter(); musicLowPassFilter.type = 'lowpass'; musicLowPassFilter.frequency.value = 20000;
-                const rd = audioCtx.createDelay(0.5); rd.delayTime.value = 0.15; 
-                const rf = audioCtx.createGain(); rf.gain.value = 0.35; 
-                const rfn = audioCtx.createBiquadFilter(); rfn.type = 'lowpass'; rfn.frequency.value = 2500; 
-                rd.connect(rf).connect(rfn).connect(rd); 
-                reverbNode = { input: rd, output: rfn };
-                const rog = audioCtx.createGain(); rog.gain.value = 0.25;
-            } catch (error) { 
-                musicGainNode = null; musicLowPassFilter = null; reverbNode = null; 
-                return false; 
+                const reverbDelay = audioCtx.createDelay(0.5); reverbDelay.delayTime.value = 0.15; const reverbFeedback = audioCtx.createGain(); reverbFeedback.gain.value = 0.35; const reverbFilter = audioCtx.createBiquadFilter(); reverbFilter.type = 'lowpass'; reverbFilter.frequency.value = 2500; reverbDelay.connect(reverbFeedback).connect(reverbFilter).connect(reverbDelay); reverbNode = { input: reverbDelay, output: reverbFilter };
+                musicGainNode.connect(musicLowPassFilter).connect(audioCtx.destination);
+                const reverbOutputGain = audioCtx.createGain(); reverbOutputGain.gain.value = 0.25; reverbNode.output.connect(reverbOutputGain).connect(audioCtx.destination);
+                musicGainNode.gain.value = 0.45; 
+                console.log("setupMasterAudioNodes: Master audio nodes created successfully."); return true;
+            } catch (error) { console.error("setupMasterAudioNodes: Error creating master audio nodes:", error); musicGainNode = null; musicLowPassFilter = null; reverbNode = null; return false; }
+        } else {
+             console.log("setupMasterAudioNodes: Master audio nodes already exist."); return true;
+        }
+    }
+
+    function triggerHapticFeedback(duration = 50) { /* No haptics in beta69 */ }
+
+    function playTone(freq, duration = 0.2, type = 'square', vol = 0.3, when = 0, options = {}) {
+        if (!audioInitialized || !audioCtx || audioCtx.state !== 'running') { return null; }
+        try {
+            const startTime = (options.absoluteTime !== undefined) ? options.absoluteTime : audioCtx.currentTime + when;
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); const outputNode = options.outputNode || audioCtx.destination;
+            if (startTime < audioCtx.currentTime) {
+                 console.warn(`playTone: Skipping note scheduled in the past. Freq: ${freq}, Scheduled: ${startTime.toFixed(3)}, Now: ${audioCtx.currentTime.toFixed(3)}`);
+                 return null;
+            }
+            osc.type = type;
+            if (options.detune) osc.detune.setValueAtTime(options.detune, startTime);
+            if (options.frequency instanceof AudioParam) { options.frequency.cancelScheduledValues(startTime); options.frequency.setValueAtTime(options.frequency.value, startTime); options.frequency.connect(osc.frequency); } else { osc.frequency.setValueAtTime(freq, startTime); }
+            gain.gain.setValueAtTime(vol, startTime);
+            if (options.rampTo !== undefined) { gain.gain.linearRampToValueAtTime(options.rampTo, startTime + duration * 0.8); gain.gain.linearRampToValueAtTime(0.001, startTime + duration); } else { gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration); }
+            osc.connect(gain).connect(outputNode);
+            osc.start(startTime);
+            const stopTime = startTime + duration;
+            if (duration > 0 && stopTime > audioCtx.currentTime) { osc.stop(stopTime); } else if (duration <= 0) {} else { try { osc.stop(); } catch (e) {} }
+            if (options.frequency instanceof AudioParam) { setTimeout(() => { try { options.frequency.disconnect(osc.frequency); } catch(e) {} }, duration * 1000 + 100); }
+            return { osc, gain };
+        } catch (error) { console.error("playTone Error:", error, {freq, duration, type, vol, when, options}); return null; }
+    }
+
+    function playStartJingle() { if (!audioInitialized) return; const now = audioCtx.currentTime; const vol = 0.4; const dur = 0.2; playTone(110, dur + 0.2, 'sawtooth', vol * 0.15, 0); playTone(440, dur, 'square', vol, 0.10); playTone(1760, dur * 0.8, 'sine', vol * 0.20, 0.3, { rampTo: 0 }); if (reverbNode) playTone(1760, dur * 0.5, 'sine', vol * 0.4, 0.35, { outputNode: reverbNode.input }); }
+    function playCollisionSound() { if (!audioInitialized) return; const now = audioCtx.currentTime; const noiseDur = 0.15; try { const noiseEnv = audioCtx.createGain(); noiseEnv.connect(audioCtx.destination); noiseEnv.gain.setValueAtTime(0.3, now); noiseEnv.gain.exponentialRampToValueAtTime(0.001, now + noiseDur); const noiseSrc = audioCtx.createBufferSource(); const bufferSize = audioCtx.sampleRate * noiseDur; const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate); const data = buffer.getChannelData(0); for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1; noiseSrc.buffer = buffer; noiseSrc.connect(noiseEnv); noiseSrc.start(now); noiseSrc.stop(now + noiseDur); } catch (e) { console.error("Error playing collision noise:", e); } playTone(987.77, 0.1, 'triangle', 0.25, 0.02); for(let i=0; i<3; i++) { playTone(2000, 0.03, 'noise', 0.08, 0.1 + i * 0.04); } }
+    function playBatteryPickupSound() { playTone(329.63, 0.08, 'sine', 0.35, 0.0); playTone(392.00, 0.08, 'sine', 0.35, 0.08); playTone(523.25, 0.15, 'sine', 0.4, 0.16); }
+    function playLowBatteryWarning() { if (!lowBatteryWarningPlayed) { playTone(880, 0.08, 'square', 0.25, 0); playTone(880, 0.08, 'square', 0.25, 0.15); lowBatteryWarningPlayed = true; setTimeout(() => { lowBatteryWarningPlayed = false; }, 5000); } }
+    function playBonusFlourish() { const baseFreq = 783.99; const vol = 0.30; playTone(baseFreq, 0.08, 'triangle', vol, 0.0); playTone(baseFreq * 1.25, 0.08, 'triangle', vol, 0.08); playTone(baseFreq * 1.5, 0.12, 'triangle', vol, 0.16); }
+    function playEngineHum() { if (engineHumNodes || !audioInitialized || !audioCtx || audioCtx.state !== 'running') return; try { const baseFreq = 60; const humGain = audioCtx.createGain(); const panner = audioCtx.createStereoPanner(); const filter = audioCtx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.value = 5000; const humOsc = audioCtx.createOscillator(); humOsc.type = 'sawtooth'; humOsc.frequency.setValueAtTime(baseFreq, audioCtx.currentTime); const detuneOsc = audioCtx.createOscillator(); detuneOsc.frequency.value = 5; const detuneGain = audioCtx.createGain(); detuneGain.gain.value = 15; humGain.gain.value = 0.06; detuneOsc.connect(detuneGain).connect(humOsc.detune); humOsc.connect(filter).connect(panner).connect(humGain).connect(audioCtx.destination); humOsc.start(); detuneOsc.start(); engineHumNodes = { osc: humOsc, gain: humGain, panner: panner, filter: filter, detuneOsc: detuneOsc }; } catch (e) { console.error("Error starting engine hum:", e); engineHumNodes = null; } }
+    function stopEngineHum() { if (!engineHumNodes) return; try { const now = audioCtx.currentTime; engineHumNodes.gain.gain.cancelScheduledValues(now); engineHumNodes.gain.gain.setTargetAtTime(0, now, 0.01); engineHumNodes.osc.stop(now + 0.05); if (engineHumNodes.detuneOsc) engineHumNodes.detuneOsc.stop(now + 0.05); } catch(e) {} engineHumNodes = null; }
+    function modulateEngineHum(batteryPercent, vertDelta, horzDelta) { if (!engineHumNodes || !audioInitialized || !audioCtx || audioCtx.state !== 'running') return; try { const now = audioCtx.currentTime; const baseFreq = 60; const pitchRange = 20; const pitchMod = (vertDelta / MOVE_SPEED_Y) * pitchRange; engineHumNodes.osc.frequency.linearRampToValueAtTime(baseFreq + pitchMod, now + 0.1); let panValue = 0; if (keys['ArrowLeft'] || keys['a']) panValue = -0.6; if (keys['ArrowRight'] || keys['d']) panValue = 0.6; engineHumNodes.panner.pan.linearRampToValueAtTime(panValue, now + 0.05); const minVol = 0.05; const maxVol = 0.10; const targetVol = maxVol - (batteryPercent / 100) * (maxVol - minVol); engineHumNodes.gain.gain.linearRampToValueAtTime(targetVol, now + 0.2); const minFilterFreq = 800; const maxFilterFreq = 5000; const targetFilterFreq = (batteryPercent < 30) ? minFilterFreq + (batteryPercent/30) * (1500 - minFilterFreq) : maxFilterFreq; engineHumNodes.filter.frequency.linearRampToValueAtTime(targetFilterFreq, now + 0.3); } catch(e) { console.error("Error modulating engine hum:", e); stopEngineHum(); } }
+    function playDodgeSound(direction) { playTone(600 + direction * 100, 0.05, 'noise', 0.05, 0); }
+    function playPullDownSound() { playTone(400, 1.0, 'sawtooth', 0.35, 0, { rampTo: 80 }); playTone(150, 1.0, 'square', 0.15, 0.1, { rampTo: 40, detune: -30 }); playTone(55, 1.2, 'sine', 0.12, 0); }
+    function playChargingSound() { if (!audioInitialized) return; stopChargingSound(); const baseFreq = 130.81; const chord = [0, 4, 7, 12]; const vol = 0.20; const noteDur = 0.1; let delay = 0; for(let i=0; i<8; i++) { const interval = chord[i % chord.length]; const freq = baseFreq * Math.pow(2, interval / 12); const node = playTone(freq, noteDur * 0.9, 'sine', vol * (1 - (i%4)*0.1), delay); if(node) chargingSoundNodes.push(node); delay += noteDur; } chargingSoundNodes.push(setTimeout(playChargingSound, delay * 1000)); }
+    function stopChargingSound() { chargingSoundNodes.forEach(item => { if (typeof item === 'number') clearTimeout(item); else if (item && item.osc) try { item.osc.stop(audioCtx.currentTime); item.gain.gain.cancelScheduledValues(audioCtx.currentTime); item.gain.gain.setValueAtTime(0, audioCtx.currentTime);} catch (e) {} }); chargingSoundNodes = []; }
+    function playChargeCompleteSound() { playTone(523.25, 0.1, 'triangle', 0.4, 0.0); playTone(659.25, 0.1, 'triangle', 0.4, 0.1); playTone(783.99, 0.1, 'triangle', 0.4, 0.2); playTone(1046.50, 0.25,'triangle', 0.5, 0.3); /* No haptics */ }
+    function playLaunchSound() { playTone(300, 0.5, 'sawtooth', 0.5, 0, { rampTo: 2500 }); playTone(400, 0.6, 'noise', 0.3, 0.05, { rampTo: 0.01 }); }
+    function playGameOverFanfare() { const now = audioCtx.currentTime; const vol = 0.25; const notes = [ { freq: 440.00, delay: 0.0, dur: 0.3 }, { freq: 349.23, delay: 0.3, dur: 0.3 }, { freq: 293.66, delay: 0.6, dur: 0.3 }, { freq: 261.63, delay: 0.9, dur: 0.6 }, ]; notes.forEach(n => playTone(n.freq, n.dur, 'triangle', vol, n.delay, { rampTo: 0.001 })); console.log("Playing soft game over fanfare"); }
+    function playWaveBeamSound(building) { playTone(1500, 0.1, 'sine', 0.08, 0, { detune: 200 }); playTone(1800, 0.1, 'sine', 0.08, 0.05, { detune: -150 }); }
+    function playLockOnSound() { playTone(523.25, 0.1, 'square', 0.35, 0); playTone(369.99, 0.1, 'square', 0.35, 0.05); }
+    function playCaptureDescentHum() { if (!audioInitialized) return; stopCaptureSounds(); const node = playTone(100, 0, 'sawtooth', 0.25); if (node) { try {node.osc.frequency.linearRampToValueAtTime(50, audioCtx.currentTime + 1.5); captureSoundNodes.push(node);} catch(e){ console.error("Error ramping capture hum:", e); try{node.osc.stop();}catch(_){} } } }
+    function playCaptureHoldingPulse() { playTone(220, 0.08, 'sine', 0.12, Math.random() * 0.2); playTone(330, 0.08, 'sine', 0.08, 0.15 + Math.random() * 0.2); }
+    function playCaptureReleaseChime() { playTone(329.63, 0.1, 'triangle', 0.35, 0); playTone(392.00, 0.1, 'triangle', 0.35, 0.1); playTone(523.25, 0.2, 'triangle', 0.4, 0.2); }
+    function stopCaptureSounds() { captureSoundNodes.forEach(item => { if (item && item.osc) try { item.osc.stop(audioCtx.currentTime); item.gain.gain.cancelScheduledValues(audioCtx.currentTime); item.gain.gain.setValueAtTime(0, audioCtx.currentTime);} catch (e) {} }); captureSoundNodes = []; }
+    function playVertiportRefuelSound() { const now = audioCtx.currentTime; const vol = 0.2; playTone(1200, 0.05, 'square', vol * 0.8, 0.0, { detune: 100 }); playTone(1500, 0.05, 'square', vol * 0.7, 0.07); for (let i = 0; i < 4; i++) { playTone(200 + Math.random() * 100, 0.1, 'sine', vol * 0.5, 0.2 + i * 0.08 + Math.random() * 0.04, { detune: (Math.random() - 0.5) * 300 }); } if (!audioInitialized || !audioCtx) return; try { const riseOsc = audioCtx.createOscillator(); const riseGain = audioCtx.createGain(); riseOsc.type = 'triangle'; riseOsc.frequency.setValueAtTime(200, now + 0.4); riseOsc.frequency.linearRampToValueAtTime(800, now + 0.4 + 0.6); riseGain.gain.setValueAtTime(0, now + 0.4); riseGain.gain.linearRampToValueAtTime(vol * 1.1, now + 0.4 + 0.2); riseGain.gain.linearRampToValueAtTime(0.001, now + 0.4 + 0.6); riseOsc.connect(riseGain).connect(audioCtx.destination); riseOsc.start(now + 0.4); riseOsc.stop(now + 0.4 + 0.6); } catch(e) { console.error("Error playing refuel sound rise:", e); } }
+    function playCollisionDissonance() { playTone(450, 0.15, 'sawtooth', 0.2, 0, { detune: 50 }); playTone(150, 0.2, 'square', 0.15, 0.02); }
+    function applyLowBatteryMusicFilter(isLow) { if (!musicLowPassFilter || !audioInitialized || !audioCtx || audioCtx.state !== 'running') return; const targetFreq = isLow ? 800 : 20000; const targetQ = isLow ? 5 : 1; const now = audioCtx.currentTime; try { musicLowPassFilter.frequency.cancelScheduledValues(now); musicLowPassFilter.Q.cancelScheduledValues(now); musicLowPassFilter.frequency.linearRampToValueAtTime(targetFreq, now + 0.5); musicLowPassFilter.Q.linearRampToValueAtTime(targetQ, now + 0.5); } catch(e) { console.error("Error applying low battery filter:", e); } }
+
+    function scheduleMusicBlock() {
+        if (!audioInitialized || !audioCtx || audioCtx.state !== 'running' || !musicGainNode) { console.warn("scheduleMusicBlock: Cannot schedule, audio not ready."); stopBackgroundMusic(); return; }
+        musicOscillators.forEach(item => { if (item && item.osc && typeof item.osc.stop === 'function') { try { item.osc.stop(audioCtx.currentTime); } catch (e) {} } }); musicOscillators = [];
+        try {
+            const tempo = currentMusicTempo; const quarterNoteTime = 60 / tempo; const measureTime = quarterNoteTime * 4; const loopLengthSeconds = measureTime * 8; currentLoopLengthSeconds = loopLengthSeconds;
+            const blockStartTime = nextMusicScheduleTime + musicScheduleLookahead;
+            const pulseVol = 0.25;
+            for (let t = 0; t < loopLengthSeconds; t += quarterNoteTime) {
+                 const scheduleTime = blockStartTime + t;
+                 const kickNode = playTone(80, 0.1, 'sine', pulseVol * 1.2, 0, { outputNode: musicGainNode, rampTo: 0.01, absoluteTime: scheduleTime });
+                 const kickClickNode = playTone(80, 0.05, 'noise', pulseVol * 0.5, 0, { outputNode: musicGainNode, absoluteTime: scheduleTime });
+                 const snareNode = playTone(250, 0.1, 'noise', pulseVol * 0.8, 0, { outputNode: musicGainNode, rampTo: 0.01, absoluteTime: scheduleTime + quarterNoteTime });
+                 if (kickNode) musicOscillators.push(kickNode); if (kickClickNode) musicOscillators.push(kickClickNode); if (snareNode) musicOscillators.push(snareNode);
+            }
+            const bassNotes = [65.41, 73.42, 87.31, 98.00]; const bassVol = 0.35; const bar = Math.floor((blockStartTime / measureTime)) % 8; const bassNoteIndex = Math.floor(bar / 2) % bassNotes.length; const bassFreq = bassNotes[bassNoteIndex];
+            for (let t = 0; t < loopLengthSeconds; t += (quarterNoteTime / 2)) {
+                if (t % (quarterNoteTime * 2) < quarterNoteTime) {
+                    const scheduleTime = blockStartTime + t; const node = playTone(bassFreq, (quarterNoteTime / 2) * 0.8, 'sawtooth', bassVol, 0, { outputNode: musicGainNode, absoluteTime: scheduleTime }); if (node) musicOscillators.push(node);
+                }
+            }
+            const melodyVol = 0.15; const arpNotes = (bar < 4) ? [0, 3, 7, 10] : [0, 4, 7, 12]; const arpBaseFreq = 261.63;
+            for (let t = 0; t < loopLengthSeconds; t += (quarterNoteTime / 4)) {
+                const scheduleTime = blockStartTime + t; const arpNoteIndex = Math.floor(t / (quarterNoteTime / 4)) % arpNotes.length; const freq = arpBaseFreq * Math.pow(2, arpNotes[arpNoteIndex] / 12); const node = playTone(freq, (quarterNoteTime / 4) * 0.7, 'triangle', melodyVol, 0, { outputNode: musicGainNode, absoluteTime: scheduleTime }); if (node) musicOscillators.push(node);
+            }
+            const blockEndTime = blockStartTime + loopLengthSeconds; nextMusicScheduleTime = blockEndTime - musicScheduleLookahead;
+        } catch (error) { console.error("Error scheduling background music block:", error); stopBackgroundMusic(); }
+    }
+
+    function checkMusicSchedule() {
+        if (!gameRunning || !audioInitialized || !audioCtx || audioCtx.state !== 'running' || !musicShouldBePlaying || isChargingSequence || isCaptured) {
+            if (musicIsPlaying) stopBackgroundMusic(); 
+            return;
+        }
+        const currentTime = audioCtx.currentTime;
+        const lastBlockEndTime = nextMusicScheduleTime + musicScheduleLookahead;
+        if (currentTime > lastBlockEndTime + 1.0) { console.warn(`Music loop checker significantly delayed. Resetting schedule time.`); nextMusicScheduleTime = currentTime; }
+        if (currentTime >= nextMusicScheduleTime) { scheduleMusicBlock(); }
+    }
+
+    function startMusicLoopChecker() {
+        if (!audioInitialized || !audioCtx || audioCtx.state !== 'running') { console.warn("startMusicLoopChecker: Cannot start, audio not ready."); return; }
+        if (musicLoopIntervalId !== null) { console.log("startMusicLoopChecker: Loop checker already running."); return; }
+        
+        musicShouldBePlaying = true; 
+        musicIsPlaying = true;      
+        console.log(`startMusicLoopChecker: Starting. musicShouldBePlaying: ${musicShouldBePlaying}, musicIsPlaying: ${musicIsPlaying}`);
+        nextMusicScheduleTime = audioCtx.currentTime;
+        scheduleMusicBlock(); 
+        musicLoopIntervalId = setInterval(checkMusicSchedule, musicCheckIntervalMs);
+    }
+
+    function stopBackgroundMusic() {
+        if (musicLoopIntervalId !== null) {
+            clearInterval(musicLoopIntervalId);
+            musicLoopIntervalId = null;
+        }
+        musicOscillators.forEach(item => { if (item && item.osc && typeof item.osc.stop === 'function') { try { if(item.gain && typeof item.gain.gain.cancelScheduledValues === 'function') { item.gain.gain.cancelScheduledValues(audioCtx.currentTime); item.gain.gain.setTargetAtTime(0.0001, audioCtx.currentTime, 0.005); } item.osc.stop(audioCtx.currentTime + 0.02); } catch (e) {} } }); musicOscillators = [];
+        
+        musicIsPlaying = false;       
+        musicShouldBePlaying = false; 
+        console.log(`stopBackgroundMusic: Stopped. musicShouldBePlaying: ${musicShouldBePlaying}, musicIsPlaying: ${musicIsPlaying}, Cleared Interval ID.`);
+        nextMusicScheduleTime = 0; currentLoopLengthSeconds = 0;
+    }
+
+    function stopAllSounds() {
+        console.log("Stopping all sounds...");
+        stopBackgroundMusic(); 
+        stopEngineHum(); 
+        stopChargingSound(); 
+        stopCaptureSounds();
+        if (musicGainNode && audioCtx && audioCtx.state === 'running') { musicGainNode.gain.cancelScheduledValues(audioCtx.currentTime); musicGainNode.gain.setValueAtTime(0.45, audioCtx.currentTime); }
+        if (musicLowPassFilter && audioCtx && audioCtx.state === 'running') { musicLowPassFilter.frequency.cancelScheduledValues(audioCtx.currentTime); musicLowPassFilter.frequency.setValueAtTime(20000, audioCtx.currentTime); musicLowPassFilter.Q.cancelScheduledValues(audioCtx.currentTime); musicLowPassFilter.Q.setValueAtTime(1, audioCtx.currentTime); }
+    }
+
+    function updateBatteryUI() { const clampedBattery = Math.max(0, Math.min(battery, 100)); batteryLevelUI.style.width = `${clampedBattery}%`; const isLow = clampedBattery < 20; if (isLow) { batteryLevelUI.style.backgroundColor = '#f44336'; if (gameRunning && !isChargingSequence && !isCaptured) playLowBatteryWarning(); } else if (clampedBattery < 50) { batteryLevelUI.style.backgroundColor = '#ffeb3b'; lowBatteryWarningPlayed = false; } else { batteryLevelUI.style.backgroundColor = '#4CAF50'; lowBatteryWarningPlayed = false; } applyLowBatteryMusicFilter(isLow && !isChargingSequence && !isCaptured); }
+    function updateScoreUI() { scoreLabel.textContent = `Score: ${score}`; }
+    function triggerShake(duration = 5) { carShake = duration; }
+    function calculateDimensions() { playableHeight = gameCanvas.height - SIDEWALK_HEIGHT; cityHeight = playableHeight; MAX_CAR_X = gameCanvas.width * 0.4; }
+    
+    function spawnBuilding(forceX = null) { const isVertiport = Math.random() < VERTIPORT_SPAWN_CHANCE && !buildings.some(b => b.isVertiport); const minWidth = isVertiport ? 100 : 60; const maxWidth = isVertiport ? 150 : 180; const minHeight = isVertiport ? playableHeight * 0.7 : 100; const maxHeight = isVertiport ? playableHeight * 0.85 : playableHeight * 0.65; const gap = 40 + Math.random() * 60; const lastBuilding = buildings[buildings.length - 1]; let nextX = forceX !== null ? forceX : (lastBuilding ? lastBuilding.x + lastBuilding.width + gap : gameCanvas.width + 50); const height = minHeight + Math.random() * (maxHeight - minHeight); buildings.push({ x: nextX, y: gameCanvas.height - height, width: minWidth + Math.random() * (maxWidth - minWidth), height: height, color: isVertiport ? '#607D8B' : `hsl(${190 + Math.random()*50}, 25%, ${15 + Math.random()*15}%)`, isVertiport: isVertiport, wavePhase: Math.random() * Math.PI * 2 }); }
+    function updateBuildings() { for (let i = buildings.length - 1; i >= 0; i--) { const b = buildings[i]; b.x -= currentScrollSpeed; if (b.isVertiport) b.wavePhase += 0.1; if (b.x + b.width < 0) buildings.splice(i, 1); } const lastBuilding = buildings[buildings.length - 1]; if (!lastBuilding || lastBuilding.x + lastBuilding.width < gameCanvas.width + 100) { spawnBuilding(); } }
+    function drawBuildings() { buildings.forEach(b => { ctx.fillStyle = b.color; ctx.fillRect(b.x, b.y, b.width, b.height); if (b.isVertiport) { const platformY = b.y - 15; ctx.fillStyle = '#455A64'; ctx.fillRect(b.x - 10, platformY, b.width + 20, 15); ctx.fillStyle = '#B0BEC5'; ctx.beginPath(); ctx.arc(b.x + b.width / 2, platformY + 7.5, b.width * 0.3, 0, Math.PI * 2); ctx.fill(); const lightColor = (Math.sin(b.wavePhase * 2) > 0) ? '#0ff' : '#ff0'; ctx.fillStyle = lightColor; ctx.fillRect(b.x, platformY + 5, 10, 5); ctx.fillRect(b.x + b.width - 10, platformY + 5, 10, 5); const waveWidth = b.width * 0.6; const waveX = b.x + (b.width - waveWidth) / 2; const waveSegmentHeight = 20; const numSegments = Math.ceil(platformY / waveSegmentHeight); for(let i=0; i<numSegments; i++) { const segmentY = platformY - (i + 1) * waveSegmentHeight; const alpha = 0.1 + Math.abs(Math.sin(b.wavePhase + i * 0.5)) * 0.2; const hue = 180 + Math.sin(b.wavePhase + i*0.3) * 20; ctx.fillStyle = `hsla(${hue}, 100%, 70%, ${alpha})`; ctx.fillRect(waveX, segmentY, waveWidth, waveSegmentHeight - 2); } } else { ctx.fillStyle = 'rgba(255, 255, 180, 0.2)'; for(let wy = b.y + 10; wy < b.y + b.height - 10; wy += 25) { for(let wx = b.x + 10; wx < b.x + b.width - 10; wx += 25) { if(Math.random() > 0.4) { ctx.fillRect(wx, wy, 10, 15); } } } } }); }
+    function spawnPedestrian() { const type = Math.random() > 0.4 ? 'OldLady' : 'BalloonPerson'; pedestrians.push({ x: gameCanvas.width + 50 + Math.random() * 100, y: gameCanvas.height - SIDEWALK_HEIGHT + 5 + Math.random() * (SIDEWALK_HEIGHT - 20), type: type, size: type === 'OldLady' ? {w: 8, h: 16} : {w: 10, h: 18}, color: type === 'OldLady' ? 'pink' : `hsl(${Math.random()*360}, 60%, 70%)`, throwCooldown: 60 + Math.random() * 120, speed: currentScrollSpeed * PEDESTRIAN_SPEED_MULTIPLIER * (0.8 + Math.random() * 0.4), lastActionFrame: 0 }); }
+    function updatePedestriansAndProjectiles() {
+        const currentPedestrianSpawnChance = BASE_PEDESTRIAN_SPAWN_CHANCE * difficultyMultiplier;
+        const currentProjectileThrowChance = BASE_PROJECTILE_THROW_CHANCE * difficultyMultiplier; 
+        for (let i = pedestrians.length - 1; i >= 0; i--) {
+            const p = pedestrians[i]; p.x -= p.speed; p.throwCooldown = Math.max(0, p.throwCooldown - 1);
+            if (p.throwCooldown === 0 && Math.random() < currentProjectileThrowChance) {
+                const projectileBaseSpeedX = -currentScrollSpeed * PROJECTILE_SPEED_MULTIPLIER; 
+                if (p.type === 'OldLady') {
+                    const itemType = Math.random() < 0.5 ? 'ChickenLeg' : 'CornCob';
+                    let initialVy = -5 - Math.random() * 5; // High-arc (from beta67)
+                    let initialVx = -2.0 - Math.random() * 1.0; // vx around -2.5 (from beta67)
+                    projectiles.push({ type: itemType, x: p.x, y: Math.min(p.y - 25, playableHeight * 0.85), vx: initialVx, vy: initialVy, size: {w: 4, h: (itemType === 'CornCob' ? 8 : 6)}, maxSize: 30 + Math.random() * 15, currentSize: 4, growthRate: 0.3 + Math.random() * 0.2, color: itemType === 'ChickenLeg' ? 'orange' : '#FFC107', rotation: 0, rotationSpeed: (Math.random() - 0.5) * 0.8, stuckFrames: 0, removeAfterFrames: -1 });
+                } else { projectiles.push({ type: 'Balloon', x: p.x, y: p.y - 15, vx: projectileBaseSpeedX * (0.6 + Math.random() * 0.3), vy: -(1.5 + Math.random() * 1.8), size: {w: 12 + Math.random()*6, h: 16 + Math.random()*8}, color: `hsl(${Math.random()*360}, 80%, 70%)` });}
+                p.throwCooldown = (80 + Math.random() * 130) / difficultyMultiplier; p.lastActionFrame = frameCount;
+            }
+            if (p.x + p.size.w < 0) { pedestrians.splice(i, 1); }
+        }
+        const maxPedestrians = 3 + Math.floor(difficultyMultiplier * 4); 
+        if (pedestrians.length < maxPedestrians && Math.random() < currentPedestrianSpawnChance) { spawnPedestrian(); }
+        for (let i = projectiles.length - 1; i >= 0; i--) {
+            const proj = projectiles[i]; proj.x += proj.vx; proj.y += proj.vy;
+            if (proj.type === 'ChickenLeg' || proj.type === 'CornCob') {
+                proj.vy += PROJECTILE_GRAVITY; proj.rotation += proj.rotationSpeed; 
+                if (proj.vy < 0 && proj.currentSize < proj.maxSize) { proj.currentSize += proj.growthRate; proj.size.w = proj.currentSize * (proj.type === 'CornCob' ? 0.6 : 1.0); proj.size.h = proj.currentSize * (proj.type === 'CornCob' ? 1.2 : 1.5); }
+                
+                if (proj.y < 0 && proj.vy < 0) {
+                    proj.y = 0;
+                    proj.vy *= -0.3; 
+                }
+
+                const groundLevel = playableHeight - proj.size.h; 
+                if (proj.y >= groundLevel - 5) { if (Math.abs(proj.vy) < 0.5) { if (proj.stuckFrames !== undefined) { proj.stuckFrames++; }} else { proj.stuckFrames = 0; } if (proj.y >= groundLevel && proj.removeAfterFrames === -1) { proj.removeAfterFrames = 3; } proj.y = Math.min(proj.y, groundLevel); } else { proj.stuckFrames = 0; }
+                if (proj.removeAfterFrames !== undefined && proj.removeAfterFrames > 0) { proj.removeAfterFrames--;}
+                if ((proj.stuckFrames !== undefined && proj.stuckFrames > 50) || (proj.removeAfterFrames !== undefined && proj.removeAfterFrames === 0)) { projectiles.splice(i, 1); continue; }
+            } else if (proj.type === 'Balloon') { proj.vx += (Math.random() - 0.5) * 0.1; proj.vx = Math.max(-1.2, Math.min(1.2, proj.vx)); }
+            if (proj.x + proj.size.w < 0 || proj.y + proj.size.h < -50 || proj.y > gameCanvas.height + 50) { projectiles.splice(i, 1); }
+        }
+    }
+    function drawPedestriansAndProjectiles() { pedestrians.forEach(p => { ctx.fillStyle = p.color; ctx.fillRect(p.x, p.y, p.size.w, p.size.h); const timeSinceAction = frameCount - p.lastActionFrame; const hintDuration = 30; if (p.lastActionFrame > 0 && timeSinceAction < hintDuration) { const alpha = 1 - (timeSinceAction / hintDuration); ctx.globalAlpha = alpha * 0.8; ctx.font = "12px 'Courier New', Courier, monospace"; ctx.textAlign = 'center'; if (p.type === 'OldLady') { ctx.fillStyle = 'orange'; ctx.fillText("🍗", p.x + p.size.w / 2, p.y - 5); } else { ctx.fillStyle = '#ccc'; ctx.fillText("o", p.x + p.size.w / 2, p.y - 5); } ctx.globalAlpha = 1.0; ctx.textAlign = 'left'; } }); projectiles.forEach(p => { ctx.save(); ctx.translate(p.x + p.size.w / 2, p.y + p.size.h / 2); if (p.type === 'ChickenLeg') { ctx.rotate(p.rotation); const meatWidth = p.size.w; const meatHeight = p.size.h * 0.65; const boneWidth = p.size.w * 0.25; const boneHeight = p.size.h * 0.4; const boneY = meatHeight / 2; ctx.fillStyle = '#D2691E'; ctx.beginPath(); ctx.ellipse(0, -meatHeight/4, meatWidth / 2, meatHeight / 2, 0, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = '#eee'; ctx.fillRect(-boneWidth / 2, boneY - boneHeight / 2, boneWidth, boneHeight); ctx.beginPath(); ctx.arc(-boneWidth / 2, boneY + boneHeight / 2, boneWidth * 0.4, 0, Math.PI * 2); ctx.arc(boneWidth / 2, boneY + boneHeight / 2, boneWidth * 0.4, 0, Math.PI * 2); ctx.fill(); } else if (p.type === 'CornCob') { ctx.rotate(p.rotation); const cobWidth = p.size.w; const cobHeight = p.size.h; const stickWidth = cobWidth * 0.3; const stickHeight = cobHeight * 0.3; const stickY = cobHeight * 0.35; ctx.fillStyle = '#FFC107'; ctx.beginPath(); ctx.ellipse(0, 0, cobWidth / 2, cobHeight / 2, 0, 0, Math.PI * 2); ctx.fill(); ctx.strokeStyle = 'rgba(139, 69, 19, 0.5)'; ctx.lineWidth = Math.max(1, cobWidth * 0.05); for(let i = -cobWidth/2 + 3; i < cobWidth/2 - 3; i += cobWidth * 0.15) { ctx.beginPath(); ctx.moveTo(i, -cobHeight/2.5); ctx.lineTo(i + cobWidth*0.05, cobHeight/2.5); ctx.stroke(); ctx.beginPath(); ctx.moveTo(i+cobWidth*0.05, -cobHeight/2.5); ctx.lineTo(i, cobHeight/2.5); ctx.stroke(); } ctx.fillStyle = '#D2B48C'; ctx.fillRect(-stickWidth / 2, stickY, stickWidth, stickHeight); } else if (p.type === 'Balloon') { ctx.fillStyle = p.color; ctx.beginPath(); ctx.ellipse(0, 0, p.size.w / 2, p.size.h / 2, 0, 0, Math.PI * 2); ctx.fill(); ctx.strokeStyle = '#ccc'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, p.size.h / 2); ctx.lineTo(0, p.size.h / 2 + 10); ctx.stroke(); } else { ctx.fillStyle = p.color; ctx.fillRect(-p.size.w / 2, -p.size.h / 2, p.size.w, p.size.h); } ctx.restore(); }); }
+    function spawnBonus() { const isChargingTrigger = Math.random() < CHARGING_TRIGGER_SPAWN_CHANCE && !isChargingSequence; bonuses.push({ type: isChargingTrigger ? 'ChargingTrigger' : 'Battery', x: gameCanvas.width + 100 + Math.random() * 200, y: isChargingTrigger ? playableHeight * 0.1 + Math.random() * playableHeight * 0.3 : Math.random() * (playableHeight * 0.8), size: isChargingTrigger ? 30 : 20, speed: currentScrollSpeed * BONUS_SPEED_MULTIPLIER }); }
+    function updateBonuses() { for (let i = bonuses.length - 1; i >= 0; i--) { const b = bonuses[i]; b.x -= b.speed; if (b.x + b.size < 0) bonuses.splice(i, 1); } const batteryCount = bonuses.filter(b => b.type === 'Battery').length; const triggerCount = bonuses.filter(b => b.type === 'ChargingTrigger').length; if (batteryCount < 3 && Math.random() < 0.005) spawnBonus(); if (triggerCount === 0 && Math.random() < CHARGING_TRIGGER_SPAWN_CHANCE) spawnBonus(); }
+    function drawBonuses() { bonuses.forEach(b => { if (b.type === 'Battery') { ctx.fillStyle = '#4CAF50'; ctx.fillRect(b.x, b.y, b.size, b.size); ctx.fillStyle = 'white'; ctx.fillRect(b.x + b.size * 0.4, b.y + b.size * 0.2, b.size * 0.2, b.size * 0.6); ctx.fillRect(b.x + b.size * 0.2, b.y + b.size * 0.4, b.size * 0.6, b.size * 0.2); } else if (b.type === 'ChargingTrigger') { ctx.fillStyle = '#0ff'; ctx.beginPath(); ctx.arc(b.x + b.size / 2, b.y + b.size / 2, b.size / 2, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = '#ff0'; ctx.beginPath(); ctx.moveTo(b.x + b.size * 0.6, b.y + b.size * 0.2); ctx.lineTo(b.x + b.size * 0.4, b.y + b.size * 0.5); ctx.lineTo(b.x + b.size * 0.55, b.y + b.size * 0.5); ctx.lineTo(b.x + b.size * 0.35, b.y + b.size * 0.8); ctx.lineTo(b.x + b.size * 0.6, b.y + b.size * 0.45); ctx.lineTo(b.x + b.size * 0.45, b.y + b.size * 0.45); ctx.closePath(); ctx.fill(); } }); }
+    function spawnBird() { const currentBirdSpawnChance = BASE_BIRD_SPAWN_CHANCE * difficultyMultiplier; if (birds.length < (4 + Math.floor(difficultyMultiplier * 6)) && Math.random() < currentBirdSpawnChance) { const isLarge = Math.random() < 0.3; const size = isLarge ? 25 + Math.random() * 10 : 12 + Math.random() * 8; const baseY = playableHeight * (isLarge ? 0.3 : 0.15) + Math.random() * playableHeight * (isLarge ? 0.4 : 0.7); let baseSpeed = currentScrollSpeed * BIRD_SPEED_MULTIPLIER * 1.1; let ampMultiplier = 1.2; let freqMultiplier = 1.2; if (score > 3000) { ampMultiplier = 1.5 + (difficultyMultiplier - 1.15) * 1.2; freqMultiplier = 1.5 + (difficultyMultiplier - 1.15) * 1.0; } birds.push({ x: gameCanvas.width + 50 + Math.random() * 100, y: baseY, baseY: baseY, size: size, type: isLarge ? 'large' : 'small', speed: baseSpeed * (isLarge ? (0.8 + Math.random() * 0.1) : (1.0 + Math.random() * 0.2)), color: `hsl(30, ${15+Math.random()*10}%, ${isLarge ? 40 : 60 + Math.random() * 20}%)`, wingPhase: Math.random() * Math.PI * 2, wingSpeed: (isLarge ? 0.15 : 0.25) + Math.random() * 0.08, wanderAmplitudeY: (25 + Math.random() * 50) * (isLarge ? 1.3 : 1.0) * ampMultiplier, wanderFrequencyY: (0.025 + Math.random() * 0.035) * (isLarge ? 0.8 : 1.0) * freqMultiplier, wanderPhaseOffsetY: Math.random() * Math.PI * 2, wanderAmplitudeX: (40 + Math.random() * 70) * (isLarge ? 0.8 : 1.0) * ampMultiplier, wanderFrequencyX: (0.02 + Math.random() * 0.025) * (isLarge ? 0.9 : 1.0) * freqMultiplier, wanderPhaseOffsetX: Math.random() * Math.PI * 2, baseXOffset: 0 }); } }
+    function updateBirds() { const maxBirds = 4 + Math.floor(difficultyMultiplier * 6); for (let i = birds.length - 1; i >= 0; i--) { const bird = birds[i]; const timeFactorY = frameCount * bird.wanderFrequencyY + bird.wanderPhaseOffsetY; const timeFactorX = frameCount * bird.wanderFrequencyX + bird.wanderPhaseOffsetX; const offsetY = Math.sin(timeFactorY) * bird.wanderAmplitudeY; const offsetX = Math.cos(timeFactorX) * bird.wanderAmplitudeX; bird.baseXOffset -= bird.speed; bird.x = (gameCanvas.width + bird.baseXOffset) + offsetX; bird.y = bird.baseY + offsetY; bird.wingPhase += bird.wingSpeed; bird.y = Math.max(0, Math.min(bird.y, playableHeight - bird.size)); if (bird.x + bird.size < -150) { birds.splice(i, 1); }} spawnBird(); }
+    function drawBirds() { birds.forEach(bird => { ctx.save(); ctx.translate(bird.x + bird.size / 2, bird.y + bird.size / 2); ctx.fillStyle = bird.color; ctx.beginPath(); ctx.ellipse(0, 0, bird.size * 0.4, bird.size * 0.25, 0, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.arc(bird.size * 0.35, -bird.size * 0.1, bird.size * 0.15, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.moveTo(bird.size * 0.5, -bird.size * 0.1); ctx.lineTo(bird.size * 0.6, -bird.size * 0.15); ctx.lineTo(bird.size * 0.6, -bird.size * 0.05); ctx.closePath(); ctx.fill(); const wingY = Math.sin(bird.wingPhase) * (bird.size * 0.35); const wingAngle = Math.sin(bird.wingPhase) * 0.8; const wingLength = bird.size * 0.9; const wingWidth = bird.size * 0.4; ctx.save(); ctx.translate(-bird.size * 0.15, 0); ctx.rotate(-wingAngle); ctx.beginPath(); ctx.moveTo(0, 0); ctx.bezierCurveTo(-wingLength * 0.4, -wingY - wingWidth * 0.5, -wingLength * 0.8, -wingY - wingWidth * 0.2, -wingLength, -wingY + wingWidth * 0.1); ctx.bezierCurveTo(-wingLength * 0.9, -wingY + wingWidth * 0.5, -wingLength * 0.5, -wingY + wingWidth * 0.7, 0, 0); ctx.closePath(); ctx.fill(); ctx.restore(); ctx.save(); ctx.translate(bird.size * 0.15, 0); ctx.rotate(wingAngle); ctx.beginPath(); ctx.moveTo(0, 0); ctx.bezierCurveTo(wingLength * 0.4, -wingY - wingWidth * 0.5, wingLength * 0.8, -wingY - wingWidth * 0.2, wingLength, -wingY + wingWidth * 0.1); ctx.bezierCurveTo(wingLength * 0.9, -wingY + wingWidth * 0.5, wingLength * 0.5, -wingY + wingWidth * 0.7, 0, 0); ctx.closePath(); ctx.fill(); ctx.restore(); ctx.restore(); }); }
+    function checkCollisions() { 
+        if (isChargingSequence || isCaptured) return; 
+        const carRect = { x: carX, y: carY, width: CAR_WIDTH, height: CAR_HEIGHT }; 
+        buildings.forEach(b => { if (b.isVertiport) { const waveWidth = b.width * 0.6; const waveX = b.x + (b.width - waveWidth) / 2; const waveRect = { x: waveX, y: 0, width: waveWidth, height: b.y - 15 }; if (isColliding(carRect, waveRect)) { startCaptureSequence(b); return; } } if (b.x < carRect.x + carRect.width && b.x + b.width > carRect.x) { if (isColliding(carRect, { x: b.x, y: b.y, width: b.width, height: b.height })) { handleCollision(b); } } }); 
+        if (isCaptured) return; 
+        for (let i = projectiles.length - 1; i >= 0; i--) { const p = projectiles[i]; if (isColliding(carRect, { x: p.x, y: p.y, width: p.size.w, height: p.size.h })) { handleCollision(p); projectiles.splice(i, 1); } } 
+        for (let i = birds.length - 1; i >= 0; i--) { const bird = birds[i]; const birdRect = { x: bird.x, y: bird.y, width: bird.size, height: bird.size }; if (isColliding(carRect, birdRect)) { handleCollision(bird); birds.splice(i, 1); } } 
+        for (let i = bonuses.length - 1; i >= 0; i--) { const b = bonuses[i]; if (isColliding(carRect, { x: b.x, y: b.y, width: b.size, height: b.size })) { if (b.type === 'ChargingTrigger') { startChargingSequence(b); } else { handleBonusPickup(b); } bonuses.splice(i, 1); break; } }
+        
+        // Blimp collision (from beta68)
+        if (blimp) {
+            if (blimp.collidesWith(carRect)) {
+                battery -= blimp.collisionDamage;
+                triggerShake(20); // Major shake
+                playCollisionSound(); 
+                playCollisionDissonance(); // More intense sound for blimp
+                updateBatteryUI();
+                // Optional: Destroy blimp on collision or make it flash/damage
+                // For now, let it pass after one hit, or remove it
+                // blimp = null; // If blimp is destroyed by collision
             }
         }
-        return true; 
     }
+    function isColliding(rect1, rect2) { return rect1.x < rect2.x + rect2.width && rect1.x + rect1.width > rect2.x && rect1.y < rect2.y + rect2.height && rect1.y + rect1.height > rect2.y; }
+    function handleCollision(obstacle) { if (carShake < 2) { battery -= COLLISION_BATTERY_COST; triggerShake(10); playCollisionSound(); updateBatteryUI(); currentScrollSpeed = Math.min(MAX_SCROLL_SPEED, currentScrollSpeed + SCROLL_SPEED_INCREMENT); currentMusicTempo = Math.min(MAX_MUSIC_TEMPO, currentMusicTempo + MUSIC_TEMPO_INCREMENT); playCollisionDissonance(); } }
+    function handleBonusPickup(bonus) { if (bonus.type === 'Battery') { battery = Math.min(100, battery + BONUS_BATTERY_GAIN); playBatteryPickupSound(); } else if (bonus.type === 'ChargingTrigger') { playBonusFlourish(); } if (bonus.type === 'Battery') score += 50; updateBatteryUI(); updateScoreUI(); }
+    function drawGameBackground() { const gradient = ctx.createLinearGradient(0, 0, 0, playableHeight); gradient.addColorStop(0, '#1a2a3a'); gradient.addColorStop(0.7, '#334455'); gradient.addColorStop(1, '#445566'); ctx.fillStyle = gradient; ctx.fillRect(0, 0, gameCanvas.width, playableHeight); ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'; for(let i=0; i<60; i++) { let starX = (100 + i * 50 + frameCount * 0.15) % gameCanvas.width; let starY = (50 + i * 30) % playableHeight * 0.85; let size = 1 + Math.random() * 1.5; if (frameCount % (50 + i % 15) < 4) { ctx.fillRect(starX, starY, size*1.5, size*1.5); } else { ctx.fillRect(starX, starY, size, size); } } drawClouds(); drawSwarmBackground(); drawBuildings(); if (isChargingSequence && targetChargeStation) { ctx.fillStyle = '#444'; ctx.fillRect(targetChargeStation.x, targetChargeStation.y, targetChargeStation.width, 15); ctx.fillStyle = '#0ff'; ctx.fillRect(targetChargeStation.x + 5, targetChargeStation.y + 5, targetChargeStation.width - 10, 5); ctx.fillStyle = '#ff0'; ctx.fillRect(targetChargeStation.x + 15, targetChargeStation.y + 2, 10, 11); ctx.fillRect(targetChargeStation.x + targetChargeStation.width - 25, targetChargeStation.y + 2, 10, 11); } ctx.fillStyle = '#555'; ctx.fillRect(0, playableHeight, gameCanvas.width, SIDEWALK_HEIGHT); ctx.strokeStyle = '#888'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(0, playableHeight + 1); ctx.lineTo(gameCanvas.width, playableHeight + 1); ctx.stroke(); }
+    function drawCar() { let drawX = carX; let drawY = carY; if (carShake > 0) { drawX += (Math.random() - 0.5) * 8; drawY += (Math.random() - 0.5) * 8; carShake--; } const bodyWidth = CAR_WIDTH * 0.8; const bodyHeight = CAR_HEIGHT * 0.7; const bodyX = drawX + (CAR_WIDTH - bodyWidth) / 2; const bodyY = drawY + (CAR_HEIGHT - bodyHeight) / 2; const rotorSize = CAR_WIDTH * 0.3; const rotorOffsetY = bodyHeight * 0.3; ctx.fillStyle = carColor; ctx.fillRect(bodyX, bodyY, bodyWidth, bodyHeight); ctx.fillStyle = '#aaf'; ctx.fillRect(bodyX + bodyWidth * 0.5, bodyY + bodyHeight * 0.15, bodyWidth * 0.45, bodyHeight * 0.7); const rotorColor1 = '#ccc'; const rotorColor2 = '#999'; const rotorAnimSpeed = 0.3; const rotorColor = (Math.sin(frameCount * rotorAnimSpeed) > 0) ? rotorColor1 : rotorColor2; ctx.fillStyle = rotorColor; ctx.fillRect(drawX - rotorSize * 0.1, drawY - rotorOffsetY, rotorSize, rotorSize * 0.4); ctx.fillRect(drawX + CAR_WIDTH - rotorSize * 0.9, drawY - rotorOffsetY, rotorSize, rotorSize * 0.4); ctx.fillRect(drawX - rotorSize * 0.1, drawY + CAR_HEIGHT - rotorOffsetY, rotorSize, rotorSize * 0.4); ctx.fillRect(drawX + CAR_WIDTH - rotorSize * 0.9, drawY + CAR_HEIGHT - rotorOffsetY, rotorSize, rotorSize * 0.4); ctx.fillStyle = 'rgba(0, 255, 255, 0.2)'; ctx.fillRect(drawX, drawY + CAR_HEIGHT - 5, CAR_WIDTH, 5); }
+    function spawnCloud() { const layer = Math.random(); const size = 60 + Math.random() * 120; clouds.push({ x: gameCanvas.width + size + Math.random() * 200, y: playableHeight * 0.05 + Math.random() * playableHeight * 0.5, size: size, opacity: 0.15 + layer * 0.3, speed: currentScrollSpeed * (0.2 + layer * 0.4), numPuffs: 3 + Math.floor(Math.random() * 3), puffOffsets: [] }); const cloud = clouds[clouds.length - 1]; for(let i = 0; i < cloud.numPuffs; i++) { cloud.puffOffsets.push({ x: (Math.random() - 0.5) * cloud.size * 0.7, y: (Math.random() - 0.5) * cloud.size * 0.25, radiusX: cloud.size * (0.25 + Math.random() * 0.2), radiusY: cloud.size * (0.15 + Math.random() * 0.15) }); } }
+    function updateClouds() { for (let i = clouds.length - 1; i >= 0; i--) { const cloud = clouds[i]; cloud.x -= cloud.speed; if (cloud.x + cloud.size < 0) { clouds.splice(i, 1); } } if (clouds.length < 8 && Math.random() < 0.02) { spawnCloud(); } }
+    function drawClouds() { clouds.forEach(cloud => { ctx.fillStyle = `rgba(200, 200, 220, ${cloud.opacity})`; cloud.puffOffsets.forEach(puff => { ctx.beginPath(); ctx.ellipse(cloud.x + puff.x, cloud.y + puff.y, puff.radiusX, puff.radiusY, 0, 0, Math.PI * 2); ctx.fill(); }); }); }
+    function spawnSwarmVehicle() { const layer = Math.random(); const size = 5 + layer * 15; swarmVehicles.push({ x: Math.random() * gameCanvas.width, y: Math.random() * playableHeight * 0.9, sizeW: size * (1.5 + Math.random() * 0.5), sizeH: size, speed: currentScrollSpeed * (0.1 + layer * 0.3), color: `hsl(${180 + Math.random() * 60}, 70%, ${30 + layer * 40}%)`, bobPhase: Math.random() * Math.PI * 2, bobSpeed: 0.01 + Math.random() * 0.02, bobAmplitude: 2 + layer * 5 }); }
+    function updateSwarmVehicles() { for (let i = swarmVehicles.length - 1; i >= 0; i--) { const v = swarmVehicles[i]; v.x -= v.speed; v.bobPhase += v.bobSpeed; v.y += Math.sin(v.bobPhase) * v.bobAmplitude * 0.1; if (v.x + v.sizeW < 0) { v.x = gameCanvas.width + v.sizeW + Math.random() * 100; v.y = Math.random() * playableHeight * 0.9; v.bobPhase = Math.random() * Math.PI * 2; } } if (swarmVehicles.length < 30 && Math.random() < 0.05) { spawnSwarmVehicle(); } }
+    function drawSwarmBackground() { swarmVehicles.forEach(v => { ctx.fillStyle = v.color; const bodyY = v.y + Math.sin(v.bobPhase) * v.bobAmplitude; ctx.fillRect(v.x, bodyY, v.sizeW, v.sizeH * 0.6); ctx.fillRect(v.x - v.sizeW * 0.1, bodyY - v.sizeH * 0.2, v.sizeW * 0.3, v.sizeH * 0.3); ctx.fillRect(v.x + v.sizeW * 0.8, bodyY - v.sizeH * 0.2, v.sizeW * 0.3, v.sizeH * 0.3); ctx.fillStyle = `rgba(200, 220, 255, 0.1)`; ctx.fillRect(v.x - v.sizeW * 0.1, bodyY - v.sizeH * 0.1, v.sizeW * 1.2, v.sizeH * 0.8); }); }
+    function findChargingStationSpot(triggerX) { let bestSpot = null; let maxGap = 0; for (let i = 0; i < buildings.length - 1; i++) { const b1 = buildings[i]; const b2 = buildings[i+1]; const gapStart = b1.x + b1.width; const gapEnd = b2.x; const gapWidth = gapEnd - gapStart; if (gapWidth > CAR_WIDTH + 40 && gapStart < triggerX + 100 && gapEnd > triggerX - 100) { if (gapWidth > maxGap) { maxGap = gapWidth; bestSpot = { x: gapStart + (gapWidth / 2) - 40, y: playableHeight - 10, width: 80 }; } } } if (!bestSpot) { bestSpot = { x: carX, y: gameCanvas.height + 50, width: 80 }; console.warn("No suitable gap found!"); } return bestSpot; }
 
-    /**
-     * Trigger haptic feedback if supported and enabled by the user.
-     * @param {number|number[]} pattern - Vibration pattern in milliseconds.
-     */
-    function triggerHapticFeedback(pattern) {
-      if (hapticsEnabled && navigator.vibrate) {
-        try {
-          navigator.vibrate(pattern);
-          if (typeof gtag === 'function') {
-            let eventLabel = Array.isArray(pattern) ? `pattern_${pattern.join('_')}` : `duration_${pattern}`;
-            gtag('event', 'haptic_feedback_triggered', {
-              event_category: 'interaction',
-              event_label: eventLabel 
-            });
-          }
-        } catch(e){
-          console.warn("Haptic feedback failed:", e);
+    function startChargingSequence(trigger) {
+        if (isChargingSequence || isCaptured) return;
+        isChargingSequence = true; chargingPhase = 'descending'; playerControlEnabled = false; targetChargeStation = findChargingStationSpot(trigger.x); autoPilotStartY = carY; autoPilotProgress = 0;
+        stopEngineHum(); playPullDownSound();
+        if (musicGainNode) musicGainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.5);
+        stopBackgroundMusic(); 
+    }
+    function updateChargingSequence() {
+        const descentSpeed = 0.015; const blastOffSpeed = 0.05;
+        if (chargingPhase === 'descending') {
+            autoPilotProgress = Math.min(1, autoPilotProgress + descentSpeed); const easedProgress = 0.5 * (1 - Math.cos(autoPilotProgress * Math.PI)); carY = autoPilotStartY + (targetChargeStation.y - CAR_HEIGHT / 2 - autoPilotStartY) * easedProgress; carX += (targetChargeStation.x + targetChargeStation.width/2 - CAR_WIDTH/2 - carX) * 0.05;
+            if (autoPilotProgress >= 1) { chargingPhase = 'charging'; carColor = '#0f0'; playChargingSound(); chargeStartTime = performance.now(); }
+        } else if (chargingPhase === 'charging') {
+            const elapsed = performance.now() - chargeStartTime; const chargeProgress = Math.min(1, elapsed / CHARGE_DURATION_MS); battery = Math.min(100, Math.floor(chargeProgress * 100)); updateBatteryUI();
+            if (chargeProgress >= 1) { chargingPhase = 'blastoff'; carColor = 'white'; stopChargingSound(); playChargeCompleteSound(); playLaunchSound(); autoPilotStartY = carY; autoPilotProgress = 0; }
+        } else if (chargingPhase === 'blastoff') {
+            autoPilotProgress = Math.min(1, autoPilotProgress + blastOffSpeed); const targetY = playableHeight / 2; const easedProgress = 0.5 * (1 - Math.cos(autoPilotProgress * Math.PI)); carY = autoPilotStartY + (targetY - autoPilotStartY) * easedProgress;
+            if (autoPilotProgress >= 1) {
+                 isChargingSequence = false; chargingPhase = null; playerControlEnabled = true; targetChargeStation = null;
+                 playEngineHum();
+                 if (musicGainNode) musicGainNode.gain.linearRampToValueAtTime(0.45, audioCtx.currentTime + 0.5);
+                 if (gameRunning && !musicIsPlaying) { startMusicLoopChecker(); } 
+            }
         }
-      }
+    }
+    function startCaptureSequence(building) {
+        if (isCaptured || isChargingSequence) return;
+        isCaptured = true; capturePhase = 'descending'; playerControlEnabled = false; captureTargetBuilding = building; autoPilotStartY = carY; autoPilotProgress = 0;
+        stopEngineHum(); playLockOnSound(); playVertiportRefuelSound(); playCaptureDescentHum();
+        stopBackgroundMusic(); 
+        if (musicGainNode) musicGainNode.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + 0.5);
+    }
+    function updateCaptureSequence() {
+        const descentSpeed = 0.01; const releaseSpeed = 0.04; const targetY = captureTargetBuilding.y - CAR_HEIGHT * 0.8;
+        if (capturePhase === 'descending') {
+            autoPilotProgress = Math.min(1, autoPilotProgress + descentSpeed); const easedProgress = 0.5 * (1 - Math.cos(autoPilotProgress * Math.PI)); carY = autoPilotStartY + (targetY - autoPilotStartY) * easedProgress; const targetX = captureTargetBuilding.x + captureTargetBuilding.width / 2 - CAR_WIDTH / 2; carX += (targetX - carX) * 0.03;
+            if (autoPilotProgress >= 1) { capturePhase = 'holding'; captureStartTime = performance.now(); stopCaptureSounds(); }
+        } else if (capturePhase === 'holding') {
+            const elapsed = performance.now() - captureStartTime; const drainProgress = Math.min(1, elapsed / CAPTURE_HOLD_DURATION_MS); battery = Math.max(0, 100 - Math.floor(drainProgress * CAPTURE_BATTERY_DRAIN)); updateBatteryUI(); if (frameCount % 30 === 0) playCaptureHoldingPulse();
+            if (elapsed >= CAPTURE_HOLD_DURATION_MS) { capturePhase = 'releasing'; playCaptureReleaseChime(); autoPilotStartY = carY; autoPilotProgress = 0; }
+        } else if (capturePhase === 'releasing') {
+            autoPilotProgress = Math.min(1, autoPilotProgress + releaseSpeed); const targetReleaseY = playableHeight / 2; const easedProgress = autoPilotProgress * autoPilotProgress; carY = autoPilotStartY + (targetReleaseY - autoPilotStartY) * easedProgress;
+            if (autoPilotProgress >= 1) {
+                 isCaptured = false; capturePhase = null; playerControlEnabled = true; captureTargetBuilding = null;
+                 playEngineHum();
+                 if (musicGainNode) musicGainNode.gain.linearRampToValueAtTime(0.45, audioCtx.currentTime + 0.5);
+                 if (gameRunning && !musicIsPlaying) { startMusicLoopChecker(); }
+            }
+        }
     }
 
-    /**
-     * Generates and plays a simple procedural audio tone.
-     * This function acts as a fallback or for quick UI sounds not requiring preloaded buffers.
-     * @param {number} f - Frequency of the tone in Hz.
-     * @param {number} d - Duration of the tone in seconds.
-     * @param {string} t - Type of waveform ('sine', 'square', 'sawtooth', 'triangle', 'noise').
-     * @param {number} v - Volume of the tone (0.0 to 1.0).
-     * @param {number} w - Delay before the tone starts in seconds.
-     * @param {object} o - Optional parameters like `rampTo` (target volume for ramp), `detune`, `absoluteTime`, `outputNode`.
-     * @returns {object|null} An object containing the oscillator and gain node if successful, otherwise null.
-     */
-    function playTone(f,d=0.2,t='square',v=0.3,w=0,o={}){const targetUiGain = window.PROCEDURAL_UI_GAIN; if(!audioInitialized||!audioCtx||audioCtx.state!=='running'||!targetUiGain)return null;try{const sT=(o.absoluteTime!==undefined)?o.absoluteTime:audioCtx.currentTime+w;const osc=audioCtx.createOscillator();const g=audioCtx.createGain();const oN=o.outputNode||targetUiGain;if(sT<audioCtx.currentTime)return null;osc.type=t;if(o.detune)osc.detune.setValueAtTime(o.detune,sT);if(o.frequency instanceof AudioParam){o.frequency.cancelScheduledValues(sT);o.frequency.setValueAtTime(o.frequency.value,sT);o.frequency.connect(osc.frequency);}else{osc.frequency.setValueAtTime(f,sT);}g.gain.setValueAtTime(v,sT);if(o.rampTo!==undefined){g.gain.linearRampToValueAtTime(o.rampTo,sT+d*0.8);g.gain.linearRampToValueAtTime(0.001,sT+d);}else{g.gain.exponentialRampToValueAtTime(0.001,sT+d);}osc.connect(g).connect(oN);osc.start(sT);const eT=sT+d;if(d>0&&eT>audioCtx.currentTime){osc.stop(eT);}if(o.frequency instanceof AudioParam){setTimeout(()=>{try{o.frequency.disconnect(osc.frequency);}catch(e){}},d*1000+100);}return{osc,gain};}catch(error){return null;}}
+    function updateGameState() {
+       if (playerControlEnabled) {
+           let vertDelta = 0; let horzDelta = 0;
+           if ((keys['ArrowUp'] || keys['w']) && !(prevKeys['ArrowUp'] || prevKeys['w'])) { playDodgeSound(-1); }
+           if ((keys['ArrowDown'] || keys['s']) && !(prevKeys['ArrowDown'] || prevKeys['s'])) { playDodgeSound(1); }
+           if (keys['ArrowUp'] || keys['w']) vertDelta = -MOVE_SPEED_Y;
+           if (keys['ArrowDown'] || keys['s']) vertDelta = MOVE_SPEED_Y;
+           if (keys['ArrowLeft'] || keys['a']) horzDelta = -MOVE_SPEED_X;
+           if (keys['ArrowRight'] || keys['d']) horzDelta = MOVE_SPEED_X;
+           carY += vertDelta; carY = Math.max(0, Math.min(carY, playableHeight - CAR_HEIGHT));
+           carX += horzDelta; carX = Math.max(MIN_CAR_X, Math.min(carX, MAX_CAR_X));
+           modulateEngineHum(battery, vertDelta, horzDelta);
+       }
+       updateBuildings(); updatePedestriansAndProjectiles(); updateBonuses(); updateBirds(); updateClouds(); updateSwarmVehicles();
+       
+       if (blimp) { // Update blimp (from beta68)
+            blimp.update();
+            if (blimp.x + blimp.width < 0) { 
+                blimp = null; 
+                // console.log("Blimp off-screen.");
+            }
+        }
 
-    /**
-     * Plays a simple fallback tone if audio buffers fail to load or other audio issues occur.
-     * This acts as an audible indicator when the system cannot play expected sounds.
-     * Includes haptic feedback for a more prominent alert.
-     * Often used as a last resort when preloaded audio assets are unavailable due to network issues,
-     * caching problems, or other browser-specific limitations.
-     * @param {number} frequency - The frequency of the tone in Hz.
-     * @param {number} duration - The duration of the tone in seconds.
-     */
-    function playFallbackTone(frequency = 440, duration = 0.3) { 
-      // Guard to prevent playTone from being called if AudioContext is not ready or running.
-      if (!audioCtx || audioCtx.state !== 'running') {
-        console.warn("playFallbackTone: AudioContext not ready or running. Cannot play fallback tone.");
-        return;
-      }
+       if (playerControlEnabled) checkCollisions();
+       
+       if (playerControlEnabled) {
+           battery -= BATTERY_DRAIN_RATE; score++;
 
-      if (typeof gtag === 'function') gtag('event', 'audio_fallback_tone_played', { 'event_label': `freq_${frequency}` });
-      // Haptic feedback for retry failure / audio issue.
-      if (navigator.vibrate) navigator.vibrate([20, 40, 20]); 
-      playTone(frequency, duration, 'sine', 0.3); // Increased volume
+            // Difficulty and pacing logic from beta67 (preserved)
+            let baseDifficultyMultiplier = 1.0;
+            if (score < 1000) { baseDifficultyMultiplier = 0.5;
+            } else if (score < 2000) { baseDifficultyMultiplier = 1.0;
+            } else if (score < 3000) { baseDifficultyMultiplier = 1.2;
+            } else if (score < 4000) { baseDifficultyMultiplier = 1.4;
+            } else { baseDifficultyMultiplier = 1.6; }
+            difficultyMultiplier = baseDifficultyMultiplier;
+
+            if (score > 13000) {
+                const chaosFactor = Math.min(2.5, 1.0 + (score - 13000) * 0.00005); 
+                difficultyMultiplier *= chaosFactor; 
+            }
+            
+            const difficultyProgress = Math.min(1, Math.max(0, (score - 1000) / 8000)); 
+            
+            currentScrollSpeed = BASE_SCROLL_SPEED + (MAX_SCROLL_SPEED - BASE_SCROLL_SPEED) * difficultyProgress * difficultyMultiplier; 
+            currentMusicTempo = BASE_MUSIC_TEMPO + (MAX_MUSIC_TEMPO - BASE_MUSIC_TEMPO) * difficultyProgress * difficultyMultiplier;
+
+            const speedCapMultiplier = (score > 13000 ? 1.8 : 1.2);
+            currentScrollSpeed = Math.min(MAX_SCROLL_SPEED * speedCapMultiplier , currentScrollSpeed); 
+            currentMusicTempo = Math.min(MAX_MUSIC_TEMPO * speedCapMultiplier, currentMusicTempo);
+       }
+
+        // Blimp spawning logic (from beta68, placed after score update)
+        if (gameRunning && playerControlEnabled && !blimp) {
+            if (score >= nextBlimpScoreTarget) {
+                blimp = new Blimp(gameCanvas, playableHeight);
+                // console.log(`Blimp spawned at score ${score}.`);
+                nextBlimpScoreTarget = score + BLIMP_SCORE_INTERVAL_MIN + Math.random() * (BLIMP_SCORE_INTERVAL_MAX - BLIMP_SCORE_INTERVAL_MIN);
+                // console.log(`Next blimp consideration score: ${nextBlimpScoreTarget}`);
+            }
+        }
+
+       if (playerControlEnabled && battery <= 0) gameOver();
     }
 
-    function playStartJingle(){if(!audioInitialized)return;playTone(110,0.4,'sawtooth',0.06,0);playTone(440,0.2,'square',0.4,0.10);playTone(1760,0.16,'sine',0.08,0.3,{rampTo:0});if(reverbNode)playTone(1760,0.1,'sine',0.16,0.35,{outputNode:reverbNode.input});}
-    function playCollisionSound(){if(!audioInitialized)return;if(isBufferReady(uiBuffer, "UI Tone")){playUiTone();}else{const n=audioCtx.currentTime;const nd=0.15;try{const ne=audioCtx.createGain();ne.connect(window.PROCEDURAL_UI_GAIN);ne.gain.setValueAtTime(0.3,n);ne.gain.exponentialRampToValueAtTime(0.001,n+nd);const ns=audioCtx.createBufferSource();const bs=audioCtx.sampleRate*nd;const b=audioCtx.createBuffer(1,bs,audioCtx.sampleRate);const d=b.getChannelData(0);for(let i=0;i<bs;i++)d[i]=Math.random()*2-1;ns.buffer=b;ns.connect(ne);ns.start(n);ns.stop(n+nd);}catch(e){}playTone(987.77,0.1,'triangle',0.25,0.02);for(let i=0;i<3;i++)playTone(2000,0.03,'noise',0.08,0.1+i*0.04);}}
-    function playBatteryPickupSound(){playTone(329.63,0.08,'sine',0.35,0.0);playTone(392.00,0.08,'sine',0.35,0.08);playTone(523.25,0.15,'sine',0.4,0.16);}
-    function playLowBatteryWarning(){if(!lowBatteryWarningPlayed){playTone(880,0.08,'square',0.25,0);playTone(880,0.08,'square',0.25,0.15);lowBatteryWarningPlayed=true;setTimeout(()=>{lowBatteryWarningPlayed=false;},5000);triggerHapticFeedback([100,50,100]);}}
-    function playBonusFlourish(){const bf=783.99;const v=0.30;playTone(bf,0.08,'triangle',v,0.0);playTone(bf*1.25,0.08,'triangle',v,0.08);playTone(bf*1.5,0.12,'triangle',v,0.16);}
-    function stopEngineHum(){cleanupAudioNode(engineHumSource.current);cleanupAudioNode(engineGain.current);engineHumSource.current=null;engineGain.current=null;if(engineHumNodes&&engineHumNodes.isProcedural){if(!engineHumNodes.osc)return;try{const n=audioCtx.currentTime;engineHumNodes.gain.gain.cancelScheduledValues(n);engineHumNodes.gain.gain.setTargetAtTime(0,n,0.01);cleanupAudioNode(engineHumNodes.osc);if(engineHumNodes.detuneOsc)cleanupAudioNode(engineHumNodes.detuneOsc);if(engineHumNodes.masterGain)cleanupAudioNode(engineHumNodes.masterGain);}catch(e){}}engineHumNodes=null;}}
-    function modulateEngineHum(bP,vD,hD){if(engineHumNodes&&engineHumNodes.isProcedural&&engineHumNodes.gain&&audioInitialized&&audioCtx&&audioCtx.state==='running'){try{const n=audioCtx.currentTime;const bF=60;const pR=20;const pM=(vD/MOVE_SPEED_Y)*pR;engineHumNodes.osc.frequency.linearRampToValueAtTime(bF+pM,n+0.1);let pV=0;if(keys['ArrowLeft']||keys['a'])pV=-0.6;if(keys['ArrowRight']||keys['d'])pV=0.6;if(engineHumNodes.panner)engineHumNodes.panner.pan.linearRampToValueAtTime(pV,n+0.05);const mV=0.05;const xV=0.10;const tV=xV-(bP/100)*(xV-mV);engineHumNodes.gain.gain.linearRampToValueAtTime(tV,n+0.2);const mFF=800;const xFF=5000;const tFF=(bP<30)?mFF+(bP/30)*(1500-mFF):xFF;if(engineHumNodes.filter)engineHumNodes.filter.frequency.linearRampToValueAtTime(tFF,n+0.3);}catch(e){}}}
-    function playDodgeSound(d){playTone(600+d*100,0.05,'noise',0.05,0);}
-    function playPullDownSound(){playTone(400,1.0,'sawtooth',0.35,0,{rampTo:80});playTone(150,1.0,'square',0.15,0.1,{rampTo:40,detune:-30});playTone(55,1.2,'sine',0.12,0);}
-    function playChargingSound(){if(!audioInitialized)return;stopChargingSound();const bF=130.81;const ch=[0,4,7,12];const v=0.20;const nD=0.1;let dl=0;for(let i=0;i<8;i++){const iv=ch[i%ch.length];const fq=bF*Math.pow(2,iv/12);const nd=playTone(fq,nD*0.9,'sine',v*(1-(i%4)*0.1),dl);if(nd)chargingSoundNodes.push(nd);dl+=nD;}chargingSoundNodes.push(setTimeout(playChargingSound,dl*1000));}
-    function stopChargingSound(){chargingSoundNodes.forEach(i=>{if(typeof i==='number')clearTimeout(i);else if(i&&i.osc)try{cleanupAudioNode(i.osc);i.gain.gain.cancelScheduledValues(audioCtx.currentTime);i.gain.gain.setValueAtTime(0,audioCtx.currentTime);}catch(e){}});chargingSoundNodes=[];}
-    function playChargeCompleteSound(){playTone(523.25,0.1,'triangle',0.4,0.0);playTone(659.25,0.1,'triangle',0.4,0.1);playTone(783.99,0.1,'triangle',0.4,0.2);playTone(1046.50,0.25,'triangle',0.5,0.3);triggerHapticFeedback(30);}
-    function playLaunchSound(){playTone(300,0.5,'sawtooth',0.5,0,{rampTo:2500});playTone(400,0.6,'noise',0.3,0.05,{rampTo:0.01});}
-    function playGameOverFanfare(){const n=audioCtx.currentTime;const v=0.25;const nt=[{f:440.00,dly:0.0,dur:0.3},{f:349.23,dly:0.3,dur:0.3},{f:293.66,dly:0.6,dur:0.3},{f:261.63,dly:0.9,dur:0.6},];nt.forEach(note=>playTone(note.f,note.dur,'triangle',v,note.dly,{rampTo:0.001}));}
-    function playWaveBeamSound(b){playTone(1500,0.1,'sine',0.08,0,{detune:200});playTone(1800,0.1,'sine',0.08,0.05,{detune:-150});}
-    function playLockOnSound(){playTone(523.25,0.1,'square',0.35,0);playTone(369.99,0.1,'square',0.35,0.05);}
-    function playCaptureDescentHum(){if(!audioInitialized)return;stopCaptureSounds();const nd=playTone(100,0,'sawtooth',0.25);if(nd){try{nd.osc.frequency.linearRampToValueAtTime(50,audioCtx.currentTime+1.5);captureSoundNodes.push(nd);}catch(e){try{cleanupAudioNode(nd.osc);}catch(_){}}}}
-    function playCaptureHoldingPulse(){playTone(220,0.08,'sine',0.12,Math.random()*0.2);playTone(330,0.08,'sine',0.08,0.15+Math.random()*0.2);}
-    function playCaptureReleaseChime(){playTone(329.63,0.1,'triangle',0.35,0);playTone(392.00,0.1,'triangle',0.35,0.1);playTone(523.25,0.2,'triangle',0.4,0.2);}
-    function stopCaptureSounds(){captureSoundNodes.forEach(i=>{if(i&&i.osc)try{cleanupAudioNode(i.osc);i.gain.gain.cancelScheduledValues(audioCtx.currentTime);i.gain.gain.setValueAtTime(0,audioCtx.currentTime);}catch(e){}});captureSoundNodes=[];}
-    function playVertiportRefuelSound(){const n=audioCtx.currentTime;const v=0.2;playTone(1200,0.05,'square',v*0.8,0.0,{detune:100});playTone(1500,0.05,'square',v*0.7,0.07);for(let i=0;i<4;i++){playTone(200+Math.random()*100,0.1,'sine',v*0.5,0.2+i*0.08+Math.random()*0.04,{detune:(Math.random()-0.5)*300});}if(!audioInitialized||!audioCtx)return;try{const rO=audioCtx.createOscillator();const rG=audioCtx.createGain();rO.type='triangle';rO.frequency.setValueAtTime(200,n+0.4);rO.frequency.linearRampToValueAtTime(800,n+0.4+0.6);rG.gain.setValueAtTime(0,n+0.4);rG.gain.linearRampToValueAtTime(v*1.1,n+0.4+0.2);rG.gain.linearRampToValueAtTime(0.001,n+0.4+0.6);rO.connect(rG).connect(window.PROCEDURAL_UI_GAIN);rO.start(n+0.4);cleanupAudioNode(rO);}catch(e){}}
-    function playCollisionDissonance(){playTone(450,0.15,'sawtooth',0.2,0,{detune:50});playTone(150,0.2,'square',0.15,0.02);}
-    function applyLowBatteryMusicFilter(iL){if(!musicLowPassFilter||!audioInitialized||!audioCtx||audioCtx.state!=='running')return;const tF=iL?800:20000;const tQ=iL?5:1;const n=audioCtx.currentTime;try{musicLowPassFilter.frequency.cancelScheduledValues(n);musicLowPassFilter.Q.cancelScheduledValues(n);musicLowPassFilter.frequency.linearRampToValueAtTime(tF,n+0.5);musicLowPassFilter.Q.linearRampToValueAtTime(tQ,n+0.5);}catch(e){}}
-    function scheduleMusicBlock(){if(!audioInitialized||!audioCtx||audioCtx.state!=='running'||!musicGainNode){stopBackgroundMusic();return;} if(backgroundGain.current && musicGainNode.numberOfOutputs === 0 && musicGainNode.connect && musicLowPassFilter && musicLowPassFilter.connect && backgroundGain.current.connect) {try{musicGainNode.connect(musicLowPassFilter).connect(backgroundGain.current);}catch(e){console.warn("Error connecting procedural music path in scheduleMusicBlock",e)}} musicOscillators.forEach(i=>{if(i&&i.osc&&typeof i.osc.stop==='function'){try{cleanupAudioNode(i.osc);}catch(e){}}});musicOscillators=[];try{const t=currentMusicTempo;const q=60/t;const m=q*4;const l=m*8;currentLoopLengthSeconds=l;const bS=nextMusicScheduleTime+musicScheduleLookahead;const pV=0.25;for(let tm=0;tm<l;tm+=q){const sT=bS+tm;const kN=playTone(80,0.1,'sine',pV*1.2,0,{outputNode:musicGainNode,rampTo:0.01,absoluteTime:sT});const kcN=playTone(80,0.05,'noise',pV*0.5,0,{outputNode:musicGainNode,absoluteTime:sT});const snN=playTone(250,0.1,'noise',pV*0.8,0,{outputNode:musicGainNode,rampTo:0.01,absoluteTime:sT+q});if(kN)musicOscillators.push(kN);if(kcN)musicOscillators.push(kcN);if(snN)musicOscillators.push(snN);}const bN=[65.41,73.42,87.31,98.00];const bV=0.35;const bar=Math.floor((bS/m))%8;const bNI=Math.floor(bar/2)%bN.length;const bF=bN[bNI];for(let tm=0;tm<l;tm+=(q/2)){if(tm%(q*2)<q){const sT=bS+tm;const nd=playTone(bF,(q/2)*0.8,'sawtooth',bV,0,{outputNode:musicGainNode,absoluteTime:sT});if(nd)musicOscillators.push(nd);}}const mV=0.15;const aN=(bar<4)?[0,3,7,10]:[0,4,7,12];const aBF=261.63;for(let tm=0;tm<l;tm+=(q/4)){const sT=bS+tm;const aNI=Math.floor(tm/(q/4))%aN.length;const fq=aBF*Math.pow(2,aN[aNI]/12);const nd=playTone(fq,(q/4)*0.7,'triangle',mV,0,{outputNode:musicGainNode,absoluteTime:sT});if(nd)musicOscillators.push(nd);}const bE=bS+l;nextMusicScheduleTime=bE-musicScheduleLookahead;}catch(error){stopBackgroundMusic();}}
-    function checkMusicSchedule(){if(!gameRunning||!audioInitialized||!audioCtx||audioCtx.state!=='running'||!musicShouldBePlaying||isChargingSequence||isCaptured){stopBackgroundMusic();return;}const cT=audioCtx.currentTime;const lBET=nextMusicScheduleTime+musicScheduleLookahead;if(cT>lBET+1.0)nextMusicScheduleTime=cT;if(cT>=nextMusicScheduleTime)scheduleMusicBlock();}
-    function startMusicLoopChecker(){if(!audioInitialized||!audioCtx||audioCtx.state!=='running')return;if(musicShouldBePlaying && isBufferReady(backgroundBuffer, "Background Music"))startBackgroundMusic();if(musicLoopIntervalId!==null)return;musicShouldBePlaying=true;nextMusicScheduleTime=audioCtx.currentTime;if(musicGainNode && backgroundGain.current && musicGainNode.numberOfOutputs === 0) { try{musicGainNode.connect(musicLowPassFilter).connect(backgroundGain.current);}catch(e){console.warn("Error connecting procedural music to backgroundGain in startMusicLoopChecker", e)} } else if (musicGainNode && !backgroundGain.current && backgroundMusicSource.current) { console.warn("MusicLoopChecker: backgroundGain for procedural music path not ready during init. Music might be silent."); } scheduleMusicBlock();stopProceduralAmbientPad(); /* Stop ambient pad when real music starts */ musicLoopIntervalId=setInterval(checkMusicSchedule,musicCheckIntervalMs);}
-    function stopBackgroundMusic(){if(musicLoopIntervalId!==null)clearInterval(musicLoopIntervalId);musicLoopIntervalId=null;musicOscillators.forEach(i=>{if(i&&i.osc&&typeof i.osc.stop==='function'){try{if(i.gain&&typeof i.gain.gain.cancelScheduledValues==='function'){i.gain.gain.cancelScheduledValues(audioCtx.currentTime);i.gain.gain.setTargetAtTime(0.0001,audioCtx.currentTime,0.005);}cleanupAudioNode(i.osc);}catch(e){}}});musicOscillators=[];cleanupAudioNode(backgroundMusicSource.current);cleanupAudioNode(backgroundGain.current);backgroundMusicSource.current=null;backgroundGain.current=null;wasPlayingMusic=false;nextMusicScheduleTime=0;currentLoopLengthSeconds=0;stopProceduralAmbientPad();}
-    function stopAllSounds(){stopBackgroundMusic();stopEngineHum();stopChargingSound();stopCaptureSounds();cleanupAudioNode(uiToneSource.current);cleanupAudioNode(uiGain.current);uiToneSource.current=null;uiGain.current=null;if(audioCtx&&audioCtx.state===='running'){cleanupAudioNode(musicGainNode);musicGainNode=null;cleanupAudioNode(musicLowPassFilter);musicLowPassFilter=null;if(reverbNode&&reverbNode.input){cleanupAudioNode(reverbNode.input);}reverbNode=null;}if(audioCtx && window.PROCEDURAL_UI_GAIN && window.PROCEDURAL_UI_GAIN.gain) { window.PROCEDURAL_UI_GAIN.gain.setValueAtTime(1.0, audioCtx.currentTime);}}
+    function gameLoop() {
+        if (!gameRunning) return;
+        frameCount++;
+        if (isChargingSequence) { updateChargingSequence(); updateBuildings(); updateClouds(); updateSwarmVehicles(); }
+        else if (isCaptured)    { updateCaptureSequence(); updateBuildings(); updateClouds(); updateSwarmVehicles(); }
+        else                    { updateGameState(); } 
+        
+        ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+        drawGameBackground(); 
+        if (blimp) blimp.draw(ctx); // Draw blimp (from beta68)
+        drawPedestriansAndProjectiles(); 
+        drawBonuses(); 
+        drawBirds(); 
+        drawCar();
+        updateBatteryUI(); updateScoreUI();
+        prevCarX = carX; prevCarY = carY; prevKeys = { ...keys };
+        animationFrameId = requestAnimationFrame(gameLoop);
+    }
 
-    function updateBatteryUI(){const cB=Math.max(0,Math.min(battery,100));batteryLevelUI.style.width=`${cB}%`;const iL=cB<20;if(iL){batteryLevelUI.style.backgroundColor='#f44336';if(gameRunning&&!isChargingSequence&&!isCaptured)playLowBatteryWarning();}else if(cB<50){batteryLevelUI.style.backgroundColor='#ffeb3b';lowBatteryWarningPlayed=false;}else{batteryLevelUI.style.backgroundColor='#4CAF50';lowBatteryWarningPlayed=false;}applyLowBatteryMusicFilter(iL&&!isChargingSequence&&!isCaptured);}
-    function updateScoreUI(){scoreLabel.textContent=`Score: ${score}`;}
-    function triggerShake(d=5){carShake=d;}
-    function calculateDimensions(){playableHeight=gameCanvas.height-SIDEWALK_HEIGHT;cityHeight=playableHeight;MAX_CAR_X=gameCanvas.width*0.4;}
-    function spawnBuilding(fX=null){const iV=Math.random()<VERTIPORT_SPAWN_CHANCE&&!buildings.some(b=>b.isVertiport);const mW=iV?100:60;const xW=iV?150:180;const mH=iV?playableHeight*0.7:100;const xH=iV?playableHeight*0.85:playableHeight*0.65;const g=40+Math.random()*60;const lB=buildings[buildings.length-1];let nX=fX!==null?fX:(lB?lB.x+lB.width+g:gameCanvas.width+50);const h=mH+Math.random()*(xH-mH);buildings.push({x:nX,y:gameCanvas.height-h,width:mW+Math.random()*(xW-mW),height:h,color:iV?'#607D8B':`hsl(${190+Math.random()*50},25%,${15+Math.random()*15}%)`,isVertiport:iV,wavePhase:Math.random()*Math.PI*2});}
-    function updateBuildings(){for(let i=buildings.length-1;i>=0;i--){const b=buildings[i];b.x-=currentScrollSpeed;if(b.isVertiport)b.wavePhase+=0.1;if(b.x+b.width<0)buildings.splice(i,1);}const lB=buildings[buildings.length-1];if(!lB||lB.x+lB.width<gameCanvas.width+100){spawnBuilding();}}
-    function drawBuildings(){buildings.forEach(b=>{ctx.fillStyle=b.color;ctx.fillRect(b.x,b.y,b.width,b.height);if(b.isVertiport){const pY=b.y-15;ctx.fillStyle='#455A64';ctx.fillRect(b.x-10,pY,b.width+20,15);ctx.fillStyle='#B0BEC5';ctx.beginPath();ctx.arc(b.x+b.width/2,pY+7.5,b.width*0.3,0,Math.PI*2);ctx.fill();const lC=(Math.sin(b.wavePhase*2)>0)?'#0ff':'#ff0';ctx.fillStyle=lC;ctx.fillRect(b.x,pY+5,10,5);ctx.fillRect(b.x+b.width-10,pY+5,10,5);const wW=b.width*0.6;const wX=b.x+(b.width-wW)/2;const wSH=20;const nS=Math.ceil(pY/wSH);for(let i=0;i<nS;i++){const sY=pY-(i+1)*wSH;const a=0.1+Math.abs(Math.sin(b.wavePhase+i*0.5))*0.2;const h=180+Math.sin(b.wavePhase+i*0.3)*20;ctx.fillStyle=`hsla(${h},100%,70%,${a})`;ctx.fillRect(wX,sY,wW,wSH-2);}}else{ctx.fillStyle='rgba(255,255,180,0.2)';for(let wy=b.y+10;wy<b.y+b.height-10;wy+=25){for(let wx=b.x+10;wx<b.x+b.width-10;wx+=25){if(Math.random()>0.4){ctx.fillRect(wx,wy,10,15);}}}}});}
-    function spawnPedestrian(){const t=Math.random()>0.4?'OldLady':'BalloonPerson';pedestrians.push({x:gameCanvas.width+50+Math.random()*100,y:gameCanvas.height-SIDEWALK_HEIGHT+5+Math.random()*(SIDEWALK_HEIGHT-20),type:t,size:t==='OldLady'?{w:8,h:16}:{w:10,h:18},color:t==='OldLady'?'pink':`hsl(${Math.random()*360},60%,70%)`,throwCooldown:60+Math.random()*120,speed:currentScrollSpeed*PEDESTRIAN_SPEED_MULTIPLIER*(0.8+Math.random()*0.4),lastActionFrame:0});}
-    function updatePedestriansAndProjectiles(){const cPS=BASE_PEDESTRIAN_SPAWN_CHANCE*difficultyMultiplier;const cPT=BASE_PROJECTILE_THROW_CHANCE*difficultyMultiplier;for(let i=pedestrians.length-1;i>=0;i--){const p=pedestrians[i];p.x-=p.speed;p.throwCooldown=Math.max(0,p.throwCooldown-1);if(p.throwCooldown===0&&Math.random()<cPT){const pBSX=-currentScrollSpeed*PROJECTILE_SPEED_MULTIPLIER;if(p.type==='OldLady'){const iT=Math.random()<0.5?'ChickenLeg':'CornCob';const mSH=playableHeight*0.35;const xSH=playableHeight*0.65;const aH=mSH+Math.random()*(xSH-mH);const tTA=Math.sqrt((2*aH)/PROJECTILE_GRAVITY);let iVy=-(tTA*PROJECTILE_GRAVITY);if(iVy>-3){iVy=-4-Math.random()*2;}const iVx=-currentScrollSpeed*(0.25+Math.random()*0.5);projectiles.push({type:iT,x:p.x,y:Math.min(p.y-25,playableHeight*0.85),vx:iVx,vy:iVy,size:{w:4,h:(iT==='CornCob'?8:6)},maxSize:30+Math.random()*15,currentSize:4,growthRate:0.3+Math.random()*0.2,color:iT==='ChickenLeg'?'orange':'#FFC107',rotation:0,rotationSpeed:(Math.random()-0.5)*0.8,stuckFrames:0,removeAfterFrames:-1});}else{projectiles.push({type:'Balloon',x:p.x,y:p.y-15,vx:pBSX*(0.6+Math.random()*0.3),vy:-(1.5+Math.random()*1.8),size:{w:12+Math.random()*6,h:16+Math.random()*8},color:`hsl(${Math.random()*360},80%,70%)`});}p.throwCooldown=(80+Math.random()*130)/difficultyMultiplier;p.lastActionFrame=frameCount;}if(p.x+p.size.w<0){pedestrians.splice(i,1);}}const mP=3+Math.floor(difficultyMultiplier*4);if(pedestrians.length<mP&&Math.random()<cPS){spawnPedestrian();}for(let i=projectiles.length-1;i>=0;i--){const pr=projectiles[i];pr.x+=pr.vx;pr.y+=pr.vy;if(pr.type==='ChickenLeg'||pr.type==='CornCob'){pr.vy+=PROJECTILE_GRAVITY;pr.rotation+=pr.rotationSpeed;if(pr.vy<0&&pr.currentSize<pr.maxSize){pr.currentSize+=pr.growthRate;pr.size.w=pr.currentSize*(pr.type==='CornCob'?0.6:1.0);pr.size.h=pr.currentSize*(pr.type==='CornCob'?1.2:1.5);}const gL=playableHeight-pr.size.h;if(pr.y>=gL-5){if(Math.abs(pr.vy)<0.5){if(pr.stuckFrames!==undefined){pr.stuckFrames++;}}else{pr.stuckFrames=0;}if(pr.y>=gL&&pr.removeAfterFrames===-1){pr.removeAfterFrames=3;}pr.y=Math.min(pr.y,gL);}else{pr.stuckFrames=0;}if(pr.removeAfterFrames!==undefined&&pr.removeAfterFrames>0){pr.removeAfterFrames--;}if((pr.stuckFrames!==undefined&&pr.stuckFrames>50)||(pr.removeAfterFrames!==undefined&&pr.removeAfterFrames===0)){projectiles.splice(i,1);continue;}}else if(pr.type==='Balloon'){pr.vx+=(Math.random()-0.5)*0.1;pr.vx=Math.max(-1.2,Math.min(1.2,pr.vx));}if(pr.x+pr.size.w<0||pr.y+pr.size.h<-50||pr.y>gameCanvas.height+50){projectiles.splice(i,1);}}}
-    function drawPedestriansAndProjectiles(){pedestrians.forEach(p=>{ctx.fillStyle=p.color;ctx.fillRect(p.x,p.y,p.size.w,p.size.h);const tSA=frameCount-p.lastActionFrame;const hD=30;if(p.lastActionFrame>0&&tSA<hD){const a=1-(tSA/hD);ctx.globalAlpha=a*0.8;ctx.font="12px Courier New";ctx.textAlign='center';if(p.type==='OldLady'){ctx.fillStyle='orange';ctx.fillText("🍗",p.x+p.size.w/2,p.y-5);}else{ctx.fillStyle='#ccc';ctx.fillText("o",p.x+p.size.w/2,p.y-5);}ctx.globalAlpha=1.0;ctx.textAlign='left';}});projectiles.forEach(p=>{ctx.save();ctx.translate(p.x+p.size.w/2,p.y+p.size.h/2);if(p.type==='ChickenLeg'){ctx.rotate(p.rotation);const mW=p.size.w;const mH=p.size.h*0.65;const bW=p.size.w*0.25;const bH=p.size.h*0.4;const bY=mH/2;ctx.fillStyle='#D2691E';ctx.beginPath();ctx.ellipse(0,-mH/4,mW/2,mH/2,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#eee';ctx.fillRect(-bW/2,bY-bH/2,bW,bH);ctx.beginPath();ctx.arc(-bW/2,bY+bH/2,bW*0.4,0,Math.PI*2);ctx.arc(bW/2,bY+bH/2,bW*0.4,0,Math.PI*2);ctx.fill();}else if(p.type==='CornCob'){ctx.rotate(p.rotation);const cW=p.size.w;const cH=p.size.h;const sW=cW*0.3;const sH=cH*0.3;const sY=cH*0.35;ctx.fillStyle='#FFC107';ctx.beginPath();ctx.ellipse(0,0,cW/2,cH/2,0,0,Math.PI*2);ctx.fill();ctx.strokeStyle='rgba(139,69,19,0.5)';ctx.lineWidth=Math.max(1,cW*0.05);for(let i=-cW/2+3;i<cW/2-3;i+=cW*0.15){ctx.beginPath();ctx.moveTo(i,-cH/2.5);ctx.lineTo(i+cW*0.05,cH/2.5);ctx.stroke();ctx.beginPath();ctx.moveTo(i+cW*0.05,-cH/2.5);ctx.lineTo(i,cH/2.5);ctx.stroke();}ctx.fillStyle='#D2B48C';ctx.fillRect(-sW/2,sY,sW,sH);}else if(p.type==='Balloon'){ctx.fillStyle=p.color;ctx.beginPath();ctx.ellipse(0,0,p.size.w/2,p.size.h/2,0,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#ccc';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(0,p.size.h/2);ctx.lineTo(0,p.size.h/2+10);ctx.stroke();}else{ctx.fillStyle=p.color;ctx.fillRect(-p.size.w/2,-p.size.h/2,p.size.w,p.size.h);}ctx.restore();});}
-    function spawnBonus(){const iCT=Math.random()<CHARGING_TRIGGER_SPAWN_CHANCE&&!isChargingSequence;bonuses.push({type:iCT?'ChargingTrigger':'Battery',x:gameCanvas.width+100+Math.random()*200,y:iCT?playableHeight*0.1+Math.random()*playableHeight*0.3:Math.random()*(playableHeight*0.8),size:iCT?30:20,speed:currentScrollSpeed*BONUS_SPEED_MULTIPLIER});}
-    function updateBonuses(){for(let i=bonuses.length-1;i>=0;i--){const b=bonuses[i];b.x-=b.speed;if(b.x+b.size<0)bonuses.splice(i,1);}const bC=bonuses.filter(b=>b.type==='Battery').length;const tC=bonuses.filter(b=>b.type==='ChargingTrigger').length;if(bC<3&&Math.random()<0.005)spawnBonus();if(tC===0&&Math.random()<CHARGING_TRIGGER_SPAWN_CHANCE)spawnBonus();}
-    function drawBonuses(){bonuses.forEach(b=>{if(b.type==='Battery'){ctx.fillStyle='#4CAF50';ctx.fillRect(b.x,b.y,b.size,b.size);ctx.fillStyle='white';ctx.fillRect(b.x+b.size*0.4,b.y+b.size*0.2,b.size*0.2,b.size*0.6);ctx.fillRect(b.x+b.size*0.2,b.y+b.size*0.4,b.size*0.6,b.size*0.2);}else if(b.type==='ChargingTrigger'){ctx.fillStyle='#0ff';ctx.beginPath();ctx.arc(b.x+b.size/2,b.y+b.size/2,b.size/2,0,Math.PI*2);ctx.fill();ctx.fillStyle='#ff0';ctx.beginPath();ctx.moveTo(b.x+b.size*0.6,b.y+b.size*0.2);ctx.lineTo(b.x+b.size*0.4,b.y+b.size*0.5);ctx.lineTo(b.x+b.size*0.55,b.y+b.size*0.5);ctx.lineTo(b.x+b.size*0.35,b.y+b.size*0.8);ctx.lineTo(b.x+b.size*0.6,b.y+b.size*0.45);ctx.lineTo(b.x+b.size*0.45,b.y+b.size*0.45);ctx.closePath();ctx.fill();}});}
-    function spawnBird(){const cBS=BASE_BIRD_SPAWN_CHANCE*difficultyMultiplier;if(birds.length<(4+Math.floor(difficultyMultiplier*6))&&Math.random()<cBS){const iL=Math.random()<0.3;const s=25+Math.random()*10;const bY=playableHeight*(iL?0.3:0.15)+Math.random()*playableHeight*(iL?0.4:0.7);let bS=currentScrollSpeed*BIRD_SPEED_MULTIPLIER*1.1;let aM=1.2;let fM=1.2;if(score>3000){aM=1.5+(difficultyMultiplier-1.15)*1.2;fM=1.5+(difficultyMultiplier-1.15)*1.0;}birds.push({x:gameCanvas.width+50+Math.random()*100,y:bY,baseY:bY,size:s,type:iL?'large':'small',speed:bS*(iL?(0.8+Math.random()*0.1):(1.0+Math.random()*0.2)),color:`hsl(30,${15+Math.random()*10}%,${iL?40:60+Math.random()*20}%)`,wingPhase:Math.random()*Math.PI*2,wingSpeed:(iL?0.15:0.25)+Math.random()*0.08,wanderAmplitudeY:(25+Math.random()*50)*(iL?1.3:1.0)*aM,wanderFrequencyY:(0.025+Math.random()*0.035)*(iL?0.8:1.0)*fM,wanderPhaseOffsetY:Math.random()*Math.PI*2,wanderAmplitudeX:(40+Math.random()*70)*(iL?0.8:1.0)*aM,wanderFrequencyX:(0.02+Math.random()*0.025)*(iL?0.9:1.0)*fM,wanderPhaseOffsetX:Math.random()*Math.PI*2,baseXOffset:0});}}
-    function updateBirds(){const mB=4+Math.floor(difficultyMultiplier*6);for(let i=birds.length-1;i>=0;i--){const b=birds[i];const tFY=frameCount*b.wanderFrequencyY+b.wanderPhaseOffsetY;const tFX=frameCount*b.wanderFrequencyX+b.wanderPhaseOffsetX;const oY=Math.sin(tFY)*b.wanderAmplitudeY;const oX=Math.cos(tFX)*b.wanderAmplitudeX;b.baseXOffset-=b.speed;b.x=(gameCanvas.width+b.baseXOffset)+oX;b.y=b.baseY+oY;b.wingPhase+=b.wingSpeed;b.y=Math.max(0,Math.min(b.y,playableHeight-b.size));if(b.x+b.size<-150){birds.splice(i,1);}}spawnBird();}
-    function drawBirds(){birds.forEach(b=>{ctx.save();ctx.translate(b.x+b.size/2,b.y+b.size/2);ctx.fillStyle=b.color;ctx.beginPath();ctx.ellipse(0,0,b.size*0.4,b.size*0.25,0,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(b.size*0.35,-b.size*0.1,b.size*0.15,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.moveTo(b.size*0.5,-b.size*0.1);ctx.lineTo(b.size*0.6,-b.size*0.15);ctx.lineTo(b.size*0.6,-b.size*0.05);ctx.closePath();ctx.fill();const wY=Math.sin(b.wingPhase)*(b.size*0.35);const wA=Math.sin(b.wingPhase)*0.8;const wL=b.size*0.9;const wW=b.size*0.4;ctx.save();ctx.translate(-b.size*0.15,0);ctx.rotate(-wA);ctx.beginPath();ctx.moveTo(0,0);ctx.bezierCurveTo(-wL*0.4,-wY-wW*0.5,-wL*0.8,-wY-wW*0.2,-wL,-wY+wW*0.1);ctx.bezierCurveTo(-wL*0.9,-wY+wW*0.5,-wL*0.5,-wY+wW*0.7,0,0);ctx.closePath();ctx.fill();ctx.restore();ctx.save();ctx.translate(b.size*0.15,0);ctx.rotate(wA);ctx.beginPath();ctx.moveTo(0,0);ctx.bezierCurveTo(wL*0.4,-wY-wW*0.5,wL*0.8,-wY-wW*0.2,wL,-wY+wW*0.1);ctx.bezierCurveTo(wL*0.9,-wY+wW*0.5,wL*0.5,-wY+wW*0.7,0,0);ctx.closePath();ctx.fill();ctx.restore();ctx.restore();});}
-    function checkCollisions(){if(isChargingSequence||isCaptured)return;const cR={x:carX,y:carY,width:CAR_WIDTH,height:CAR_HEIGHT};buildings.forEach(b=>{if(b.isVertiport){const wW=b.width*0.6;const wX=b.x+(b.width-wW)/2;const wR={x:wX,y:0,width:wW,height:b.y-15};if(isColliding(cR,wR)){startCaptureSequence(b);return;}}if(b.x<cR.x+cR.width&&b.x+b.width>cR.x){if(isColliding(cR,{x:b.x,y:b.y,width:b.width,height:b.height})){handleCollision(b);}}});if(isCaptured)return;for(let i=projectiles.length-1;i>=0;i--){const p=projectiles[i];if(isColliding(cR,{x:p.x,y:p.y,width:p.size.w,height:p.size.h})){handleCollision(p);projectiles.splice(i,1);}}for(let i=birds.length-1;i>=0;i--){const bd=birds[i];const bR={x:bd.x,y:bd.y,width:bd.size,height:bd.size};if(isColliding(cR,bR)){handleCollision(bd);birds.splice(i,1);}}for(let i=bonuses.length-1;i>=0;i--){const bn=bonuses[i];if(isColliding(cR,{x:bn.x,y:bn.y,width:bn.size,height:bn.size})){if(bn.type==='ChargingTrigger'){startChargingSequence(bn);}else{handleBonusPickup(bn);}bonuses.splice(i,1);break;}}}
-    function isColliding(r1,r2){return r1.x<r2.x+r2.width&&r1.x+r1.width>r2.x&&r1.y<r2.y+r2.height&&r1.y+r1.height>r2.y;}
-    function handleCollision(o){if(carShake<2){battery-=COLLISION_BATTERY_COST;triggerShake(10);playCollisionSound();updateBatteryUI();currentScrollSpeed=Math.min(MAX_SCROLL_SPEED,currentScrollSpeed+SCROLL_SPEED_INCREMENT);currentMusicTempo=Math.min(MAX_MUSIC_TEMPO,currentMusicTempo+MUSIC_TEMPO_INCREMENT);playCollisionDissonance();triggerHapticFeedback(200);}}
-    function handleBonusPickup(b){if(b.type==='Battery'){battery=Math.min(100,battery+BONUS_BATTERY_GAIN);playBatteryPickupSound();triggerHapticFeedback(150);}else if(b.type==='ChargingTrigger'){playBonusFlourish();}if(b.type==='Battery')score+=50;updateBatteryUI();updateScoreUI();}
-    function drawGameBackground(){const g=ctx.createLinearGradient(0,0,0,playableHeight);g.addColorStop(0,'#1a2a3a');g.addColorStop(0.7,'#334455');g.addColorStop(1,'#445566');ctx.fillStyle=g;ctx.fillRect(0,0,gameCanvas.width,playableHeight);ctx.fillStyle='rgba(255,255,255,0.7)';for(let i=0;i<60;i++){let sX=(100+i*50+frameCount*0.15)%gameCanvas.width;let sY=(50+i*30)%playableHeight*0.85;let sz=1+Math.random()*1.5;if(frameCount%(50+i%15)<4){ctx.fillRect(sX,sY,sz*1.5,sz*1.5);}else{ctx.fillRect(sX,sY,sz,sz);}}drawClouds();drawSwarmBackground();drawBuildings();if(isChargingSequence&&targetChargeStation){ctx.fillStyle='#444';ctx.fillRect(targetChargeStation.x,targetChargeStation.y,targetChargeStation.width,15);ctx.fillStyle='#0ff';ctx.fillRect(targetChargeStation.x+5,targetChargeStation.y+5,targetChargeStation.width-10,5);ctx.fillStyle='#ff0';ctx.fillRect(targetChargeStation.x+15,targetChargeStation.y+2,10,11);ctx.fillRect(targetChargeStation.x+targetChargeStation.width-25,targetChargeStation.y+2,10,11);}ctx.fillStyle='#555';ctx.fillRect(0,playableHeight,gameCanvas.width,SIDEWALK_HEIGHT);ctx.strokeStyle='#888';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,playableHeight+1);ctx.lineTo(gameCanvas.width,playableHeight+1);ctx.stroke();}
-    function drawCar(){let dX=carX;let dY=carY;if(carShake>0){dX+=(Math.random()-0.5)*8;dY+=(Math.random()-0.5)*8;carShake--;}const bW=CAR_WIDTH*0.8;const bH=CAR_HEIGHT*0.7;const bX=dX+(CAR_WIDTH-bW)/2;const bY=dY+(CAR_HEIGHT-bH)/2;const rS=CAR_WIDTH*0.3;const rOY=bH*0.3;ctx.fillStyle=carColor;ctx.fillRect(bX,bY,bW,bH);ctx.fillStyle='#aaf';ctx.fillRect(bX+bW*0.5,bY+bH*0.15,bW*0.45,bH*0.7);const rC1='#ccc';const rC2='#999';const rAS=0.3;const rC=(Math.sin(frameCount*rAS)>0)?rC1:rC2;ctx.fillStyle=rC;ctx.fillRect(dX-rS*0.1,dY-rOY,rS,rS*0.4);ctx.fillRect(dX+CAR_WIDTH-rS*0.9,dY-rOY,rS,rS*0.4);ctx.fillRect(dX-rS*0.1,dY+CAR_HEIGHT-rOY,rS,rS*0.4);ctx.fillRect(dX+CAR_WIDTH-rS*0.9,dY+CAR_HEIGHT-rOY,rS,rS*0.4);ctx.fillStyle='rgba(0,255,255,0.2)';ctx.fillRect(dX,dY+CAR_HEIGHT-5,CAR_WIDTH,5);}
-    function spawnCloud(){const l=Math.random();const s=60+Math.random()*120;clouds.push({x:gameCanvas.width+s+Math.random()*200,y:playableHeight*0.05+Math.random()*playableHeight*0.5,size:s,opacity:0.15+l*0.3,speed:currentScrollSpeed*(0.2+l*0.4),numPuffs:3+Math.floor(Math.random()*3),puffOffsets:[]});const c=clouds[clouds.length-1];for(let i=0;i<c.numPuffs;i++){c.puffOffsets.push({x:(Math.random()-0.5)*c.size*0.7,y:(Math.random()-0.5)*c.size*0.25,radiusX:c.size*(0.25+Math.random()*0.2),radiusY:c.size*(0.15+Math.random()*0.15)});}}
-    function updateClouds(){for(let i=clouds.length-1;i>=0;i--){const c=clouds[i];c.x-=c.speed;if(c.x+c.size<0){clouds.splice(i,1);}}if(clouds.length<8&&Math.random()<0.02){spawnCloud();}}
-    function drawClouds(){clouds.forEach(c=>{ctx.fillStyle=`rgba(200,200,220,${c.opacity})`;c.puffOffsets.forEach(p=>{ctx.beginPath();ctx.ellipse(c.x+p.x,c.y+p.y,p.radiusX,p.radiusY,0,0,Math.PI*2);ctx.fill();});});}
-    function spawnSwarmVehicle(){const l=Math.random();const s=5+l*15;swarmVehicles.push({x:Math.random()*gameCanvas.width,y:Math.random()*playableHeight*0.9,sizeW:s*(1.5+Math.random()*0.5),sizeH:s,speed:currentScrollSpeed*(0.1+l*0.3),color:`hsl(${180+Math.random()*60},70%,${30+l*40}%)`,bobPhase:Math.random()*Math.PI*2,bobSpeed:0.01+Math.random()*0.02,bobAmplitude:2+l*5});}
-    function updateSwarmVehicles(){for(let i=swarmVehicles.length-1;i>=0;i--){const v=swarmVehicles[i];v.x-=v.speed;v.bobPhase+=v.bobSpeed;v.y+=Math.sin(v.bobPhase)*v.bobAmplitude*0.1;if(v.x+v.sizeW<0){v.x=gameCanvas.width+v.sizeW+Math.random()*100;v.y=Math.random()*playableHeight*0.9;v.bobPhase=Math.random()*Math.PI*2;}}if(swarmVehicles.length<30&&Math.random()<0.05){spawnSwarmVehicle();}}
-    function drawSwarmBackground(){swarmVehicles.forEach(v=>{ctx.fillStyle=v.color;const bY=v.y+Math.sin(v.bobPhase)*v.bobAmplitude;ctx.fillRect(v.x,bY,v.sizeW,v.sizeH*0.6);ctx.fillRect(v.x-v.sizeW*0.1,bY-v.sizeH*0.2,v.sizeW*0.3,v.sizeH*0.3);ctx.fillRect(v.x+v.sizeW*0.8,bY-v.sizeH*0.2,v.sizeW*0.3,v.sizeH*0.3);ctx.fillStyle=`rgba(200,220,255,0.1)`;ctx.fillRect(v.x-v.sizeW*0.1,bY-v.sizeH*0.1,v.sizeW*1.2,v.sizeH*0.8);});}
-    function findChargingStationSpot(tX){let bS=null;let mG=0;for(let i=0;i<buildings.length-1;i++){const b1=buildings[i];const b2=buildings[i+1];const gS=b1.x+b1.width;const gE=b2.x;const gW=gE-gS;if(gW>CAR_WIDTH+40&&gS<tX+100&&gE>tX-100){if(gW>mG){mG=gW;bS={x:gS+(gW/2)-40,y:playableHeight-10,width:80};}}}if(!bS){bS={x:carX,y:gameCanvas.height+50,width:80};}return bS;}
+    function startGame() {
+        gameRunning = false; 
+        if (animationFrameId) cancelAnimationFrame(animationFrameId); animationFrameId = null;
+        if (musicIsPlaying) stopBackgroundMusic(); 
 
-    function startChargingSequence(t){if(isChargingSequence||isCaptured)return;isChargingSequence=true;chargingPhase='descending';playerControlEnabled=false;targetChargeStation=findChargingStationSpot(t.x);autoPilotStartY=carY;autoPilotProgress=0;stopEngineHum();playPullDownSound();if(musicGainNode)musicGainNode.gain.linearRampToValueAtTime(0,audioCtx.currentTime+0.5);stopBackgroundMusic();}
-    function updateChargingSequence(){const dS=0.015;const bOS=0.05;if(chargingPhase==='descending'){autoPilotProgress=Math.min(1,autoPilotProgress+dS);const eP=0.5*(1-Math.cos(autoPilotProgress*Math.PI));carY=autoPilotStartY+(targetChargeStation.y-CAR_HEIGHT/2-autoPilotStartY)*eP;carX+=(targetChargeStation.x+targetChargeStation.width/2-CAR_WIDTH/2-carX)*0.05;if(autoPilotProgress>=1){chargingPhase='charging';carColor='#0f0';playChargingSound();chargeStartTime=performance.now();}}else if(chargingPhase==='charging'){const el=performance.now()-chargeStartTime;const cP=Math.min(1,el/CHARGE_DURATION_MS);battery=Math.min(100,Math.floor(cP*100));updateBatteryUI();if(cP>=1){chargingPhase='blastoff';carColor='#fff';stopChargingSound();playChargeCompleteSound();playLaunchSound();autoPilotStartY=carY;autoPilotProgress=0;}}else if(chargingPhase==='blastoff'){autoPilotProgress=Math.min(1,autoPilotProgress+bOS);const tY=playableHeight/2;const eP=0.5*(1-Math.cos(autoPilotProgress*Math.PI));carY=autoPilotStartY+(tY-autoPilotStartY)*eP;if(autoPilotProgress>=1){isChargingSequence=false;chargingPhase=null;playerControlEnabled=true;targetChargeStation=null;startEngineHum();if(musicGainNode)musicGainNode.gain.linearRampToValueAtTime(0.45,audioCtx.currentTime+0.5);if(gameRunning){startMusicLoopChecker();}}}}
-    function startCaptureSequence(b){if(isCaptured||isChargingSequence)return;isCaptured=true;capturePhase='descending';playerControlEnabled=false;captureTargetBuilding=b;autoPilotStartY=carY;autoPilotProgress=0;stopEngineHum();playLockOnSound();playVertiportRefuelSound();stopBackgroundMusic();if(musicGainNode)musicGainNode.gain.linearRampToValueAtTime(0.1,audioCtx.currentTime+0.5);}
-    function updateCaptureSequence(){const dS=0.01;const rS=0.04;const tY=captureTargetBuilding.y-CAR_HEIGHT*0.8;if(capturePhase==='descending'){autoPilotProgress=Math.min(1,autoPilotProgress+dS);const eP=0.5*(1-Math.cos(autoPilotProgress*Math.PI));carY=autoPilotStartY+(tY-autoPilotStartY)*eP;const tX=captureTargetBuilding.x+captureTargetBuilding.width/2-CAR_WIDTH/2;carX+=(tX-carX)*0.03;if(autoPilotProgress>=1){capturePhase='holding';captureStartTime=performance.now();stopCaptureSounds();playCaptureDescentHum();}}else if(capturePhase==='holding'){const el=performance.now()-captureStartTime;const dP=Math.min(1,el/CAPTURE_HOLD_DURATION_MS);battery=Math.max(0,100-Math.floor(dP*CAPTURE_BATTERY_DRAIN));updateBatteryUI();if(frameCount%30===0)playCaptureHoldingPulse();if(el>=CAPTURE_HOLD_DURATION_MS){capturePhase='releasing';playCaptureReleaseChime();autoPilotStartY=carY;autoPilotProgress=0;}}else if(capturePhase==='releasing'){autoPilotProgress=Math.min(1,autoPilotProgress+rS);const tRY=playableHeight/2;const eP=autoPilotProgress*autoPilotProgress;carY=autoPilotStartY+(tRY-autoPilotStartY)*eP;if(autoPilotProgress>=1){isCaptured=false;capturePhase=null;playerControlEnabled=true;captureTargetBuilding=null;startEngineHum();if(musicGainNode)musicGainNode.gain.linearRampToValueAtTime(0.45,audioCtx.currentTime+0.5);if(gameRunning){startMusicLoopChecker();}}}}
-    function updateGameState(){if(playerControlEnabled){let vD=0;let hD=0;if((keys['ArrowUp']||keys['w'])&&!(prevKeys['ArrowUp']||prevKeys['w'])){playDodgeSound(-1);}if((keys['ArrowDown']||keys['s'])&&!(prevKeys['ArrowDown']||prevKeys['s'])){playDodgeSound(1);}if(keys['ArrowUp']||keys['w'])vD=-MOVE_SPEED_Y;if(keys['ArrowDown']||keys['s'])vD=MOVE_SPEED_Y;if(keys['ArrowLeft']||keys['a'])hD=-MOVE_SPEED_X;if(keys['ArrowRight']||keys['d'])hD=MOVE_SPEED_X;carY+=vD;carX+=hD;carY=Math.max(0,Math.min(carY,playableHeight-CAR_HEIGHT));carX=Math.max(MIN_CAR_X,Math.min(carX,MAX_CAR_X));modulateEngineHum(battery,vD,hD);}updateBuildings();updatePedestriansAndProjectiles();updateBonuses();updateBirds();updateClouds();updateSwarmVehicles();if(playerControlEnabled)checkCollisions();if(playerControlEnabled){battery-=BATTERY_DRAIN_RATE;score++;
-      // Haptic feedback for score milestones
-      if (score >= 1000 && lastScoreHapticMilestone < 1000) {
-        triggerHapticFeedback([50, 30, 50, 30, 50]);
-        lastScoreHapticMilestone = 1000;
-      } else if (score >= 2000 && lastScoreHapticMilestone < 2000) {
-        triggerHapticFeedback([50, 30, 50, 30, 50]);
-        lastScoreHapticMilestone = 2000;
-      } else if (score >= 3000 && lastScoreHapticMilestone < 3000) {
-        triggerHapticFeedback([50, 30, 50, 30, 50]);
-        lastScoreHapticMilestone = 3000;
-      } else if (score >= 4000 && lastScoreHapticMilestone < 4000) {
-        triggerHapticFeedback([50, 30, 50, 30, 50]);
-        lastScoreHapticMilestone = 4000;
-      }
+        battery = 100; score = 0; calculateDimensions(); carY = playableHeight / 2; carX = 80; carColor = 'white'; keys = {}; prevKeys = {}; buildings = []; pedestrians = []; projectiles = []; bonuses = []; birds = []; clouds = []; swarmVehicles = []; carShake = 0; frameCount = 0; lowBatteryWarningPlayed = false; isChargingSequence = false; chargingPhase = null; targetChargeStation = null; isCaptured = false; capturePhase = null; captureTargetBuilding = null; playerControlEnabled = true; prevCarX = carX; prevCarY = carY;
+        spawnBuilding(gameCanvas.width * 0.6); spawnBuilding(); for(let i=0; i<5; i++) spawnCloud(); for(let i=0; i<20; i++) spawnSwarmVehicle();
+        currentScrollSpeed = BASE_SCROLL_SPEED; currentMusicTempo = BASE_MUSIC_TEMPO;
+        difficultyMultiplier = 1.0; 
+        
+        blimp = null; // Reset blimp (from beta68)
+        nextBlimpScoreTarget = 10000; // Reset blimp spawn score (from beta68)
 
-      const dP=Math.min(1,Math.max(0,(score-1000)/3000));currentScrollSpeed=BASE_SCROLL_SPEED+(MAX_SCROLL_SPEED-BASE_SCROLL_SPEED)*dP*difficultyMultiplier;currentMusicTempo=BASE_MUSIC_TEMPO+(MAX_MUSIC_TEMPO-BASE_MUSIC_TEMPO)*dP*difficultyMultiplier;currentScrollSpeed=Math.min(MAX_SCROLL_SPEED*1.2,currentScrollSpeed);currentMusicTempo=Math.min(MAX_MUSIC_TEMPO*1.2,currentMusicTempo);}if(playerControlEnabled&&battery<=0)gameOver();}
-    function gameLoop(){if(!gameRunning)return;frameCount++;if(isChargingSequence){updateChargingSequence();updateBuildings();updateClouds();updateSwarmVehicles();}else if(isCaptured){updateCaptureSequence();updateBuildings();updateClouds();updateSwarmVehicles();}else{updateGameState();}ctx.clearRect(0,0,gameCanvas.width,gameCanvas.height);drawGameBackground();drawPedestriansAndProjectiles();drawBonuses();drawBirds();drawCar();updateBatteryUI();updateScoreUI();prevCarX=carX;prevCarY=carY;prevKeys={...keys};animationFrameId=requestAnimationFrame(gameLoop);}
-    
-    function startGame(){
-      gameRunning=false;
-      if(animationFrameId) cancelAnimationFrame(animationFrameId);
-      animationFrameId=null;
-      stopAllSounds();
-      battery=100;score=0;lastScoreHapticMilestone = 0; // Reset score milestone haptic
-      calculateDimensions();
-      carY=playableHeight/2;carX=80;carColor='white';keys={};prevKeys={};
-      buildings=[];pedestrians=[];projectiles=[];bonuses=[];birds=[];clouds=[];swarmVehicles=[];
-      carShake=0;frameCount=0;lowBatteryWarningPlayed=false;
-      isChargingSequence=false;chargingPhase=null;targetChargeStation=null;
-      isCaptured=false;capturePhase=null;captureTargetBuilding=null;
-      playerControlEnabled=true;prevCarX=carX;prevCarY=carY;
-      spawnBuilding(gameCanvas.width*0.6);spawnBuilding();
-      for(let i=0;i<5;i++)spawnCloud();
-      for(let i=0;i<20;i++)spawnSwarmVehicle(); // Swarm for active game, not just idle
-      currentScrollSpeed=BASE_SCROLL_SPEED;currentMusicTempo=BASE_MUSIC_TEMPO;difficultyMultiplier=1.0;
-      
-      startScreen.style.display='none';
-      // gameCanvas.style.background is handled by CSS to be transparent by default.
-      // drawGameBackground will paint an opaque background when the game starts.
-      gameCanvas.style.display='block'; // Ensure canvas is visible
-      uiOverlay.style.display='block';
-      brandingWatermark.style.display='block';
-      gameOverScreen.style.display='none';
-      
-      updateBatteryUI();updateScoreUI();
-      const iMD=window.matchMedia('(pointer:coarse)').matches;
-      if(iMD){
-        if(mobileControlsLeft)mobileControlsLeft.style.display='block';
-        if(mobileControlsRight)mobileControlsRight.style.display='flex';
-      }else{
-        if(mobileControlsLeft)mobileControlsLeft.style.display='none';
-        if(mobileControlsRight)mobileControlsRight.style.display='none';
-      }
-      setTimeout(()=>{
-        if(!audioInitialized){
-          console.warn("startGame: Audio not initialized despite attempts.");
+        startScreen.style.display = 'none';
+        gameCanvas.style.display = 'block';
+        uiOverlay.style.display = 'block'; 
+        brandingWatermark.style.display = 'block'; 
+        gameOverScreen.style.display = 'none';
+        updateBatteryUI(); updateScoreUI();
+
+        const isMobileDevice = window.matchMedia('(pointer: coarse)').matches;
+        if (isMobileDevice) {
+            if (mobileControlsLeft) mobileControlsLeft.style.display = 'block'; 
+            if (mobileControlsRight) mobileControlsRight.style.display = 'flex';
         } else {
-          playStartJingle();
-          startEngineHum();
-          triggerHapticFeedback([50, 20, 50]); // Engine Start Haptic
-          if(window.PROCEDURAL_UI_GAIN&&window.PROCEDURAL_UI_GAIN.gain)window.PROCEDURAL_UI_GAIN.gain.setValueAtTime(1.0,audioCtx.currentTime);
-          if(musicGainNode&&musicGainNode.gain)musicGainNode.gain.setValueAtTime(0.45,audioCtx.currentTime);
-          if(musicLowPassFilter)musicLowPassFilter.frequency.setValueAtTime(20000,audioCtx.currentTime);
-          wasPlayingMusic = true; 
-          wasPlayingEngine = true; 
-          startMusicLoopChecker();
-        }
-        gameRunning=true;
-        animationFrameId=requestAnimationFrame(gameLoop);
-        if (devMode) console.log("🟢 QA: startGame() executed and game loop requested.");
-    },50);
-}
-    function gameOver(){if(!gameRunning)return;gameRunning=false;playerControlEnabled=false;wasPlayingMusic = false; wasPlayingEngine = false; stopAllSounds();if(animationFrameId)cancelAnimationFrame(animationFrameId);animationFrameId=null;uiOverlay.style.display='none';brandingWatermark.style.display='none';if(mobileControlsLeft)mobileControlsLeft.style.display='none';if(mobileControlsRight)mobileControlsRight.style.display='none';finalScoreLabel.textContent=`Final Score: ${score}`;gameOverScreen.style.display='flex';if(audioInitialized&&audioCtx&&audioCtx.state==='running')playGameOverFanfare();triggerHapticFeedback(100);}
-    
-    /**
-     * Handles the click event for the Start Game and Replay buttons.
-     * Manages AudioContext initialization/resume and game start flow.
-     * Displays a failure notice if audio cannot be initialized.
-     * @param {Event} event - The click event.
-     */
-    function handleStartOrReplay(event){
-      event.preventDefault(); 
-      const bId=event.target.id;
-      if (devMode) console.log(`🟡 QA (handleStartOrReplay): Button "${bId}" clicked. AudioContext state: ${audioCtx ? audioCtx.state : 'N/A'}`);
-
-      if (!audioCtx){
-        console.error("handleStartOrReplay: Cannot start, AudioContext not available.");
-        displayStartFailureNotice("Audio system not supported or blocked by browser.");
-        return;
-      }
-      if(bId==='startButton'&&gameRunning) {
-        if (devMode) console.log("handleStartOrReplay: Game already running, start button click ignored.");
-        return;
-      }
-
-      if(bId==='replayButton'){
-        if (devMode) console.log("handleStartOrReplay: Replay button clicked.");
-        fetch('https://bit.ly/hoverrush-gameover',{mode:'no-cors'}).catch(err=>{});
-      }
-
-      const attemptStartGameAfterAudio = () => {
-        if (devMode) console.log("handleStartOrReplay: Attempting to start game after audio check...");
-        if (!audioInitialized) {
-          if (devMode) console.log("handleStartOrReplay: Audio not initialized, attempting initAudio().");
-          if (!initAudio()) {
-            console.error("handleStartOrReplay: Audio system failed to initialize after resume/tap.");
-            displayStartFailureNotice("Game could not start: Audio system failed to initialize. Please try again or refresh.");
-            return;
-          }
-          if (devMode) console.log(`handleStartOrReplay: initAudio() result: ${audioInitialized}`);
+             if (mobileControlsLeft) mobileControlsLeft.style.display = 'none';
+            if (mobileControlsRight) mobileControlsRight.style.display = 'none';
         }
         
-        if (audioCtx.state === 'running' && audioInitialized) {
-          if (devMode) console.log("handleStartOrReplay: AudioContext running and initialized. Calling startGame().");
-          startGame();
-        } else {
-          console.warn(`handleStartOrReplay: Audio system not ready (State: ${audioCtx.state}, Initialized: ${audioInitialized}).`);
-          displayStartFailureNotice(`Audio system not ready (State: ${audioCtx.state}). Please tap to enable audio.`);
-        }
-      };
-
-      if(audioCtx.state === 'suspended'){
-        if (devMode) console.log("handleStartOrReplay: AudioContext is suspended. Attempting resume...");
-        audioCtx.resume().then(()=>{
-          if (devMode) console.log(`handleStartOrReplay: AudioContext.resume() successful. New state: ${audioCtx.state}`);
-          audioContextUnlocked = true; // Mark as unlocked by this gesture
-          if(audioCtx.state === 'running'){
-            attemptStartGameAfterAudio();
-          }else{
-            console.warn("handleStartOrReplay: Could not enable audio after resume promise resolved, state is not 'running'.");
-            displayStartFailureNotice("Could not enable audio. Please tap/click again.");
-          }
-        }).catch(err=>{
-          console.error(`handleStartOrReplay: AudioContext.resume() failed: ${err.name}.`, err);
-          displayStartFailureNotice(`Audio could not be started: ${err.name}. Please try again.`);
-        });
-      } else if (audioCtx.state === 'running') {
-        if (devMode) console.log("handleStartOrReplay: AudioContext is already running.");
-        audioContextUnlocked = true; // Should already be true if running, but good to set
-        attemptStartGameAfterAudio();
-      } else {
-        console.error(`handleStartOrReplay: Audio system in unexpected state: ${audioCtx.state}.`);
-        displayStartFailureNotice(`Audio system error (State: ${audioCtx.state}). Please try again.`);
-      }
-    }
-    
-    /**
-     * Unlocks the AudioContext by resuming it on a user gesture.
-     * This is crucial for mobile browsers (especially iOS/Safari) due to strict autoplay policies.
-     * It ensures audio can play only after a user interaction, providing a smooth UX initiation.
-     * It also triggers audio initialization and ensures game audio resumes if needed.
-     */
-    function unlockAudioContext() { 
-      if (!audioCtx || audioCtx.state === 'closed') {
-          console.warn("Unlock: AudioContext closed or not available.");
-          return;
-      }
-      // Check if the context is suspended (common on page load in mobile browsers)
-      if (audioCtx.state === 'suspended') {
-        audioCtx.resume().then(() => {
-          audioContextUnlocked = true; 
-          console.log("✅ AudioContext unlocked via user gesture."); // Log on successful unlock
-          if (typeof gtag === 'function') gtag('event', 'audio_unlocked');
-          // Haptic feedback after successful context resume due to user gesture.
-          if (navigator.vibrate) navigator.vibrate([20]); 
-          if (!audioInitialized) initAudio(); 
-          if (gameRunning && document.visibilityState === 'visible') { 
-            safeResumeAudioWithFormalGiveUp(); // Attempt to resume all game audio
-          }
-        }).catch(err => {
-          console.warn("❌ Failed to unlock AudioContext:", err); // Log on failure to unlock
-        });
-      } else if (!audioInitialized && audioCtx.state === 'running') { 
-          // If context is already running but not yet initialized (e.g., fast user interaction), initialize.
-          initAudio(); 
-          audioContextUnlocked = true; 
-          if (gameRunning && document.visibilityState === 'visible') safeResumeAudioWithFormalGiveUp(); 
-      }
-    }
-    // Listen for user gestures (touch or click) to unlock the AudioContext. These listeners are set to run once.
-    window.addEventListener('touchend', unlockAudioContext, { once: true, passive: true }); 
-    window.addEventListener('click', unlockAudioContext, { once: true, passive: true }); 
-        
-    // Moved button listeners to DOMContentLoaded for better lifecycle management and QA
-    // startButton.addEventListener('click', handleStartOrReplay); 
-    // replayButton.addEventListener('click', handleStartOrReplay);
-
-    window.addEventListener('keydown', (e) => { if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 's', 'a', 'd', ' '].includes(e.key)) { e.preventDefault(); } keys[e.key] = true; });
-    window.addEventListener('keyup', (e) => { keys[e.key] = false; });
-    function handleTouchStart(key, event) { event.preventDefault(); keys[key] = true; if (navigator.vibrate) triggerHapticFeedback(10); } // Haptic on touch button press
-    function handleTouchEnd(key, event) { event.preventDefault(); keys[key] = false; }
-    // These touch button listeners are now attached in DOMContentLoaded
-    // touchUpButton.addEventListener('touchstart', (e) => handleTouchStart('ArrowUp', e), { passive: false });
-    // touchUpButton.addEventListener('touchend', (e) => handleTouchEnd('ArrowUp', e));
-    // touchDownButton.addEventListener('touchstart', (e) => handleTouchStart('ArrowDown', e), { passive: false });
-    // touchDownButton.addEventListener('touchend', (e) => handleTouchEnd('ArrowDown', e));
-    // touchLeftButton.addEventListener('touchstart', (e) => handleTouchStart('ArrowLeft', e), { passive: false });
-    // touchLeftButton.addEventListener('touchend', (e) => handleTouchEnd('ArrowLeft', e));
-    // touchRightButton.addEventListener('touchstart', (e) => handleTouchStart('ArrowRight', e), { passive: false });
-    // touchRightButton.addEventListener('touchend', (e) => handleTouchEnd('ArrowRight', e));
-    // These listeners are now attached in DOMContentLoaded
-    // [touchUpButton, touchDownButton, touchLeftButton, touchRightButton, startButton, replayButton].forEach(button => {
-    //     button.addEventListener('contextmenu', (e) => e.preventDefault());
-    // });
-
-    function resizeGame(){const w=window.innerWidth;const h=window.innerHeight;gameCanvas.width=w;gameCanvas.height=h;gameCanvas.style.width=w+'px';gameCanvas.style.height=h+'px';calculateDimensions();updateBatteryUI();updateScoreUI();if(!gameRunning&&ctx){/* During idle, canvas is cleared instead of filled to allow background through */ if(swarmVehicles?.length){drawSwarmBackground();}}if(gameRunning&&playerControlEnabled){carX=Math.max(MIN_CAR_X,Math.min(carX,MAX_CAR_X));carY=Math.max(0,Math.min(carY,playableHeight-CAR_HEIGHT));}}
-    let resizeTimeout; window.addEventListener('resize',()=>{clearTimeout(resizeTimeout);resizeTimeout=setTimeout(resizeGame,100);}); window.addEventListener('orientationchange',()=>{clearTimeout(resizeTimeout);resizeTimeout=setTimeout(resizeGame,150);});
-    
-    /**
-     * Attempts to resume audio playback after tab switch or user reentry.
-     * This function is the core of the audio resilience. It ensures that game audio is playing
-     * when it should be, especially after tab switches or initial load delays.
-     * It uses an exponential backoff retry strategy for loading buffers, up to MAX_RETRIES.
-     * If all retries fail, it plays a fallback tone and displays a user-facing error notice.
-     * Purpose: Prevent audio playing when app is in background (saving battery and preventing annoyance),
-     * and smoothly resume when brought back to the foreground.
-     */
-    function safeResumeAudioWithFormalGiveUp() {
-      // Guard conditions:
-      if (!audioInitialized || audioCtx.state !== 'running' || !audioContextUnlocked) {
-        console.log("safeResumeAudioWithFormalGiveUp: Skipped due to audio system state or not unlocked.");
-        return;
-      }
-
-      // Check if all necessary buffers are loaded using the dedicated helper.
-      if (!areAudioBuffersReady([backgroundBuffer, engineBuffer, uiBuffer])) {
-        if (retryAttempts < MAX_RETRIES) {
-          console.warn(`⏳ Buffer loading retry ${retryAttempts + 1}/${MAX_RETRIES}`);
-          retryAttempts++;
-          // Schedule next retry with exponential backoff. The delay increases to give more time for loading.
-          setTimeout(() => safeResumeAudioWithFormalGiveUp(), 500 * Math.pow(1.5, retryAttempts - 1)); 
-          return;
-        }
-
-        // Retries exhausted: inform the user and fallback.
-        // This is a critical edge case indicating persistent loading issues.
-        console.error("❌ Audio buffer load failed after max retries.");
-        if (typeof gtag === 'function') gtag('event', 'audio_buffer_retry_fail', { 'event_label': 'max_retries_reached' });
-        playFallbackTone(); // Play a simple fallback tone with haptic for audible cue
-        displayUserAudioIssueNotice(); // Show the stylized error notice with retry button
-        retryAttempts = 0; // Reset retry count for future attempts if user clicks retry
-        return;
-      }
-
-      // ✅ Buffers ready: reset retry count and resume playback
-      retryAttempts = 0; // Reset on success, indicating healthy state
-      console.log("safeResumeAudioWithFormalGiveUp: All buffers are ready. Resuming audio.");
-      // Call the new notice for successful audio restoration.
-      displayAudioRestoredNotice();
-
-      if (wasPlayingMusic) startBackgroundMusic();
-      if (wasPlayingEngine) startEngineHum();
-    }
-    
-    /**
-     * Displays a glowing cyberpunk-styled error banner when audio fails.
-     * The banner is designed to be visually striking and provides clear user guidance.
-     * It includes a "Retry Audio" button to allow users to manually re-attempt audio loading.
-     */
-    function displayUserAudioIssueNotice() {
-      // Prevent multiple notices from appearing
-      if (document.getElementById('audio-error-banner')) {
-        return;
-      }
-      const notice = document.createElement('div');
-      notice.id = "audio-error-banner";
-      
-      const message = document.createElement('p');
-      message.textContent = "⚠️ Audio failed to load. Please tap anywhere or refresh.";
-      notice.appendChild(message);
-
-      const retryButton = document.createElement('button');
-      retryButton.textContent = "🔁 Tap to Retry Audio"; // Added retry button text
-      retryButton.onclick = () => {
-        notice.remove(); // Remove banner immediately on click
-        safeResumeAudioWithFormalGiveUp(); // Call the resume function again
-      };
-      notice.appendChild(retryButton);
-
-      document.body.appendChild(notice);
-      triggerHapticFeedback([100]); // Haptic feedback when the error notice appears
-      setTimeout(() => notice.remove(), 8000); // Auto-dismiss after 8 seconds
-    }
-
-    /**
-     * Displays a glowing cyberpunk-styled success banner when audio is restored.
-     * This provides positive feedback to the user after a period of audio issues.
-     * It includes a light haptic pulse for tactile confirmation.
-     */
-    function displayAudioRestoredNotice() {
-      // Prevent multiple notices from appearing
-      if (document.getElementById('audio-restored-banner')) {
-        return;
-      }
-      const notice = document.createElement('div');
-      notice.id = "audio-restored-banner";
-      
-      const message = document.createElement('p');
-      message.textContent = "✅ Audio Restored!";
-      notice.appendChild(message);
-
-      document.body.appendChild(notice);
-      triggerHapticFeedback([10]); // Light haptic pulse for success
-      setTimeout(() => notice.remove(), 6000); // Auto-dismiss after 6 seconds
-    }
-
-    /**
-     * Displays a cyberpunk-styled banner for failures specifically during the initial game start process,
-     * often due to audio initialization issues not caught by regular resume logic.
-     * @param {string} msg - The message to display to the user.
-     */
-    function displayStartFailureNotice(msg) {
-      if (document.getElementById('start-failure-banner')) {
-        return; // Prevent multiple instances
-      }
-      const notice = document.createElement('div');
-      notice.id = "start-failure-banner";
-      
-      const message = document.createElement('p');
-      message.textContent = msg;
-      notice.appendChild(message);
-
-      const retryButton = document.createElement('button');
-      retryButton.textContent = "🔁 Tap to Retry";
-      retryButton.onclick = () => {
-        notice.remove();
-        // Simulate a click on the start button to re-attempt starting the game
-        handleStartOrReplay({ target: document.getElementById('startButton') }); 
-      };
-      notice.appendChild(retryButton);
-
-      document.body.appendChild(notice);
-      triggerHapticFeedback([100]); // Haptic feedback when the error notice appears
-      setTimeout(() => notice.remove(), 8000); // Auto-dismiss after 8 seconds
-    }
-
-
-    /**
-     * This visibility change handler ensures audio smoothly resumes when the user returns to the tab,
-     * and pauses/fades out audio when the tab is hidden. It incorporates retry logic for buffer loading
-     * and gracefully manages AudioContext state.
-     * Purpose: Prevent audio playing when app is in background (saving battery and preventing annoyance),
-     * and smoothly resume when brought back to the foreground.
-     */
-    document.addEventListener('visibilitychange', () => {
-      if (!audioCtx) return;
-      const state = document.visibilityState;
-
-      console.log(`📄 Tab is now ${state}. AudioContext: ${audioCtx.state}`);
-
-      if (state === 'visible') {
-        // If context was suspended, try to resume it.
-        if (audioCtx.state === 'suspended') {
-          audioCtx.resume().then(() => {
-            if (typeof gtag === 'function') gtag('event', 'tab_resumed', {'status': 'context_resumed'});
-            if (navigator.vibrate) navigator.vibrate([20]); // 📱 haptic confirmation on context resume
-            safeResumeAudioWithFormalGiveUp(); // Attempt to resume all game audio
-          }).catch(err => {
-            console.error("⚠️ Failed to resume AudioContext on visibility change:", err);
-          });
-        } else {
-          // If context already running, just ensure sounds are playing.
-          safeResumeAudioWithFormalGiveUp(); // Attempt to resume all game audio
-          if (typeof gtag === 'function') gtag('event', 'tab_resumed', {'status': 'context_already_running'});
-        }
-      } else { // Tab is hidden
-        console.log("Tab hidden. Fading out and cleaning up audio.");
-        // Fade out audio
-        if (backgroundGain.current) fadeOutAudio(backgroundGain.current, 1.0);
-        if (engineGain.current) fadeOutAudio(engineGain.current, 1.0);
-        if (engineHumNodes && engineHumNodes.masterGain) fadeOutAudio(engineHumNodes.masterGain, 1.0); // Ensure procedural engine hum fades too
-
-        // Store playback state
-        wasPlayingMusic = !!(backgroundMusicSource.current || (musicLoopIntervalId && musicShouldBePlaying));
-        wasPlayingEngine = !!(engineHumSource.current || (engineHumNodes && engineHumNodes.isProcedural));
-
-        // Clear interval and cleanup nodes after a short delay for smooth fade-out
         setTimeout(() => {
-          if (musicLoopIntervalId !== null) { clearInterval(musicLoopIntervalId); musicLoopIntervalId = null; }
-          musicOscillators.forEach(item => { if (item && item.osc) cleanupAudioNode(item.osc); });
-          musicOscillators = [];
-
-          // Cleanup global source and gain nodes
-          cleanupAudioNode(backgroundMusicSource.current);
-          cleanupAudioNode(backgroundGain.current);
-          backgroundMusicSource.current = null;
-          backgroundGain.current = null;
-
-          cleanupAudioNode(engineHumSource.current);
-          cleanupAudioNode(engineGain.current);
-          engineHumSource.current = null;
-          engineGain.current = null;
-
-          cleanupAudioNode(uiToneSource.current); // Explicit cleanup for uiTone
-          cleanupAudioNode(uiGain.current);       // Explicit cleanup for uiGain
-          uiToneSource.current = null;
-          uiGain.current = null;
-          
-          if(engineHumNodes && engineHumNodes.isProcedural) { stopEngineHum(); } // Ensure procedural hum stops too
-          stopProceduralAmbientPad(); // Ensure ambient pad stops too
-          
-          console.log("Audio nodes cleaned up.");
-        }, 1000); // Wait for fade-out duration
-      }
-    });
-    
-    /**
-     * Display mobile audio unlock prompt.
-     * Purpose: Guides mobile users to interact with the page to enable audio context.
-     * This addresses mobile browser policies that prevent audio from playing until a user gesture.
-     */
-    function showAudioUnlockPrompt() {
-      const prompt = document.createElement('div');
-      prompt.id = "audio-unlock-prompt";
-      prompt.innerHTML = "👉 Tap to enable game audio!";
-      document.body.appendChild(prompt);
-
-      // Remove prompt once a user interaction occurs.
-      const removePrompt = () => {
-        prompt.remove();
-        document.removeEventListener('touchstart', removePrompt);
-        document.removeEventListener('click', removePrompt);
-      };
-
-      document.addEventListener('touchstart', removePrompt, { once: true, passive: true });
-      document.addEventListener('click', removePrompt, { once: true, passive: true });
+             if (!audioInitialized) { 
+                console.warn("startGame: Audio not initialized. Will attempt init via initAudio()."); 
+                if (!initAudio()) {
+                    console.error("startGame: Audio initialization failed during game start sequence. Music/sounds may not play.");
+                }
+             }
+             
+             if (audioInitialized && audioCtx && audioCtx.state === 'running') { 
+                 console.log("startGame: Audio ready, playing sounds/music.");
+                 playStartJingle(); playEngineHum();
+                 if (musicGainNode) musicGainNode.gain.setValueAtTime(0.45, audioCtx.currentTime);
+                 if (musicLowPassFilter) musicLowPassFilter.frequency.setValueAtTime(20000, audioCtx.currentTime);
+                 startMusicLoopChecker(); 
+             } else {
+                 console.warn(`startGame: Audio not fully ready after timeout (State: ${audioCtx?.state}, Initialized: ${audioInitialized}). Music might not start.`);
+             }
+             gameRunning = true; 
+             if (animationFrameId) cancelAnimationFrame(animationFrameId); 
+             animationFrameId = requestAnimationFrame(gameLoop); 
+             console.log("Game started. GameRunning:", gameRunning);
+        }, 50); 
     }
 
-    /**
-     * Optional development checklist logger.
-     * Logs confirmation messages for key patch implementations.
-     * Set `devMode = true` to activate.
-     */
-    const devMode = typeof gtag === 'function'; // Simple devMode based on gtag presence
-    let iSLId = null; // Animation frame ID for idle screen loop for gameCanvas. Global to allow QA check.
+    function gameOver() {
+      if (!gameRunning) return;
+      gameRunning = false; playerControlEnabled = false;
+      stopAllSounds(); 
+      if (animationFrameId) cancelAnimationFrame(animationFrameId); animationFrameId = null;
 
-    // Renamed from performFullQA to performFinalQA as per prompt.
-    function performFinalQA() { /* ✅ MODIFIED: Renamed function for final QA pass */
-        if (!devMode) return;
-        console.group("🚀 HoverRush - Triple QA Self-Audit 🚀");
-        
-        // --- Visual & Core Functionality Checks ---
-        console.group("🎨 Visuals & Core Interactivity");
-        // Re-get element references here to ensure they are the latest state in the DOM
-        const animatedBg = document.getElementById('animatedBackground');
-        const flyingCars = document.querySelectorAll('#animatedBackground .flyingCar'); /* ✅ MODIFIED: Ensure query is specific to #animatedBackground */
-        const startBtn = document.getElementById('startButton');
-        const canvas = document.getElementById('gameCanvas');
+      uiOverlay.style.display = 'none'; 
+      brandingWatermark.style.display = 'none'; 
+      if (mobileControlsLeft) mobileControlsLeft.style.display = 'none';
+      if (mobileControlsRight) mobileControlsRight.style.display = 'none';
 
-        // 1. Animated Background
-        if (animatedBg && getComputedStyle(animatedBg).zIndex === '0') {
-          console.log("✅ Animated background present and layered (z-index: 0)."); 
-        } else {
-          console.warn("❌ Animated background missing or mislayered (expected z-index: 0)."); 
+      finalScoreLabel.textContent = `Final Score: ${score}`;
+      gameOverScreen.style.display = 'flex';
+      if (audioInitialized && audioCtx && audioCtx.state === 'running') { playGameOverFanfare(); }
+      // No haptics
+    }
+
+    function handleStartOrReplay(event) {
+        event.preventDefault();
+        const buttonId = event.target.id;
+        console.log(`${buttonId} Clicked. AudioContext state: ${audioCtx?.state}`);
+        if (!audioCtx) { console.error("Cannot start game, AudioContext creation failed."); return; }
+
+        if (buttonId === 'startButton' && gameRunning) {
+            console.warn("Start button clicked, but game is already running.");
+            return;
         }
 
-        if (flyingCars.length >= 4) {
-          console.log(`✅ Found ${flyingCars.length} flying cars (expected 4+).`); 
-        } else {
-          console.warn(`❌ Only ${flyingCars.length} flying cars found (expected 4+).`); 
-        }
-        console.log(document.querySelector('style').innerHTML.includes('@keyframes flyAcross') ? "✅ CSS @keyframes flyAcross defined." : "❌ CSS @keyframes flyAcross MISSING.");
-
-        // 2. Canvas Background
-        const canvasStyle = getComputedStyle(canvas).backgroundColor;
-        if (canvasStyle === 'rgba(0, 0, 0, 0)' || canvasStyle.includes('transparent')) {
-          console.log("✅ Canvas background is transparent."); 
-        } else {
-          console.warn(`❌ Canvas background may be opaque: ${canvasStyle} (expected transparent).`); 
-        }
-
-        // 3. Start Button
-        // Check if handleStartOrReplay is among the click listeners using the custom __events property
-        const isListenerAttached = startBtn?.__events?.click?.some(listener => listener === handleStartOrReplay);
-        // Check for the custom _boundHandler property set during the start button binding
-        const hasBoundHandlerProperty = startBtn?._boundHandler === true;
-
-        if (startBtn && (isListenerAttached || hasBoundHandlerProperty)) { 
-            console.log("✅ Start button bound to click.");
-        } else {
-            console.warn("❌ Start button not functional or listener NOT correctly bound.");
-        }
-        console.log(typeof iSL === 'function' && iSLId !== null ? "✅ Idle animation (iSL) active on DOMContentLoaded." : "❌ Idle animation (iSL) NOT active or iSLId is null.");
-
-        console.groupEnd(); // Visuals & Core Interactivity
-
-        // --- Audio System Checks (largely from previous logAudioSystemCheck) ---
-        console.group("🔊 Audio System Integrity");
-        let checklistItems = {
-            "cleanupAudioNode present": typeof cleanupAudioNode === 'function',
-            "Styled audio notice (audio-error-banner) implemented": (typeof displayUserAudioIssueNotice === 'function' && displayUserAudioIssueNotice.toString().includes('id = "audio-error-banner"')),
-            "Haptics triggered during UI tone playback": playUiTone.toString().includes('navigator.vibrate([20])'),
-            "Haptics triggered during audio resume": unlockAudioContext.toString().includes('navigator.vibrate([20])'), 
-            "Haptics triggered during retry failure": playFallbackTone.toString().includes('navigator.vibrate([20, 40, 20])'),
-            "Haptics triggered on audio error notice display": displayUserAudioIssueNotice.toString().includes('triggerHapticFeedback([100])'),
-            "Procedural fallback tone logic implemented for UI": playUiTone.toString().includes('playProceduralUiTone()'),
-            "Procedural fallback tone logic implemented for Engine": startEngineHum.toString().includes('engineHumNodes = null') && startEngineHum.toString().includes('hO.start(); dO.start();'),
-            "Procedural fallback tone logic implemented for Background": startBackgroundMusic.toString().includes('startProceduralAmbientPad()'),
-            "audioContextUnlocked flag present and used": typeof audioContextUnlocked === 'boolean' && (unlockAudioContext.toString().includes('audioContextUnlocked = true') || handleStartOrReplay.toString().includes('audioContextUnlocked = true')),
-            "isBufferReady helper active": startBackgroundMusic.toString().includes('isBufferReady') && startEngineHum.toString().includes('isBufferReady') && playUiTone.toString().includes('isBufferReady'),
-            "retry button added to notice": displayUserAudioIssueNotice.toString().includes('retryButton.textContent = "🔁 Tap to Retry Audio"'),
-            "unlock logging implemented": unlockAudioContext.toString().includes('console.log("✅ AudioContext unlocked via user gesture.")') && unlockAudioContext.toString().includes('console.warn("❌ Failed to unlock AudioContext:")'),
-            "audio restored notice implemented": typeof displayAudioRestoredNotice === 'function',
-            "audioCtx guarded in fallback": playFallbackTone.toString().includes('if (!audioCtx || audioCtx.state !== \'running\')'),
-            "AudioContext state checked on game start": handleStartOrReplay.toString().includes('audioCtx.state === \'running\''),
-            "Game started QA log": startGame.toString().includes('console.log("🟢 QA: startGame() executed and game loop requested.")'),
-            "Game did not start QA log (handleStartOrReplay)": handleStartOrReplay.toString().includes('displayStartFailureNotice("Game could not start: Audio system failed to initialize. Please try again or refresh.")'),
-            "Start button clicked QA log (handleStartOrReplay)": handleStartOrReplay.toString().includes('console.log(`🟡 QA (handleStartOrReplay): Button "${bId}" clicked.'),
-            "displayStartFailureNotice implemented": typeof displayStartFailureNotice === 'function' && displayStartFailureNotice.toString().includes('id = "start-failure-banner"'),
+        const attemptStartGame = () => {
+            if (initAudio() || (audioCtx.state === 'running' && audioInitialized)) { 
+                console.log(`${buttonId}: Audio ready, starting game.`);
+                startGame();
+            } else {
+                console.error(`${buttonId}: Failed to initialize audio nodes or context not running. State: ${audioCtx?.state}, Initialized: ${audioInitialized}`);
+                alert("Audio system failed to initialize. Please try again, or refresh if the problem persists.");
+            }
         };
 
-        for (const [item, status] of Object.entries(checklistItems)) {
-            console.log(status ? `✅ ${item}` : `❌ ${item}`);
+        if (audioCtx.state === 'suspended') {
+            console.log("AudioContext suspended, resuming...");
+            audioCtx.resume().then(() => {
+                 console.log(`AudioContext state after resume attempt: ${audioCtx.state}`);
+                 if (audioCtx.state === 'running') {
+                     attemptStartGame();
+                 } else {
+                     console.error(`${buttonId}: AudioContext did not resume to 'running' state.`);
+                     alert("Could not enable audio. Please tap the screen or button again.");
+                 }
+            }).catch(err => {
+                console.error("AudioContext resume failed:", err);
+                alert(`Audio could not be started: ${err.name}.`);
+            });
+        } else if (audioCtx.state === 'running') {
+             console.log("AudioContext already running.");
+            attemptStartGame();
+        } else {
+             console.error(`AudioContext in unexpected state: ${audioCtx.state}. Cannot start.`);
+             alert(`Audio system error (State: ${audioCtx.state}). Please reload.`);
         }
-        console.groupEnd(); // Audio System Integrity
-        
-        console.log("✨ Triple QA Self-Audit Complete. Review logs for details. ✨");
-        console.groupEnd(); // HoverRush - Triple QA Self-Audit
     }
+    startButton.addEventListener('click', handleStartOrReplay);
+    replayButton.addEventListener('click', handleStartOrReplay);
+    window.addEventListener('keydown', (e) => { if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 's', 'a', 'd', ' '].includes(e.key)) { e.preventDefault(); } keys[e.key] = true; });
+    window.addEventListener('keyup', (e) => { keys[e.key] = false; });
 
-    // Stores event listeners for QA audit purposes (non-standard, but useful for testing)
-    // This allows inspecting which listeners are attached to elements.
-    Element.prototype._addEventListener = Element.prototype.addEventListener;
-    Element.prototype.addEventListener = function(type, listener, options) {
-        this._addEventListener(type, listener, options);
-        if (!this.__events) this.__events = {};
-        if (!this.__events[type]) this.__events[type] = [];
-        this.__events[type].push(listener);
-    };
-
-    document.addEventListener('DOMContentLoaded', () => {
-        // ✅ MODIFIED: Moved element declarations into DOMContentLoaded scope for better management
-        const startButton = document.getElementById('startButton');
-        const replayButton = document.getElementById('replayButton');
-        const hapticToggle = document.getElementById('haptic-toggle');
-        const touchUpButton = document.getElementById('touch-up');
-        const touchDownButton = document.getElementById('touch-down');
-        const touchLeftButton = document.getElementById('touch-left');
-        const touchRightButton = document.getElementById('touch-right');
-
-        // --- VISUAL RESTORATION (Confirmation & Fallbacks - if HTML elements were missing, inject them here) ---
-        // These checks are for robustness, ensuring critical elements are present even if HTML copy-paste errors occurred.
-        // In a perfect scenario, these elements are already in the HTML.
-
-        // Animated Background & Cars
-        let animatedBackgroundDiv = document.getElementById("animatedBackground");
-        if (!animatedBackgroundDiv) {
-            animatedBackgroundDiv = document.createElement("div");
-            animatedBackgroundDiv.id = "animatedBackground";
-            document.body.prepend(animatedBackgroundDiv);
-            if (devMode) console.warn("⚠️ QA Fallback: #animatedBackground was missing - injected.");
-        }
-        // Ensure at least 4 flying cars are present dynamically if not in HTML initially.
-        // (This part is mostly for demonstrating self-healing, as they are in the provided HTML)
-        const existingCars = animatedBackgroundDiv.querySelectorAll('.flyingCar');
-        if (existingCars.length < 4) {
-            const neededCars = 4 - existingCars.length;
-            for (let i = 0; i < neededCars; i++) {
-                const newCar = document.createElement('div');
-                newCar.className = `flyingCar car${existingCars.length + 1 + i}`;
-                // Assign some basic dynamic positioning/delay to avoid overlap if injected
-                newCar.style.top = `${25 + (i * 15)}%`;
-                newCar.style.left = `${-100 - (i * 20)}px`;
-                newCar.style.animationDelay = `${(i * 1.5)}s`;
-                animatedBackgroundDiv.appendChild(newCar);
-                if (devMode) console.warn(`⚠️ QA Fallback: Injected missing flying car: ${newCar.className}`);
-            }
-        }
-
-        // Ensure @keyframes flyAcross is defined in the style block.
-        if (!document.querySelector('style').innerHTML.includes('@keyframes flyAcross')) {
-            const styleElem = document.createElement('style');
-            styleElem.textContent = `@keyframes flyAcross {0% { left: -100px; transform: scale(1) rotateY(0deg); opacity: 0.8;} 50% { transform: scale(1.1) rotateY(0deg); opacity: 0.9;} 100% { left: 110%; transform: scale(1) rotateY(0deg); opacity: 0.8;}}`;
-            document.head.appendChild(styleElem);
-            if (devMode) console.warn("⚠️ QA Fallback: @keyframes flyAcross was missing - injected.");
-        }
-
-        // Start Button Event Listener: Ensure it's bound.
-        // This check uses the custom `__events` property for auditing.
-        // Moved listener registrations here as per prompt's guidance
-        if (startButton && typeof handleStartOrReplay === 'function') {
-            startButton.addEventListener('click', handleStartOrReplay); // ✅ MODIFIED: Moved listener registration to DOMContentLoaded
-            startButton._boundHandler = true; // ✅ Inserted by Gemini Pro 2.5 – Start Button Binding Check Property
-        } else {
-            console.warn("❌ Start button element or handleStartOrReplay function missing, cannot confirm binding.");
-        }
-
-        if (replayButton && typeof handleStartOrReplay === 'function') {
-            replayButton.addEventListener('click', handleStartOrReplay); // ✅ MODIFIED: Moved listener registration to DOMContentLoaded
-        } else {
-            console.warn("❌ Replay button element or handleStartOrReplay function missing.");
-        }
-
-        // Mobile button listeners
-        if (touchUpButton) touchUpButton.addEventListener('touchstart', (e) => handleTouchStart('ArrowUp', e), { passive: false });
-        if (touchUpButton) touchUpButton.addEventListener('touchend', (e) => handleTouchEnd('ArrowUp', e));
-        if (touchDownButton) touchDownButton.addEventListener('touchstart', (e) => handleTouchStart('ArrowDown', e), { passive: false });
-        if (touchDownButton) touchDownButton.addEventListener('touchend', (e) => handleTouchEnd('ArrowDown', e));
-        if (touchLeftButton) touchLeftButton.addEventListener('touchstart', (e) => handleTouchStart('ArrowLeft', e), { passive: false });
-        if (touchLeftButton) touchLeftButton.addEventListener('touchend', (e) => handleTouchEnd('ArrowLeft', e));
-        if (touchRightButton) touchRightButton.addEventListener('touchstart', (e) => handleTouchStart('ArrowRight', e), { passive: false });
-        if (touchRightButton) touchRightButton.addEventListener('touchend', (e) => handleTouchEnd('ArrowRight', e));
-        
-        // Prevent context menu on all buttons
-        [startButton, replayButton, touchUpButton, touchDownButton, touchLeftButton, touchRightButton].forEach(button => {
-            if (button) button.addEventListener('contextmenu', (e) => e.preventDefault());
-        });
-        // --- END VISUAL RESTORATION ---
-
-        // Initialize haptic toggle state from local storage
-        if (hapticToggle) {
-          hapticToggle.checked = hapticsEnabled;
-          hapticToggle.addEventListener('change', () => {
-            hapticsEnabled = hapticToggle.checked;
-            localStorage.setItem('hapticsEnabled', hapticsEnabled);
-            console.log("Haptics Enabled:", hapticsEnabled);
-          });
-        }
-
-        resizeGame(); 
-        updateBatteryUI(); updateScoreUI();
-        // Initial mobile unlock prompt (only show on mobile user agents)
-        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-          showAudioUnlockPrompt();
-        }
-
-        // Initialize swarm vehicles for idle animation on gameCanvas
-        for(let i=0;i<20;i++) spawnSwarmVehicle(); 
-
-        // Idle Screen Loop for gameCanvas effects.
-        // This function draws the background swarm vehicles during the start screen.
-        function iSL(){ 
-            if(gameRunning){ // If game is running, stop idle animation
-                if(iSLId) cancelAnimationFrame(iSLId);
-                iSLId = null;
-                return;
-            }
-            if(ctx && gameCanvas.width > 0 && gameCanvas.height > 0){
-                // MODIFIED: Clear canvas instead of filling, to allow #animatedBackground to show through
-                ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height); 
-                
-                updateSwarmVehicles(); // Update positions of idle swarm vehicles
-                drawSwarmBackground(); // Draw only the swarm vehicles on the transparent canvas
-                
-                iSLId = requestAnimationFrame(iSL); // Continue idle loop
-            } else {
-                // If canvas is not ready (e.g., width/height are 0), attempt resize and retry loop.
-                if (gameCanvas.width === 0 || gameCanvas.height === 0) {
-                    resizeGame();
-                }
-                iSLId = requestAnimationFrame(iSL);
-            }
-        }
-        // Start idle animation loop immediately on DOMContentLoaded for gameCanvas
-        iSLId = requestAnimationFrame(iSL); // Assign to global iSLId for QA check.
-
-        startScreen.style.display='flex'; // Ensure start screen is visible initially.
-        console.log("Initial setup complete. HoverRush ready.");
-
-        // Run final QA check after initial setup is complete.
-        performFinalQA(); // ✅ MODIFIED: Called the renamed QA function
+    function handleTouchStart(key, event) { event.preventDefault(); keys[key] = true; /* No haptics */ }
+    function handleTouchEnd(key, event) { event.preventDefault(); keys[key] = false; }
+    touchUpButton.addEventListener('touchstart', (e) => handleTouchStart('ArrowUp', e), { passive: false });
+    touchUpButton.addEventListener('touchend', (e) => handleTouchEnd('ArrowUp', e));
+    touchDownButton.addEventListener('touchstart', (e) => handleTouchStart('ArrowDown', e), { passive: false });
+    touchDownButton.addEventListener('touchend', (e) => handleTouchEnd('ArrowDown', e));
+    touchLeftButton.addEventListener('touchstart', (e) => handleTouchStart('ArrowLeft', e), { passive: false });
+    touchLeftButton.addEventListener('touchend', (e) => handleTouchEnd('ArrowLeft', e));
+    touchRightButton.addEventListener('touchstart', (e) => handleTouchStart('ArrowRight', e), { passive: false });
+    touchRightButton.addEventListener('touchend', (e) => handleTouchEnd('ArrowRight', e));
+    [touchUpButton, touchDownButton, touchLeftButton, touchRightButton, startButton, replayButton].forEach(button => {
+        button.addEventListener('contextmenu', (e) => e.preventDefault());
     });
 
-  </script>
-<script>
-// ✅ Restored handleStartOrReplay to fix game start functionality
-function handleStartOrReplay() {
-  if (!audioCtx) {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  }
-  audioCtx.resume().then(() => {
-    if (!audioInitialized) initAudio();
-    document.getElementById('start-screen').style.display = 'none';
-    document.getElementById('animatedBackground').style.display = 'none';
-    document.getElementById('gameCanvas').style.display = 'block';
-    document.getElementById('ui-overlay').style.display = 'block';
-    startGame();
-  }).catch(err => {
-    console.error("❌ Failed to resume AudioContext:", err);
-  });
-}
-</script></body>
+    function resizeGame() {
+        const width = window.innerWidth; const height = window.innerHeight; 
+        gameCanvas.width = width; gameCanvas.height = height;  
+        gameCanvas.style.width = width + 'px'; gameCanvas.style.height = height + 'px'; 
+        calculateDimensions(); updateBatteryUI(); updateScoreUI();
+        if (!gameRunning && ctx) {
+            ctx.fillStyle = '#050510'; ctx.fillRect(0,0, width, height);
+            if (swarmVehicles?.length) { drawSwarmBackground(); }
+        }
+        if (gameRunning && playerControlEnabled) {
+            carX = Math.max(MIN_CAR_X, Math.min(carX, MAX_CAR_X));
+            carY = Math.max(0, Math.min(carY, playableHeight - CAR_HEIGHT));
+        }
+    }
+    let resizeTimeout;
+    window.addEventListener('resize', () => { clearTimeout(resizeTimeout); resizeTimeout = setTimeout(resizeGame, 100); });
+    window.addEventListener('orientationchange', () => { clearTimeout(resizeTimeout); resizeTimeout = setTimeout(resizeGame, 150); });
+    
+    document.addEventListener('visibilitychange', () => {
+        if (!audioCtx) return;
+
+        if (document.hidden) {
+            console.log("Main visibilitychange: Page hidden.");
+            if (musicIsPlaying) { 
+                stopBackgroundMusic(); 
+            }
+        } else { 
+            console.log("Main visibilitychange: Page visible. Attempting auto-resume.");
+            if (audioCtx.state === "suspended") {
+                audioCtx.resume().then(() => {
+                    console.log(`Main visibilitychange: AudioContext auto-resumed. New state: ${audioCtx.state}`);
+                    if (!audioInitialized) {
+                        console.log("Main visibilitychange: Attempting audio re-initialization after auto-resume.");
+                        initAudio(); 
+                    }
+                    if (audioCtx.state === 'running' && audioInitialized && gameRunning && !musicIsPlaying && !isChargingSequence && !isCaptured) {
+                        console.log("Main visibilitychange: Restarting background music loop (context was suspended).");
+                        startMusicLoopChecker();
+                    }
+                }).catch(err => {
+                    console.error("Main visibilitychange: Error during AudioContext auto-resume:", err);
+                });
+            } else if (audioCtx.state === "running") { 
+                if (!audioInitialized) { initAudio(); } 
+                if (audioInitialized && gameRunning && !musicIsPlaying && !isChargingSequence && !isCaptured) {
+                    console.log("Main visibilitychange: Restarting background music loop (context already running).");
+                    startMusicLoopChecker();
+                }
+            }
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        resizeGame(); updateBatteryUI(); updateScoreUI();
+        for(let i=0; i<20; i++) spawnSwarmVehicle();
+        let initialSwarmLoopId = null;
+        function initialSwarmLoop() {
+            if (gameRunning) { if (initialSwarmLoopId) cancelAnimationFrame(initialSwarmLoopId); initialSwarmLoopId = null; return; }
+            if (ctx && gameCanvas.width > 0 && gameCanvas.height > 0) {
+                ctx.fillStyle = '#050510'; ctx.fillRect(0,0, gameCanvas.width, gameCanvas.height);
+                updateSwarmVehicles(); drawSwarmBackground();
+                initialSwarmLoopId = requestAnimationFrame(initialSwarmLoop);
+            }
+        }
+        requestAnimationFrame(() => { 
+           if (gameCanvas.width === 0 || gameCanvas.height === 0) { resizeGame(); }
+           if (gameCanvas.width > 0 && gameCanvas.height > 0) { initialSwarmLoop(); }
+        });
+        startScreen.style.display = 'flex';
+    });
+</script>
+
+</body>
 </html>
