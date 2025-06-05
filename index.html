@@ -420,14 +420,19 @@
     const PROJECTILE_GRAVITY = 0.15; 
     let difficultyMultiplier = 1.0; 
 
-    // --- Blimp Variables (from beta68, integrated into beta67) ---
+    // --- Blimp Variables ---
     let blimp = null;
     let nextBlimpScoreTarget = 10000;
     const BLIMP_SCORE_INTERVAL_MIN = 2000;
     const BLIMP_SCORE_INTERVAL_MAX = 3000;
     const BLIMP_COLLISION_DAMAGE = 25;
+    let blimpAudioNodes = [];
+    let blimpAudioGainNode = null;
+    const BLIMP_AUDIO_FADE_DURATION = 1.5; // seconds
+    const BLIMP_AUDIO_VOLUME = 0.1; // Max volume for blimp sound
 
-    // --- Blimp Class (from beta68, integrated into beta67) ---
+
+    // --- Blimp Class ---
     class Blimp {
         constructor(canvas, playableHeight) {
             this.canvas = canvas;
@@ -437,12 +442,17 @@
             this.x = this.canvas.width;
             this.y = this.playableHeight * 0.15 + Math.random() * (this.playableHeight * 0.1); 
             this.vx = -0.3 - Math.random() * 0.4; 
-            this.bannerLogo = 'TEMP_LOGO_OR_BASE64_PLACEHOLDER'; // As per requirement
-            this.collisionDamage = BLIMP_COLLISION_DAMAGE; 
+            // // TODO: Replace 'TEMP_B64_LOGO_BANNER_PLACEHOLDER' with real base64 logo or image drawing logic
+            this.bannerLogo = 'TEMP_B64_LOGO_BANNER_PLACEHOLDER';
+            this.collisionDamage = BLIMP_COLLISION_DAMAGE;
+            this.bannerWavePhase = Math.random() * Math.PI * 2;
+            this.bannerWaveSpeed = 0.05 + Math.random() * 0.03;
+            this.bannerWaveAmplitude = 5 + Math.random() * 5;
         }
 
         update() {
             this.x += this.vx;
+            this.bannerWavePhase += this.bannerWaveSpeed;
         }
 
         draw(ctx) {
@@ -465,7 +475,8 @@
             const bannerHeight = this.height * 0.5;
             const bannerWidth = this.width * 0.9;
             const bannerX = this.x + (this.width - bannerWidth) / 2;
-            const bannerY = this.y + this.height + 15; // Below blimp with a small gap
+            const waveOffsetY = Math.sin(this.bannerWavePhase) * this.bannerWaveAmplitude;
+            const bannerY = this.y + this.height + 15 + waveOffsetY; 
 
             ctx.fillStyle = '#FFF'; // Banner background
             ctx.fillRect(bannerX, bannerY, bannerWidth, bannerHeight);
@@ -473,27 +484,30 @@
             ctx.lineWidth = 1;
             ctx.strokeRect(bannerX, bannerY, bannerWidth, bannerHeight);
 
-
             // Placeholder text on banner
             ctx.fillStyle = '#d9534f'; // Reddish text
-            ctx.font = `bold ${Math.max(16, bannerHeight * 0.5)}px 'Courier New', Courier, monospace`; // Use game's font family
+            const fontSize = Math.max(10, Math.min(20, bannerHeight * 0.25)); // Smaller for long text
+            ctx.font = `bold ${fontSize}px 'Courier New', Courier, monospace`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
+            // // TODO: Replace 'TEMP_B64_LOGO_BANNER_PLACEHOLDER' with real base64 logo or image drawing logic (this.bannerLogo holds the string)
             ctx.fillText(this.bannerLogo, bannerX + bannerWidth / 2, bannerY + bannerHeight / 2);
             ctx.textAlign = 'left'; // Reset
             ctx.textBaseline = 'alphabetic'; // Reset
         }
 
         collidesWith(rect) {
+            // Approximate collision for blimp body + banner area
+            const bannerFullHeight = this.height * 0.5 + 15 + this.bannerWaveAmplitude; // Max banner offset
             return rect.x < this.x + this.width &&
                    rect.x + rect.width > this.x &&
-                   rect.y < this.y + this.height + (this.height * 0.5 + 15) && // Include banner roughly
+                   rect.y < this.y + this.height + bannerFullHeight && 
                    rect.y + rect.height > this.y;
         }
     }
 
 
-    // --- Audio Engine (from beta67) ---
+    // --- Audio Engine ---
     let audioCtx;
     let audioInitialized = false;
     try {
@@ -581,7 +595,7 @@
         }
     }
 
-    function triggerHapticFeedback(duration = 50) { /* No haptics in beta69 */ }
+    function triggerHapticFeedback(duration = 50) { /* No haptics in beta69/70 */ }
 
     function playTone(freq, duration = 0.2, type = 'square', vol = 0.3, when = 0, options = {}) {
         if (!audioInitialized || !audioCtx || audioCtx.state !== 'running') { return null; }
@@ -596,7 +610,7 @@
             if (options.detune) osc.detune.setValueAtTime(options.detune, startTime);
             if (options.frequency instanceof AudioParam) { options.frequency.cancelScheduledValues(startTime); options.frequency.setValueAtTime(options.frequency.value, startTime); options.frequency.connect(osc.frequency); } else { osc.frequency.setValueAtTime(freq, startTime); }
             gain.gain.setValueAtTime(vol, startTime);
-            if (options.rampTo !== undefined) { gain.gain.linearRampToValueAtTime(options.rampTo, startTime + duration * 0.8); gain.gain.linearRampToValueAtTime(0.001, startTime + duration); } else { gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration); }
+            if (options.rampTo !== undefined) { gain.gain.linearRampToValueAtTime(options.rampTo, startTime + duration * 0.8); gain.gain.linearRampToValueAtTime(0.001, startTime + duration); } else if (duration > 0) { gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration); } // only ramp if duration > 0
             osc.connect(gain).connect(outputNode);
             osc.start(startTime);
             const stopTime = startTime + duration;
@@ -695,12 +709,91 @@
         nextMusicScheduleTime = 0; currentLoopLengthSeconds = 0;
     }
 
+    function playBlimpSound() {
+        if (!audioInitialized || !audioCtx || audioCtx.state !== 'running' || blimpAudioGainNode) return;
+        try {
+            blimpAudioGainNode = audioCtx.createGain();
+            blimpAudioGainNode.connect(audioCtx.destination);
+            blimpAudioGainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+            blimpAudioGainNode.gain.linearRampToValueAtTime(BLIMP_AUDIO_VOLUME, audioCtx.currentTime + BLIMP_AUDIO_FADE_DURATION);
+
+            const baseFreq = 55; // A1
+            const osc1 = audioCtx.createOscillator(); osc1.type = 'sine'; osc1.frequency.value = baseFreq;
+            osc1.connect(blimpAudioGainNode); osc1.start();
+
+            const osc2 = audioCtx.createOscillator(); osc2.type = 'sawtooth'; osc2.frequency.value = baseFreq * 1.5; // Perfect fifth (E2)
+            const osc2Gain = audioCtx.createGain(); osc2Gain.gain.value = 0.4;
+            osc2.connect(osc2Gain).connect(blimpAudioGainNode); osc2.start();
+            
+            const lfo = audioCtx.createOscillator(); lfo.type = 'sine'; lfo.frequency.value = 0.2; // Slow LFO
+            const lfoGain = audioCtx.createGain(); lfoGain.gain.value = BLIMP_AUDIO_VOLUME * 0.2; 
+            lfo.connect(lfoGain);
+            lfoGain.connect(blimpAudioGainNode.gain); 
+            lfo.start();
+
+            blimpAudioNodes = [osc1, osc2, osc2Gain, lfo, lfoGain]; 
+            // console.log("Blimp sound started.");
+        } catch (e) {
+            console.error("Error playing blimp sound:", e);
+            if (blimpAudioGainNode) try { blimpAudioGainNode.disconnect(); } catch(_) {}
+            blimpAudioGainNode = null;
+            blimpAudioNodes.forEach(node => {
+                if (node instanceof OscillatorNode) try { node.stop(); } catch(_) {}
+                if (typeof node.disconnect === 'function') try { node.disconnect(); } catch(_) {}
+            });
+            blimpAudioNodes = [];
+        }
+    }
+
+    function stopBlimpSound(immediate = false) {
+        if (!blimpAudioGainNode || !blimpAudioNodes || !blimpAudioNodes.length) return;
+        
+        const fadeDuration = immediate ? 0.05 : BLIMP_AUDIO_FADE_DURATION;
+        const now = audioCtx.currentTime;
+
+        try {
+            const lfoGainNode = blimpAudioNodes.find(n => n instanceof GainNode && n !== blimpAudioGainNode && n !== blimpAudioNodes[2]); // blimpAudioNodes[2] is osc2Gain
+            if (lfoGainNode && blimpAudioGainNode) {
+                 try { lfoGainNode.disconnect(blimpAudioGainNode.gain); }
+                 catch(e) { console.warn("Failed to disconnect LFO gain from blimp main gain:", e); }
+            }
+
+            blimpAudioGainNode.gain.cancelScheduledValues(now);
+            blimpAudioGainNode.gain.setValueAtTime(blimpAudioGainNode.gain.value, now);
+            blimpAudioGainNode.gain.linearRampToValueAtTime(0.0001, now + fadeDuration);
+
+            const cleanupTime = (fadeDuration + 0.1) * 1000;
+            setTimeout(() => {
+                blimpAudioNodes.forEach(node => {
+                    if (node instanceof OscillatorNode) try { node.stop(0); } catch(_) {}
+                    if (typeof node.disconnect === 'function') try { node.disconnect(); } catch(_) {}
+                });
+                if (blimpAudioGainNode) try { blimpAudioGainNode.disconnect(); } catch(_) {}
+                
+                blimpAudioNodes = [];
+                blimpAudioGainNode = null;
+                // console.log("Blimp sound stopped and cleaned up.");
+            }, cleanupTime);
+        } catch(e) {
+            console.error("Error stopping blimp sound:", e);
+            blimpAudioNodes.forEach(node => {
+                if (node instanceof OscillatorNode) try { node.stop(0); } catch(_) {}
+                if (typeof node.disconnect === 'function') try { node.disconnect(); } catch(_) {}
+            });
+            if (blimpAudioGainNode) try { blimpAudioGainNode.disconnect(); } catch(_) {}
+            blimpAudioNodes = [];
+            blimpAudioGainNode = null;
+        }
+    }
+
+
     function stopAllSounds() {
         console.log("Stopping all sounds...");
         stopBackgroundMusic(); 
         stopEngineHum(); 
         stopChargingSound(); 
         stopCaptureSounds();
+        stopBlimpSound(true);
         if (musicGainNode && audioCtx && audioCtx.state === 'running') { musicGainNode.gain.cancelScheduledValues(audioCtx.currentTime); musicGainNode.gain.setValueAtTime(0.45, audioCtx.currentTime); }
         if (musicLowPassFilter && audioCtx && audioCtx.state === 'running') { musicLowPassFilter.frequency.cancelScheduledValues(audioCtx.currentTime); musicLowPassFilter.frequency.setValueAtTime(20000, audioCtx.currentTime); musicLowPassFilter.Q.cancelScheduledValues(audioCtx.currentTime); musicLowPassFilter.Q.setValueAtTime(1, audioCtx.currentTime); }
     }
@@ -720,28 +813,46 @@
         for (let i = pedestrians.length - 1; i >= 0; i--) {
             const p = pedestrians[i]; p.x -= p.speed; p.throwCooldown = Math.max(0, p.throwCooldown - 1);
             if (p.throwCooldown === 0 && Math.random() < currentProjectileThrowChance) {
-                const projectileBaseSpeedX = -currentScrollSpeed * PROJECTILE_SPEED_MULTIPLIER; 
                 if (p.type === 'OldLady') {
                     const itemType = Math.random() < 0.5 ? 'ChickenLeg' : 'CornCob';
-                    let initialVy = -5 - Math.random() * 5; // High-arc (from beta67)
-                    let initialVx = -2.0 - Math.random() * 1.0; // vx around -2.5 (from beta67)
-                    projectiles.push({ type: itemType, x: p.x, y: Math.min(p.y - 25, playableHeight * 0.85), vx: initialVx, vy: initialVy, size: {w: 4, h: (itemType === 'CornCob' ? 8 : 6)}, maxSize: 30 + Math.random() * 15, currentSize: 4, growthRate: 0.3 + Math.random() * 0.2, color: itemType === 'ChickenLeg' ? 'orange' : '#FFC107', rotation: 0, rotationSpeed: (Math.random() - 0.5) * 0.8, stuckFrames: 0, removeAfterFrames: -1 });
-                } else { projectiles.push({ type: 'Balloon', x: p.x, y: p.y - 15, vx: projectileBaseSpeedX * (0.6 + Math.random() * 0.3), vy: -(1.5 + Math.random() * 1.8), size: {w: 12 + Math.random()*6, h: 16 + Math.random()*8}, color: `hsl(${Math.random()*360}, 80%, 70%)` });}
+                    let initialVy = -8 - Math.random() * 6; // More aggressive upward velocity
+                    let initialVx = -1.5 - Math.random() * 1.5; // Adjusted Vx for arc
+                    projectiles.push({ 
+                        type: itemType, 
+                        x: p.x, 
+                        y: p.y - 10, // Spawn from pedestrian hand height
+                        vx: initialVx, 
+                        vy: initialVy, 
+                        size: {w: 4, h: (itemType === 'CornCob' ? 8 : 6)}, 
+                        maxSize: 30 + Math.random() * 15, 
+                        currentSize: 4, 
+                        growthRate: 0.3 + Math.random() * 0.2, 
+                        color: itemType === 'ChickenLeg' ? 'orange' : '#FFC107', 
+                        rotation: 0, 
+                        rotationSpeed: (Math.random() - 0.5) * 0.8, 
+                        stuckFrames: 0, 
+                        removeAfterFrames: -1 
+                    });
+                } else { 
+                    const projectileBaseSpeedX = -currentScrollSpeed * PROJECTILE_SPEED_MULTIPLIER;
+                    projectiles.push({ type: 'Balloon', x: p.x, y: p.y - 15, vx: projectileBaseSpeedX * (0.6 + Math.random() * 0.3), vy: -(1.5 + Math.random() * 1.8), size: {w: 12 + Math.random()*6, h: 16 + Math.random()*8}, color: `hsl(${Math.random()*360}, 80%, 70%)` });
+                }
                 p.throwCooldown = (80 + Math.random() * 130) / difficultyMultiplier; p.lastActionFrame = frameCount;
             }
             if (p.x + p.size.w < 0) { pedestrians.splice(i, 1); }
         }
         const maxPedestrians = 3 + Math.floor(difficultyMultiplier * 4); 
         if (pedestrians.length < maxPedestrians && Math.random() < currentPedestrianSpawnChance) { spawnPedestrian(); }
+        
         for (let i = projectiles.length - 1; i >= 0; i--) {
             const proj = projectiles[i]; proj.x += proj.vx; proj.y += proj.vy;
             if (proj.type === 'ChickenLeg' || proj.type === 'CornCob') {
                 proj.vy += PROJECTILE_GRAVITY; proj.rotation += proj.rotationSpeed; 
                 if (proj.vy < 0 && proj.currentSize < proj.maxSize) { proj.currentSize += proj.growthRate; proj.size.w = proj.currentSize * (proj.type === 'CornCob' ? 0.6 : 1.0); proj.size.h = proj.currentSize * (proj.type === 'CornCob' ? 1.2 : 1.5); }
                 
-                if (proj.y < 0 && proj.vy < 0) {
+                if (proj.y < 0 && proj.vy < 0) { // Hit ceiling
                     proj.y = 0;
-                    proj.vy *= -0.3; 
+                    proj.vy *= -0.3; // Bounce down, lose some energy
                 }
 
                 const groundLevel = playableHeight - proj.size.h; 
@@ -768,17 +879,14 @@
         for (let i = birds.length - 1; i >= 0; i--) { const bird = birds[i]; const birdRect = { x: bird.x, y: bird.y, width: bird.size, height: bird.size }; if (isColliding(carRect, birdRect)) { handleCollision(bird); birds.splice(i, 1); } } 
         for (let i = bonuses.length - 1; i >= 0; i--) { const b = bonuses[i]; if (isColliding(carRect, { x: b.x, y: b.y, width: b.size, height: b.size })) { if (b.type === 'ChargingTrigger') { startChargingSequence(b); } else { handleBonusPickup(b); } bonuses.splice(i, 1); break; } }
         
-        // Blimp collision (from beta68)
         if (blimp) {
             if (blimp.collidesWith(carRect)) {
                 battery -= blimp.collisionDamage;
-                triggerShake(20); // Major shake
+                triggerShake(20); 
                 playCollisionSound(); 
-                playCollisionDissonance(); // More intense sound for blimp
+                playCollisionDissonance();
                 updateBatteryUI();
-                // Optional: Destroy blimp on collision or make it flash/damage
-                // For now, let it pass after one hit, or remove it
-                // blimp = null; // If blimp is destroyed by collision
+                // Blimp is not destroyed by collision by default, it's a persistent threat while on screen.
             }
         }
     }
@@ -861,10 +969,11 @@
        }
        updateBuildings(); updatePedestriansAndProjectiles(); updateBonuses(); updateBirds(); updateClouds(); updateSwarmVehicles();
        
-       if (blimp) { // Update blimp (from beta68)
+       if (blimp) { 
             blimp.update();
             if (blimp.x + blimp.width < 0) { 
                 blimp = null; 
+                stopBlimpSound();
                 // console.log("Blimp off-screen.");
             }
         }
@@ -874,7 +983,6 @@
        if (playerControlEnabled) {
            battery -= BATTERY_DRAIN_RATE; score++;
 
-            // Difficulty and pacing logic from beta67 (preserved)
             let baseDifficultyMultiplier = 1.0;
             if (score < 1000) { baseDifficultyMultiplier = 0.5;
             } else if (score < 2000) { baseDifficultyMultiplier = 1.0;
@@ -898,10 +1006,10 @@
             currentMusicTempo = Math.min(MAX_MUSIC_TEMPO * speedCapMultiplier, currentMusicTempo);
        }
 
-        // Blimp spawning logic (from beta68, placed after score update)
         if (gameRunning && playerControlEnabled && !blimp) {
             if (score >= nextBlimpScoreTarget) {
                 blimp = new Blimp(gameCanvas, playableHeight);
+                playBlimpSound();
                 // console.log(`Blimp spawned at score ${score}.`);
                 nextBlimpScoreTarget = score + BLIMP_SCORE_INTERVAL_MIN + Math.random() * (BLIMP_SCORE_INTERVAL_MAX - BLIMP_SCORE_INTERVAL_MIN);
                 // console.log(`Next blimp consideration score: ${nextBlimpScoreTarget}`);
@@ -920,7 +1028,7 @@
         
         ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
         drawGameBackground(); 
-        if (blimp) blimp.draw(ctx); // Draw blimp (from beta68)
+        if (blimp) blimp.draw(ctx); 
         drawPedestriansAndProjectiles(); 
         drawBonuses(); 
         drawBirds(); 
@@ -933,15 +1041,16 @@
     function startGame() {
         gameRunning = false; 
         if (animationFrameId) cancelAnimationFrame(animationFrameId); animationFrameId = null;
-        if (musicIsPlaying) stopBackgroundMusic(); 
+        // Stop all sounds including potentially running blimp sound from previous game
+        stopAllSounds(); // This will call stopBlimpSound(true)
 
         battery = 100; score = 0; calculateDimensions(); carY = playableHeight / 2; carX = 80; carColor = 'white'; keys = {}; prevKeys = {}; buildings = []; pedestrians = []; projectiles = []; bonuses = []; birds = []; clouds = []; swarmVehicles = []; carShake = 0; frameCount = 0; lowBatteryWarningPlayed = false; isChargingSequence = false; chargingPhase = null; targetChargeStation = null; isCaptured = false; capturePhase = null; captureTargetBuilding = null; playerControlEnabled = true; prevCarX = carX; prevCarY = carY;
         spawnBuilding(gameCanvas.width * 0.6); spawnBuilding(); for(let i=0; i<5; i++) spawnCloud(); for(let i=0; i<20; i++) spawnSwarmVehicle();
         currentScrollSpeed = BASE_SCROLL_SPEED; currentMusicTempo = BASE_MUSIC_TEMPO;
         difficultyMultiplier = 1.0; 
         
-        blimp = null; // Reset blimp (from beta68)
-        nextBlimpScoreTarget = 10000; // Reset blimp spawn score (from beta68)
+        blimp = null; 
+        nextBlimpScoreTarget = 10000;
 
         startScreen.style.display = 'none';
         gameCanvas.style.display = 'block';
@@ -1088,6 +1197,10 @@
             if (musicIsPlaying) { 
                 stopBackgroundMusic(); 
             }
+            // Potentially stop blimp sound if it's a long interval sound
+            if (blimpAudioGainNode) {
+                stopBlimpSound(true); // Stop immediately on hide
+            }
         } else { 
             console.log("Main visibilitychange: Page visible. Attempting auto-resume.");
             if (audioCtx.state === "suspended") {
@@ -1101,6 +1214,10 @@
                         console.log("Main visibilitychange: Restarting background music loop (context was suspended).");
                         startMusicLoopChecker();
                     }
+                    // Resume blimp sound if blimp is on screen
+                    if (blimp && audioCtx.state === 'running' && audioInitialized && gameRunning && !blimpAudioGainNode) {
+                        playBlimpSound();
+                    }
                 }).catch(err => {
                     console.error("Main visibilitychange: Error during AudioContext auto-resume:", err);
                 });
@@ -1109,6 +1226,10 @@
                 if (audioInitialized && gameRunning && !musicIsPlaying && !isChargingSequence && !isCaptured) {
                     console.log("Main visibilitychange: Restarting background music loop (context already running).");
                     startMusicLoopChecker();
+                }
+                // Resume blimp sound if blimp is on screen
+                if (blimp && audioInitialized && gameRunning && !blimpAudioGainNode) {
+                     playBlimpSound();
                 }
             }
         }
