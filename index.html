@@ -426,28 +426,31 @@
     const BLIMP_SCORE_INTERVAL_MIN = 2000;
     const BLIMP_SCORE_INTERVAL_MAX = 3000;
     const BLIMP_COLLISION_DAMAGE = 25;
-    let blimpAudioNodes = [];
-    let blimpAudioGainNode = null;
-    const BLIMP_AUDIO_FADE_DURATION = 1.5; // seconds
-    const BLIMP_AUDIO_VOLUME = 0.1; // Max volume for blimp sound
 
+    // --- Blimp Theme Audio Variables ---
+    let blimpThemeGainNode = null;
+    let blimpThemeNodes = []; // To store {osc, gain} from playTone for the theme
+    let blimpThemeLoopTimeoutId = null;
+    let blimpThemeIsPlaying = false;
+    const BLIMP_THEME_VOLUME = 0.12; 
+    const BLIMP_THEME_FADE_DURATION = 1.5; // seconds
 
     // --- Blimp Class ---
     class Blimp {
         constructor(canvas, playableHeight) {
             this.canvas = canvas;
             this.playableHeight = playableHeight;
-            this.width = 250 + Math.random() * 100; 
-            this.height = this.width * 0.4; 
+            this.width = 220 + Math.random() * 80; // Slightly smaller overall for better visual
+            this.height = this.width * 0.35; // More elongated
             this.x = this.canvas.width;
-            this.y = this.playableHeight * 0.15 + Math.random() * (this.playableHeight * 0.1); 
-            this.vx = -0.3 - Math.random() * 0.4; 
+            this.y = this.playableHeight * 0.1 + Math.random() * (this.playableHeight * 0.15); // Higher altitude range
+            this.vx = -0.25 - Math.random() * 0.3; // Slower
             // // TODO: Replace 'TEMP_B64_LOGO_BANNER_PLACEHOLDER' with real base64 logo or image drawing logic
             this.bannerLogo = 'TEMP_B64_LOGO_BANNER_PLACEHOLDER';
             this.collisionDamage = BLIMP_COLLISION_DAMAGE;
             this.bannerWavePhase = Math.random() * Math.PI * 2;
-            this.bannerWaveSpeed = 0.05 + Math.random() * 0.03;
-            this.bannerWaveAmplitude = 5 + Math.random() * 5;
+            this.bannerWaveSpeed = 0.04 + Math.random() * 0.02;
+            this.bannerWaveAmplitude = 3 + Math.random() * 3;
         }
 
         update() {
@@ -456,53 +459,119 @@
         }
 
         draw(ctx) {
-            // Blimp body (simple ellipse)
-            ctx.fillStyle = '#b0c4de'; // Light steel blue
+            const centerX = this.x + this.width / 2;
+            const centerY = this.y + this.height / 2;
+
+            // Tail Fins (Orange) - Draw first to be underneath
+            ctx.fillStyle = '#FFA500'; // Orange
+            const finWidth = this.width * 0.25;
+            const finHeight = this.height * 0.6;
+            // Top fin
             ctx.beginPath();
-            ctx.ellipse(this.x + this.width / 2, this.y + this.height / 2, this.width / 2, this.height / 2, 0, 0, Math.PI * 2);
+            ctx.moveTo(centerX + this.width * 0.3, centerY - this.height * 0.1);
+            ctx.lineTo(centerX + this.width * 0.55, centerY - finHeight / 2);
+            ctx.lineTo(centerX + this.width * 0.45, centerY);
+            ctx.closePath();
             ctx.fill();
-            ctx.strokeStyle = '#708090'; // Slate gray
+            // Bottom fin
+            ctx.beginPath();
+            ctx.moveTo(centerX + this.width * 0.3, centerY + this.height * 0.1);
+            ctx.lineTo(centerX + this.width * 0.55, centerY + finHeight / 2);
+            ctx.lineTo(centerX + this.width * 0.45, centerY);
+            ctx.closePath();
+            ctx.fill();
+            // Horizontal fins (rudder like)
+            const hFinWidth = this.width * 0.15;
+            const hFinHeight = this.height * 0.8;
+            ctx.beginPath();
+            ctx.moveTo(centerX + this.width * 0.35, centerY - hFinHeight/2);
+            ctx.lineTo(centerX + this.width * 0.5, centerY - hFinHeight/2 + hFinHeight*0.2);
+            ctx.lineTo(centerX + this.width * 0.5, centerY + hFinHeight/2 - hFinHeight*0.2);
+            ctx.lineTo(centerX + this.width * 0.35, centerY + hFinHeight/2);
+            ctx.closePath();
+            ctx.fill();
+
+
+            // Blimp Body (Yellow)
+            ctx.fillStyle = '#FFDB58'; // Mustard Yellow / Gold-ish
+            ctx.beginPath();
+            ctx.ellipse(centerX, centerY, this.width / 2, this.height / 2, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#B8860B'; // DarkGoldenRod for outline
             ctx.lineWidth = 2;
             ctx.stroke();
 
-            // Gondola
-            const gondolaWidth = this.width * 0.4;
-            const gondolaHeight = this.height * 0.3;
-            ctx.fillStyle = '#778899'; // Light slate gray
-            ctx.fillRect(this.x + this.width / 2 - gondolaWidth / 2, this.y + this.height * 0.8, gondolaWidth, gondolaHeight);
+            // Nose (Orange)
+            ctx.fillStyle = '#FFA500'; // Orange
+            ctx.beginPath();
+            ctx.ellipse(centerX - this.width * 0.4, centerY, this.width * 0.15, this.height * 0.45, 0, Math.PI * 0.5, Math.PI * 1.5, true);
+            ctx.fill();
             
-            // Banner
-            const bannerHeight = this.height * 0.5;
-            const bannerWidth = this.width * 0.9;
-            const bannerX = this.x + (this.width - bannerWidth) / 2;
-            const waveOffsetY = Math.sin(this.bannerWavePhase) * this.bannerWaveAmplitude;
-            const bannerY = this.y + this.height + 15 + waveOffsetY; 
+            // Horizontal Center Line
+            ctx.strokeStyle = '#B8860B';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(centerX - this.width/2 * 0.8, centerY);
+            ctx.lineTo(centerX + this.width/2 * 0.8, centerY);
+            ctx.stroke();
 
+
+            // Gondola (Dark Gray)
+            const gondolaWidth = this.width * 0.3;
+            const gondolaHeight = this.height * 0.25;
+            ctx.fillStyle = '#A9A9A9'; // DarkGray
+            ctx.fillRect(centerX - gondolaWidth / 2, centerY + this.height / 2 - gondolaHeight*0.3, gondolaWidth, gondolaHeight);
+            ctx.strokeStyle = '#696969'; // DimGray
+            ctx.strokeRect(centerX - gondolaWidth / 2, centerY + this.height / 2 - gondolaHeight*0.3, gondolaWidth, gondolaHeight);
+
+
+            // Banner (trailing to the right)
+            const bannerHeight = this.height * 0.3; // Smaller height
+            const bannerWidth = this.width * 0.7;
+            const bannerAttachX = centerX + this.width * 0.45; // Attachment point on blimp rear
+            const bannerAttachY = centerY;
+            
+            const bannerStartX = this.x + this.width + 20; // Start banner to the right of blimp
+            const waveOffsetY = Math.sin(this.bannerWavePhase) * this.bannerWaveAmplitude;
+            const bannerStartY = this.y + this.height / 2 - bannerHeight / 2 + waveOffsetY;
+
+            // Connecting lines
+            ctx.strokeStyle = '#555';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(bannerAttachX, bannerAttachY - this.height * 0.05);
+            ctx.lineTo(bannerStartX, bannerStartY + bannerHeight * 0.2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(bannerAttachX, bannerAttachY + this.height * 0.05);
+            ctx.lineTo(bannerStartX, bannerStartY + bannerHeight * 0.8);
+            ctx.stroke();
+            
             ctx.fillStyle = '#FFF'; // Banner background
-            ctx.fillRect(bannerX, bannerY, bannerWidth, bannerHeight);
+            ctx.fillRect(bannerStartX, bannerStartY, bannerWidth, bannerHeight);
             ctx.strokeStyle = '#555';
             ctx.lineWidth = 1;
-            ctx.strokeRect(bannerX, bannerY, bannerWidth, bannerHeight);
+            ctx.strokeRect(bannerStartX, bannerStartY, bannerWidth, bannerHeight);
 
             // Placeholder text on banner
-            ctx.fillStyle = '#d9534f'; // Reddish text
-            const fontSize = Math.max(10, Math.min(20, bannerHeight * 0.25)); // Smaller for long text
+            ctx.fillStyle = '#d9534f'; 
+            const fontSize = Math.max(8, Math.min(16, bannerHeight * 0.35)); 
             ctx.font = `bold ${fontSize}px 'Courier New', Courier, monospace`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            // // TODO: Replace 'TEMP_B64_LOGO_BANNER_PLACEHOLDER' with real base64 logo or image drawing logic (this.bannerLogo holds the string)
-            ctx.fillText(this.bannerLogo, bannerX + bannerWidth / 2, bannerY + bannerHeight / 2);
-            ctx.textAlign = 'left'; // Reset
-            ctx.textBaseline = 'alphabetic'; // Reset
+            // // TODO: Replace 'TEMP_B64_LOGO_BANNER_PLACEHOLDER' with real base64 logo or image drawing logic
+            ctx.fillText(this.bannerLogo, bannerStartX + bannerWidth / 2, bannerStartY + bannerHeight / 2);
+            ctx.textAlign = 'left'; 
+            ctx.textBaseline = 'alphabetic';
         }
 
         collidesWith(rect) {
-            // Approximate collision for blimp body + banner area
-            const bannerFullHeight = this.height * 0.5 + 15 + this.bannerWaveAmplitude; // Max banner offset
+            // Simplified collision for main body, more generous
             return rect.x < this.x + this.width &&
                    rect.x + rect.width > this.x &&
-                   rect.y < this.y + this.height + bannerFullHeight && 
+                   rect.y < this.y + this.height && 
                    rect.y + rect.height > this.y;
+            // Note: Banner collision could be added but might be too punishing for a trailing element
         }
     }
 
@@ -526,6 +595,9 @@
                     if (gameRunning && !musicIsPlaying && !isChargingSequence && !isCaptured) { 
                         console.log("Restarting music loop checker due to automatic context resume and game state.");
                         startMusicLoopChecker(); 
+                    }
+                     if (blimp && gameRunning && !blimpThemeIsPlaying) { // If blimp was on screen
+                        playBlimpTheme();
                     }
                 }
              }
@@ -595,7 +667,7 @@
         }
     }
 
-    function triggerHapticFeedback(duration = 50) { /* No haptics in beta69/70 */ }
+    function triggerHapticFeedback(duration = 50) { /* No haptics */ }
 
     function playTone(freq, duration = 0.2, type = 'square', vol = 0.3, when = 0, options = {}) {
         if (!audioInitialized || !audioCtx || audioCtx.state !== 'running') { return null; }
@@ -609,12 +681,22 @@
             osc.type = type;
             if (options.detune) osc.detune.setValueAtTime(options.detune, startTime);
             if (options.frequency instanceof AudioParam) { options.frequency.cancelScheduledValues(startTime); options.frequency.setValueAtTime(options.frequency.value, startTime); options.frequency.connect(osc.frequency); } else { osc.frequency.setValueAtTime(freq, startTime); }
+            
             gain.gain.setValueAtTime(vol, startTime);
-            if (options.rampTo !== undefined) { gain.gain.linearRampToValueAtTime(options.rampTo, startTime + duration * 0.8); gain.gain.linearRampToValueAtTime(0.001, startTime + duration); } else if (duration > 0) { gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration); } // only ramp if duration > 0
+            if (options.rampTo !== undefined && duration > 0) { 
+                gain.gain.linearRampToValueAtTime(options.rampTo, startTime + duration * 0.8); 
+                gain.gain.linearRampToValueAtTime(0.001, startTime + duration); 
+            } else if (duration > 0) { 
+                gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration); 
+            }
+            
             osc.connect(gain).connect(outputNode);
             osc.start(startTime);
             const stopTime = startTime + duration;
-            if (duration > 0 && stopTime > audioCtx.currentTime) { osc.stop(stopTime); } else if (duration <= 0) {} else { try { osc.stop(); } catch (e) {} }
+            if (duration > 0 && stopTime > audioCtx.currentTime) { osc.stop(stopTime); } 
+            else if (duration <= 0) { /* Indefinite tone, must be stopped manually or by parent node */ }
+            else { try { osc.stop(); } catch (e) {} } // Stop if somehow scheduled in past for 0 duration
+            
             if (options.frequency instanceof AudioParam) { setTimeout(() => { try { options.frequency.disconnect(osc.frequency); } catch(e) {} }, duration * 1000 + 100); }
             return { osc, gain };
         } catch (error) { console.error("playTone Error:", error, {freq, duration, type, vol, when, options}); return null; }
@@ -632,12 +714,37 @@
     function playPullDownSound() { playTone(400, 1.0, 'sawtooth', 0.35, 0, { rampTo: 80 }); playTone(150, 1.0, 'square', 0.15, 0.1, { rampTo: 40, detune: -30 }); playTone(55, 1.2, 'sine', 0.12, 0); }
     function playChargingSound() { if (!audioInitialized) return; stopChargingSound(); const baseFreq = 130.81; const chord = [0, 4, 7, 12]; const vol = 0.20; const noteDur = 0.1; let delay = 0; for(let i=0; i<8; i++) { const interval = chord[i % chord.length]; const freq = baseFreq * Math.pow(2, interval / 12); const node = playTone(freq, noteDur * 0.9, 'sine', vol * (1 - (i%4)*0.1), delay); if(node) chargingSoundNodes.push(node); delay += noteDur; } chargingSoundNodes.push(setTimeout(playChargingSound, delay * 1000)); }
     function stopChargingSound() { chargingSoundNodes.forEach(item => { if (typeof item === 'number') clearTimeout(item); else if (item && item.osc) try { item.osc.stop(audioCtx.currentTime); item.gain.gain.cancelScheduledValues(audioCtx.currentTime); item.gain.gain.setValueAtTime(0, audioCtx.currentTime);} catch (e) {} }); chargingSoundNodes = []; }
-    function playChargeCompleteSound() { playTone(523.25, 0.1, 'triangle', 0.4, 0.0); playTone(659.25, 0.1, 'triangle', 0.4, 0.1); playTone(783.99, 0.1, 'triangle', 0.4, 0.2); playTone(1046.50, 0.25,'triangle', 0.5, 0.3); /* No haptics */ }
+    function playChargeCompleteSound() { playTone(523.25, 0.1, 'triangle', 0.4, 0.0); playTone(659.25, 0.1, 'triangle', 0.4, 0.1); playTone(783.99, 0.1, 'triangle', 0.4, 0.2); playTone(1046.50, 0.25,'triangle', 0.5, 0.3); }
     function playLaunchSound() { playTone(300, 0.5, 'sawtooth', 0.5, 0, { rampTo: 2500 }); playTone(400, 0.6, 'noise', 0.3, 0.05, { rampTo: 0.01 }); }
     function playGameOverFanfare() { const now = audioCtx.currentTime; const vol = 0.25; const notes = [ { freq: 440.00, delay: 0.0, dur: 0.3 }, { freq: 349.23, delay: 0.3, dur: 0.3 }, { freq: 293.66, delay: 0.6, dur: 0.3 }, { freq: 261.63, delay: 0.9, dur: 0.6 }, ]; notes.forEach(n => playTone(n.freq, n.dur, 'triangle', vol, n.delay, { rampTo: 0.001 })); console.log("Playing soft game over fanfare"); }
     function playWaveBeamSound(building) { playTone(1500, 0.1, 'sine', 0.08, 0, { detune: 200 }); playTone(1800, 0.1, 'sine', 0.08, 0.05, { detune: -150 }); }
     function playLockOnSound() { playTone(523.25, 0.1, 'square', 0.35, 0); playTone(369.99, 0.1, 'square', 0.35, 0.05); }
-    function playCaptureDescentHum() { if (!audioInitialized) return; stopCaptureSounds(); const node = playTone(100, 0, 'sawtooth', 0.25); if (node) { try {node.osc.frequency.linearRampToValueAtTime(50, audioCtx.currentTime + 1.5); captureSoundNodes.push(node);} catch(e){ console.error("Error ramping capture hum:", e); try{node.osc.stop();}catch(_){} } } }
+    
+    function playVertiportPowerDownSound() { // Restored "power-down" sine wave
+        if (!audioInitialized || !audioCtx || audioCtx.state !== 'running') return;
+        
+        const startFreq = 440; 
+        const endFreq = 80;   
+        const rampDuration = 1.5; 
+        const soundDuration = rampDuration + 0.2; // Keep sound slightly longer than ramp for fade out
+        const vol = 0.25;
+
+        const node = playTone(startFreq, soundDuration, 'sine', vol, 0, { rampTo: 0.001 }); 
+
+        if (node && node.osc) {
+            // Add to captureSoundNodes so it can be stopped if sequence is interrupted
+            // or if another capture sound needs to override.
+            captureSoundNodes.push(node); 
+            try {
+                const now = audioCtx.currentTime;
+                node.osc.frequency.setValueAtTime(startFreq, now); 
+                node.osc.frequency.linearRampToValueAtTime(endFreq, now + rampDuration);
+            } catch(e) {
+                console.error("Error ramping vertiport power down sound:", e);
+            }
+        }
+    }
+
     function playCaptureHoldingPulse() { playTone(220, 0.08, 'sine', 0.12, Math.random() * 0.2); playTone(330, 0.08, 'sine', 0.08, 0.15 + Math.random() * 0.2); }
     function playCaptureReleaseChime() { playTone(329.63, 0.1, 'triangle', 0.35, 0); playTone(392.00, 0.1, 'triangle', 0.35, 0.1); playTone(523.25, 0.2, 'triangle', 0.4, 0.2); }
     function stopCaptureSounds() { captureSoundNodes.forEach(item => { if (item && item.osc) try { item.osc.stop(audioCtx.currentTime); item.gain.gain.cancelScheduledValues(audioCtx.currentTime); item.gain.gain.setValueAtTime(0, audioCtx.currentTime);} catch (e) {} }); captureSoundNodes = []; }
@@ -709,83 +816,98 @@
         nextMusicScheduleTime = 0; currentLoopLengthSeconds = 0;
     }
 
-    function playBlimpSound() {
-        if (!audioInitialized || !audioCtx || audioCtx.state !== 'running' || blimpAudioGainNode) return;
+    function playBlimpTheme() {
+        if (!audioInitialized || !audioCtx || audioCtx.state !== 'running' || blimpThemeIsPlaying) return;
+        
+        blimpThemeIsPlaying = true;
         try {
-            blimpAudioGainNode = audioCtx.createGain();
-            blimpAudioGainNode.connect(audioCtx.destination);
-            blimpAudioGainNode.gain.setValueAtTime(0, audioCtx.currentTime);
-            blimpAudioGainNode.gain.linearRampToValueAtTime(BLIMP_AUDIO_VOLUME, audioCtx.currentTime + BLIMP_AUDIO_FADE_DURATION);
+            blimpThemeGainNode = audioCtx.createGain();
+            blimpThemeGainNode.connect(audioCtx.destination);
+            blimpThemeGainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+            blimpThemeGainNode.gain.linearRampToValueAtTime(BLIMP_THEME_VOLUME, audioCtx.currentTime + BLIMP_THEME_FADE_DURATION);
 
-            const baseFreq = 55; // A1
-            const osc1 = audioCtx.createOscillator(); osc1.type = 'sine'; osc1.frequency.value = baseFreq;
-            osc1.connect(blimpAudioGainNode); osc1.start();
-
-            const osc2 = audioCtx.createOscillator(); osc2.type = 'sawtooth'; osc2.frequency.value = baseFreq * 1.5; // Perfect fifth (E2)
-            const osc2Gain = audioCtx.createGain(); osc2Gain.gain.value = 0.4;
-            osc2.connect(osc2Gain).connect(blimpAudioGainNode); osc2.start();
-            
-            const lfo = audioCtx.createOscillator(); lfo.type = 'sine'; lfo.frequency.value = 0.2; // Slow LFO
-            const lfoGain = audioCtx.createGain(); lfoGain.gain.value = BLIMP_AUDIO_VOLUME * 0.2; 
-            lfo.connect(lfoGain);
-            lfoGain.connect(blimpAudioGainNode.gain); 
-            lfo.start();
-
-            blimpAudioNodes = [osc1, osc2, osc2Gain, lfo, lfoGain]; 
-            // console.log("Blimp sound started.");
+            scheduleBlimpThemeNotes();
+            // console.log("Blimp theme started.");
         } catch (e) {
-            console.error("Error playing blimp sound:", e);
-            if (blimpAudioGainNode) try { blimpAudioGainNode.disconnect(); } catch(_) {}
-            blimpAudioGainNode = null;
-            blimpAudioNodes.forEach(node => {
-                if (node instanceof OscillatorNode) try { node.stop(); } catch(_) {}
-                if (typeof node.disconnect === 'function') try { node.disconnect(); } catch(_) {}
-            });
-            blimpAudioNodes = [];
+            console.error("Error playing blimp theme:", e);
+            blimpThemeIsPlaying = false;
+            if (blimpThemeGainNode) try { blimpThemeGainNode.disconnect(); } catch(_) {}
+            blimpThemeGainNode = null;
         }
     }
 
-    function stopBlimpSound(immediate = false) {
-        if (!blimpAudioGainNode || !blimpAudioNodes || !blimpAudioNodes.length) return;
+    function scheduleBlimpThemeNotes() {
+        if (!blimpThemeIsPlaying || !blimpThemeGainNode || !audioCtx || audioCtx.state !== 'running') {
+            stopBlimpTheme(true); // Ensure cleanup if state is bad
+            return;
+        }
+
+        blimpThemeNodes.forEach(item => {
+            if (item && item.osc) try { item.osc.stop(audioCtx.currentTime); } catch (e) {}
+        });
+        blimpThemeNodes = [];
+
+        const notes = [ // Whimsical/slightly heroic progression
+            { freq: 261.63, dur: 1.9, type: 'triangle' }, // C4
+            { freq: 329.63, dur: 1.9, type: 'triangle' }, // E4
+            { freq: 392.00, dur: 1.9, type: 'triangle' }, // G4
+            { freq: 349.23, dur: 1.9, type: 'triangle' }, // F4 (adds a bit of tension/resolution)
+        ];
+        const loopDuration = 8.0; // Target ~8s loop
+        let currentTimeInLoop = audioCtx.currentTime;
+        let accumulatedDelay = 0;
+
+        for (const note of notes) {
+            const node = playTone(note.freq, note.dur, note.type, 0.7, // Volume relative to blimpThemeGainNode
+                                  accumulatedDelay, 
+                                  { outputNode: blimpThemeGainNode, absoluteTime: currentTimeInLoop + accumulatedDelay, rampTo: 0.001 });
+            if (node) blimpThemeNodes.push(node);
+            accumulatedDelay += (note.dur + 0.1); // Small gap
+        }
         
-        const fadeDuration = immediate ? 0.05 : BLIMP_AUDIO_FADE_DURATION;
+        blimpThemeLoopTimeoutId = setTimeout(scheduleBlimpThemeNotes, loopDuration * 1000);
+    }
+
+    function stopBlimpTheme(immediate = false) {
+        if (!blimpThemeIsPlaying && !blimpThemeGainNode) return; // Check both as gainNode is key
+
+        blimpThemeIsPlaying = false; // Set this first to prevent re-scheduling
+        if (blimpThemeLoopTimeoutId) {
+            clearTimeout(blimpThemeLoopTimeoutId);
+            blimpThemeLoopTimeoutId = null;
+        }
+        
+        if (!blimpThemeGainNode) return; // Nothing to stop if gain node is gone
+
+        const fadeDuration = immediate ? 0.05 : BLIMP_THEME_FADE_DURATION;
         const now = audioCtx.currentTime;
 
         try {
-            const lfoGainNode = blimpAudioNodes.find(n => n instanceof GainNode && n !== blimpAudioGainNode && n !== blimpAudioNodes[2]); // blimpAudioNodes[2] is osc2Gain
-            if (lfoGainNode && blimpAudioGainNode) {
-                 try { lfoGainNode.disconnect(blimpAudioGainNode.gain); }
-                 catch(e) { console.warn("Failed to disconnect LFO gain from blimp main gain:", e); }
-            }
+            blimpThemeGainNode.gain.cancelScheduledValues(now);
+            blimpThemeGainNode.gain.setValueAtTime(blimpThemeGainNode.gain.value, now); 
+            blimpThemeGainNode.gain.linearRampToValueAtTime(0.0001, now + fadeDuration);
 
-            blimpAudioGainNode.gain.cancelScheduledValues(now);
-            blimpAudioGainNode.gain.setValueAtTime(blimpAudioGainNode.gain.value, now);
-            blimpAudioGainNode.gain.linearRampToValueAtTime(0.0001, now + fadeDuration);
-
-            const cleanupTime = (fadeDuration + 0.1) * 1000;
+            const cleanupTime = (fadeDuration + 0.2) * 1000;
             setTimeout(() => {
-                blimpAudioNodes.forEach(node => {
-                    if (node instanceof OscillatorNode) try { node.stop(0); } catch(_) {}
-                    if (typeof node.disconnect === 'function') try { node.disconnect(); } catch(_) {}
+                blimpThemeNodes.forEach(item => {
+                    if (item && item.osc) try { item.osc.stop(); } catch(_) {}
+                    // Note gains are part of playTone's internal structure, not typically disconnected here
                 });
-                if (blimpAudioGainNode) try { blimpAudioGainNode.disconnect(); } catch(_) {}
-                
-                blimpAudioNodes = [];
-                blimpAudioGainNode = null;
-                // console.log("Blimp sound stopped and cleaned up.");
+                blimpThemeNodes = [];
+                if (blimpThemeGainNode) try { blimpThemeGainNode.disconnect(); } catch(_) {}
+                blimpThemeGainNode = null;
+                // console.log("Blimp theme stopped and cleaned up.");
             }, cleanupTime);
         } catch(e) {
-            console.error("Error stopping blimp sound:", e);
-            blimpAudioNodes.forEach(node => {
-                if (node instanceof OscillatorNode) try { node.stop(0); } catch(_) {}
-                if (typeof node.disconnect === 'function') try { node.disconnect(); } catch(_) {}
+            console.error("Error stopping blimp theme:", e);
+            blimpThemeNodes.forEach(item => {
+                 if (item && item.osc) try { item.osc.stop(); } catch(_) {}
             });
-            if (blimpAudioGainNode) try { blimpAudioGainNode.disconnect(); } catch(_) {}
-            blimpAudioNodes = [];
-            blimpAudioGainNode = null;
+            blimpThemeNodes = [];
+            if (blimpThemeGainNode) try { blimpThemeGainNode.disconnect(); } catch(_) {}
+            blimpThemeGainNode = null;
         }
     }
-
 
     function stopAllSounds() {
         console.log("Stopping all sounds...");
@@ -793,7 +915,7 @@
         stopEngineHum(); 
         stopChargingSound(); 
         stopCaptureSounds();
-        stopBlimpSound(true);
+        stopBlimpTheme(true); // Stop blimp theme immediately
         if (musicGainNode && audioCtx && audioCtx.state === 'running') { musicGainNode.gain.cancelScheduledValues(audioCtx.currentTime); musicGainNode.gain.setValueAtTime(0.45, audioCtx.currentTime); }
         if (musicLowPassFilter && audioCtx && audioCtx.state === 'running') { musicLowPassFilter.frequency.cancelScheduledValues(audioCtx.currentTime); musicLowPassFilter.frequency.setValueAtTime(20000, audioCtx.currentTime); musicLowPassFilter.Q.cancelScheduledValues(audioCtx.currentTime); musicLowPassFilter.Q.setValueAtTime(1, audioCtx.currentTime); }
     }
@@ -815,12 +937,13 @@
             if (p.throwCooldown === 0 && Math.random() < currentProjectileThrowChance) {
                 if (p.type === 'OldLady') {
                     const itemType = Math.random() < 0.5 ? 'ChickenLeg' : 'CornCob';
-                    let initialVy = -8 - Math.random() * 6; // More aggressive upward velocity
-                    let initialVx = -1.5 - Math.random() * 1.5; // Adjusted Vx for arc
+                    // Increased vertical velocity for higher arcs (target 70-85% screen height)
+                    let initialVy = -10 - Math.random() * 3; // Range -13 to -10 
+                    let initialVx = -1.0 - Math.random() * 1.0; // Slightly reduced horizontal for higher arc
                     projectiles.push({ 
                         type: itemType, 
                         x: p.x, 
-                        y: p.y - 10, // Spawn from pedestrian hand height
+                        y: p.y - 10, 
                         vx: initialVx, 
                         vy: initialVy, 
                         size: {w: 4, h: (itemType === 'CornCob' ? 8 : 6)}, 
@@ -850,9 +973,9 @@
                 proj.vy += PROJECTILE_GRAVITY; proj.rotation += proj.rotationSpeed; 
                 if (proj.vy < 0 && proj.currentSize < proj.maxSize) { proj.currentSize += proj.growthRate; proj.size.w = proj.currentSize * (proj.type === 'CornCob' ? 0.6 : 1.0); proj.size.h = proj.currentSize * (proj.type === 'CornCob' ? 1.2 : 1.5); }
                 
-                if (proj.y < 0 && proj.vy < 0) { // Hit ceiling
+                if (proj.y < 0 && proj.vy < 0) { 
                     proj.y = 0;
-                    proj.vy *= -0.3; // Bounce down, lose some energy
+                    proj.vy *= -0.3; 
                 }
 
                 const groundLevel = playableHeight - proj.size.h; 
@@ -886,7 +1009,6 @@
                 playCollisionSound(); 
                 playCollisionDissonance();
                 updateBatteryUI();
-                // Blimp is not destroyed by collision by default, it's a persistent threat while on screen.
             }
         }
     }
@@ -928,10 +1050,13 @@
             }
         }
     }
-    function startCaptureSequence(building) {
+    function startCaptureSequence(building) { // Vertiport capture
         if (isCaptured || isChargingSequence) return;
         isCaptured = true; capturePhase = 'descending'; playerControlEnabled = false; captureTargetBuilding = building; autoPilotStartY = carY; autoPilotProgress = 0;
-        stopEngineHum(); playLockOnSound(); playVertiportRefuelSound(); playCaptureDescentHum();
+        stopEngineHum(); 
+        playLockOnSound(); 
+        playVertiportRefuelSound(); // This is more of an ambient/effect sound
+        playVertiportPowerDownSound(); // This is the restored "power-down" sine wave
         stopBackgroundMusic(); 
         if (musicGainNode) musicGainNode.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + 0.5);
     }
@@ -939,7 +1064,13 @@
         const descentSpeed = 0.01; const releaseSpeed = 0.04; const targetY = captureTargetBuilding.y - CAR_HEIGHT * 0.8;
         if (capturePhase === 'descending') {
             autoPilotProgress = Math.min(1, autoPilotProgress + descentSpeed); const easedProgress = 0.5 * (1 - Math.cos(autoPilotProgress * Math.PI)); carY = autoPilotStartY + (targetY - autoPilotStartY) * easedProgress; const targetX = captureTargetBuilding.x + captureTargetBuilding.width / 2 - CAR_WIDTH / 2; carX += (targetX - carX) * 0.03;
-            if (autoPilotProgress >= 1) { capturePhase = 'holding'; captureStartTime = performance.now(); stopCaptureSounds(); }
+            if (autoPilotProgress >= 1) { 
+                capturePhase = 'holding'; 
+                captureStartTime = performance.now(); 
+                // Stop the powerDown sound if it's still going, or ensure it's short enough
+                // stopCaptureSounds(); // This might be too aggressive if other holding sounds are planned.
+                                    // playVertiportPowerDownSound is now timed by playTone.
+            }
         } else if (capturePhase === 'holding') {
             const elapsed = performance.now() - captureStartTime; const drainProgress = Math.min(1, elapsed / CAPTURE_HOLD_DURATION_MS); battery = Math.max(0, 100 - Math.floor(drainProgress * CAPTURE_BATTERY_DRAIN)); updateBatteryUI(); if (frameCount % 30 === 0) playCaptureHoldingPulse();
             if (elapsed >= CAPTURE_HOLD_DURATION_MS) { capturePhase = 'releasing'; playCaptureReleaseChime(); autoPilotStartY = carY; autoPilotProgress = 0; }
@@ -971,9 +1102,9 @@
        
        if (blimp) { 
             blimp.update();
-            if (blimp.x + blimp.width < 0) { 
+            if (blimp.x + blimp.width + (blimp.width * 0.7 + 20) < 0) { // Check if blimp + banner are off-screen
                 blimp = null; 
-                stopBlimpSound();
+                stopBlimpTheme();
                 // console.log("Blimp off-screen.");
             }
         }
@@ -1009,7 +1140,7 @@
         if (gameRunning && playerControlEnabled && !blimp) {
             if (score >= nextBlimpScoreTarget) {
                 blimp = new Blimp(gameCanvas, playableHeight);
-                playBlimpSound();
+                playBlimpTheme(); // Play new blimp theme
                 // console.log(`Blimp spawned at score ${score}.`);
                 nextBlimpScoreTarget = score + BLIMP_SCORE_INTERVAL_MIN + Math.random() * (BLIMP_SCORE_INTERVAL_MAX - BLIMP_SCORE_INTERVAL_MIN);
                 // console.log(`Next blimp consideration score: ${nextBlimpScoreTarget}`);
@@ -1041,8 +1172,7 @@
     function startGame() {
         gameRunning = false; 
         if (animationFrameId) cancelAnimationFrame(animationFrameId); animationFrameId = null;
-        // Stop all sounds including potentially running blimp sound from previous game
-        stopAllSounds(); // This will call stopBlimpSound(true)
+        stopAllSounds(); 
 
         battery = 100; score = 0; calculateDimensions(); carY = playableHeight / 2; carX = 80; carColor = 'white'; keys = {}; prevKeys = {}; buildings = []; pedestrians = []; projectiles = []; bonuses = []; birds = []; clouds = []; swarmVehicles = []; carShake = 0; frameCount = 0; lowBatteryWarningPlayed = false; isChargingSequence = false; chargingPhase = null; targetChargeStation = null; isCaptured = false; capturePhase = null; captureTargetBuilding = null; playerControlEnabled = true; prevCarX = carX; prevCarY = carY;
         spawnBuilding(gameCanvas.width * 0.6); spawnBuilding(); for(let i=0; i<5; i++) spawnCloud(); for(let i=0; i<20; i++) spawnSwarmVehicle();
@@ -1051,6 +1181,7 @@
         
         blimp = null; 
         nextBlimpScoreTarget = 10000;
+        blimpThemeIsPlaying = false; // Ensure theme flag is reset
 
         startScreen.style.display = 'none';
         gameCanvas.style.display = 'block';
@@ -1106,7 +1237,6 @@
       finalScoreLabel.textContent = `Final Score: ${score}`;
       gameOverScreen.style.display = 'flex';
       if (audioInitialized && audioCtx && audioCtx.state === 'running') { playGameOverFanfare(); }
-      // No haptics
     }
 
     function handleStartOrReplay(event) {
@@ -1157,7 +1287,7 @@
     window.addEventListener('keydown', (e) => { if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 's', 'a', 'd', ' '].includes(e.key)) { e.preventDefault(); } keys[e.key] = true; });
     window.addEventListener('keyup', (e) => { keys[e.key] = false; });
 
-    function handleTouchStart(key, event) { event.preventDefault(); keys[key] = true; /* No haptics */ }
+    function handleTouchStart(key, event) { event.preventDefault(); keys[key] = true; }
     function handleTouchEnd(key, event) { event.preventDefault(); keys[key] = false; }
     touchUpButton.addEventListener('touchstart', (e) => handleTouchStart('ArrowUp', e), { passive: false });
     touchUpButton.addEventListener('touchend', (e) => handleTouchEnd('ArrowUp', e));
@@ -1197,9 +1327,8 @@
             if (musicIsPlaying) { 
                 stopBackgroundMusic(); 
             }
-            // Potentially stop blimp sound if it's a long interval sound
-            if (blimpAudioGainNode) {
-                stopBlimpSound(true); // Stop immediately on hide
+            if (blimpThemeIsPlaying) {
+                stopBlimpTheme(true); 
             }
         } else { 
             console.log("Main visibilitychange: Page visible. Attempting auto-resume.");
@@ -1214,9 +1343,8 @@
                         console.log("Main visibilitychange: Restarting background music loop (context was suspended).");
                         startMusicLoopChecker();
                     }
-                    // Resume blimp sound if blimp is on screen
-                    if (blimp && audioCtx.state === 'running' && audioInitialized && gameRunning && !blimpAudioGainNode) {
-                        playBlimpSound();
+                    if (blimp && audioCtx.state === 'running' && audioInitialized && gameRunning && !blimpThemeIsPlaying) {
+                        playBlimpTheme();
                     }
                 }).catch(err => {
                     console.error("Main visibilitychange: Error during AudioContext auto-resume:", err);
@@ -1227,9 +1355,8 @@
                     console.log("Main visibilitychange: Restarting background music loop (context already running).");
                     startMusicLoopChecker();
                 }
-                // Resume blimp sound if blimp is on screen
-                if (blimp && audioInitialized && gameRunning && !blimpAudioGainNode) {
-                     playBlimpSound();
+                if (blimp && audioInitialized && gameRunning && !blimpThemeIsPlaying) {
+                     playBlimpTheme();
                 }
             }
         }
