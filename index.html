@@ -440,138 +440,193 @@
         constructor(canvas, playableHeight) {
             this.canvas = canvas;
             this.playableHeight = playableHeight;
-            this.width = 220 + Math.random() * 80; // Slightly smaller overall for better visual
-            this.height = this.width * 0.35; // More elongated
+            this.width = 220 + Math.random() * 80; 
+            this.height = this.width * 0.35; 
             this.x = this.canvas.width;
-            this.y = this.playableHeight * 0.1 + Math.random() * (this.playableHeight * 0.15); // Higher altitude range
-            this.vx = -0.25 - Math.random() * 0.3; // Slower
-            // // TODO: Replace 'TEMP_B64_LOGO_BANNER_PLACEHOLDER' with real base64 logo or image drawing logic
-            this.bannerLogo = 'TEMP_B64_LOGO_BANNER_PLACEHOLDER';
+            this.y = this.playableHeight * 0.1 + Math.random() * (this.playableHeight * 0.15); 
+            this.vx = -0.25 - Math.random() * 0.3; 
+            this.bannerLogo = 'TEMP_B64_LOGO_BANNER_PLACEHOLDER'; // // TODO: Replace placeholder
             this.collisionDamage = BLIMP_COLLISION_DAMAGE;
             this.bannerWavePhase = Math.random() * Math.PI * 2;
             this.bannerWaveSpeed = 0.04 + Math.random() * 0.02;
-            this.bannerWaveAmplitude = 3 + Math.random() * 3;
+            this.bannerWaveAmplitude = 3 + Math.random() * 3; // For banner waving
+            this.windowPulsePhase = Math.random() * Math.PI * 2;
+            this.windowPulseSpeed = 0.05 + Math.random() * 0.03;
         }
 
         update() {
             this.x += this.vx;
             this.bannerWavePhase += this.bannerWaveSpeed;
+            this.windowPulsePhase += this.windowPulseSpeed;
         }
 
         draw(ctx) {
             const centerX = this.x + this.width / 2;
             const centerY = this.y + this.height / 2;
 
-            // Tail Fins (Orange) - Draw first to be underneath
-            ctx.fillStyle = '#FFA500'; // Orange
-            const finWidth = this.width * 0.25;
-            const finHeight = this.height * 0.6;
+            // Blimp Body (Yellow with Gradient)
+            const bodyGradient = ctx.createLinearGradient(centerX, centerY - this.height / 2, centerX, centerY + this.height / 2);
+            bodyGradient.addColorStop(0, '#FFFACD'); // LemonChiffon (lighter top)
+            bodyGradient.addColorStop(0.5, '#FFDB58'); // Mustard Yellow
+            bodyGradient.addColorStop(1, '#B8860B');   // DarkGoldenRod (darker bottom)
+            ctx.fillStyle = bodyGradient;
+            ctx.beginPath();
+            ctx.ellipse(centerX, centerY, this.width / 2, this.height / 2, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#8B4513'; // SaddleBrown for a stronger outline
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+            
+            // Tail Fins (Softer Orange) - Draw first to be underneath
+            ctx.fillStyle = '#FF8C00'; // DarkOrange (softer)
+            const finBaseX = centerX + this.width * 0.35;
+            const finTipX = centerX + this.width * 0.55;
+            const finWidth = this.width * 0.20; // control width of fin base
+            const finHeight = this.height * 0.5; // control height of fin tip
             // Top fin
             ctx.beginPath();
-            ctx.moveTo(centerX + this.width * 0.3, centerY - this.height * 0.1);
-            ctx.lineTo(centerX + this.width * 0.55, centerY - finHeight / 2);
-            ctx.lineTo(centerX + this.width * 0.45, centerY);
+            ctx.moveTo(finBaseX - finWidth/2, centerY - this.height * 0.05);
+            ctx.quadraticCurveTo(finBaseX, centerY - finHeight * 0.7, finTipX, centerY - finHeight/2);
+            ctx.quadraticCurveTo(finBaseX, centerY + finHeight * 0.1, finBaseX + finWidth/2, centerY + this.height * 0.05);
             ctx.closePath();
             ctx.fill();
             // Bottom fin
             ctx.beginPath();
-            ctx.moveTo(centerX + this.width * 0.3, centerY + this.height * 0.1);
-            ctx.lineTo(centerX + this.width * 0.55, centerY + finHeight / 2);
-            ctx.lineTo(centerX + this.width * 0.45, centerY);
+            ctx.moveTo(finBaseX - finWidth/2, centerY + this.height * 0.05);
+            ctx.quadraticCurveTo(finBaseX, centerY + finHeight * 0.7, finTipX, centerY + finHeight/2);
+            ctx.quadraticCurveTo(finBaseX, centerY - finHeight * 0.1, finBaseX + finWidth/2, centerY - this.height * 0.05);
             ctx.closePath();
-            ctx.fill();
-            // Horizontal fins (rudder like)
-            const hFinWidth = this.width * 0.15;
-            const hFinHeight = this.height * 0.8;
-            ctx.beginPath();
-            ctx.moveTo(centerX + this.width * 0.35, centerY - hFinHeight/2);
-            ctx.lineTo(centerX + this.width * 0.5, centerY - hFinHeight/2 + hFinHeight*0.2);
-            ctx.lineTo(centerX + this.width * 0.5, centerY + hFinHeight/2 - hFinHeight*0.2);
-            ctx.lineTo(centerX + this.width * 0.35, centerY + hFinHeight/2);
-            ctx.closePath();
-            ctx.fill();
-
-
-            // Blimp Body (Yellow)
-            ctx.fillStyle = '#FFDB58'; // Mustard Yellow / Gold-ish
-            ctx.beginPath();
-            ctx.ellipse(centerX, centerY, this.width / 2, this.height / 2, 0, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.strokeStyle = '#B8860B'; // DarkGoldenRod for outline
-            ctx.lineWidth = 2;
-            ctx.stroke();
-
-            // Nose (Orange)
-            ctx.fillStyle = '#FFA500'; // Orange
-            ctx.beginPath();
-            ctx.ellipse(centerX - this.width * 0.4, centerY, this.width * 0.15, this.height * 0.45, 0, Math.PI * 0.5, Math.PI * 1.5, true);
             ctx.fill();
             
-            // Horizontal Center Line
-            ctx.strokeStyle = '#B8860B';
-            ctx.lineWidth = 1;
+            // Air Rudder (Vertical Fin)
+            ctx.fillStyle = '#FF8C00';
+            const rudderBaseY = centerY + this.height * 0.05;
+            const rudderTipY = centerY + this.height * 0.5;
+            const rudderX = centerX + this.width * 0.45;
             ctx.beginPath();
-            ctx.moveTo(centerX - this.width/2 * 0.8, centerY);
-            ctx.lineTo(centerX + this.width/2 * 0.8, centerY);
+            ctx.moveTo(rudderX - this.width * 0.05, rudderBaseY);
+            ctx.lineTo(rudderX, rudderTipY);
+            ctx.lineTo(rudderX + this.width * 0.05, rudderBaseY);
+            ctx.closePath();
+            ctx.fill();
+
+            // Horizontal Center Line
+            ctx.strokeStyle = '#A0522D'; // Sienna
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(centerX - this.width/2 * 0.75, centerY);
+            ctx.lineTo(centerX + this.width/2 * 0.7, centerY);
             ctx.stroke();
+
+            // Optional faint logo silhouette on body (simple circle for placeholder)
+            ctx.fillStyle = 'rgba(100, 100, 100, 0.1)'; // Very faint gray
+            ctx.beginPath();
+            ctx.arc(centerX - this.width * 0.1, centerY, this.height * 0.2, 0, Math.PI * 2);
+            ctx.fill();
 
 
             // Gondola (Dark Gray)
             const gondolaWidth = this.width * 0.3;
             const gondolaHeight = this.height * 0.25;
-            ctx.fillStyle = '#A9A9A9'; // DarkGray
-            ctx.fillRect(centerX - gondolaWidth / 2, centerY + this.height / 2 - gondolaHeight*0.3, gondolaWidth, gondolaHeight);
-            ctx.strokeStyle = '#696969'; // DimGray
-            ctx.strokeRect(centerX - gondolaWidth / 2, centerY + this.height / 2 - gondolaHeight*0.3, gondolaWidth, gondolaHeight);
+            const gondolaX = centerX - gondolaWidth / 2;
+            const gondolaY = centerY + this.height / 2 - gondolaHeight * 0.4; // Adjusted Y slightly
+            ctx.fillStyle = '#696969'; // DimGray
+            ctx.fillRect(gondolaX, gondolaY, gondolaWidth, gondolaHeight);
+            ctx.strokeStyle = '#2F4F4F'; // DarkSlateGray
+            ctx.strokeRect(gondolaX, gondolaY, gondolaWidth, gondolaHeight);
 
-
-            // Banner (trailing to the right)
-            const bannerHeight = this.height * 0.3; // Smaller height
-            const bannerWidth = this.width * 0.7;
-            const bannerAttachX = centerX + this.width * 0.45; // Attachment point on blimp rear
-            const bannerAttachY = centerY;
+            // Animated Gondola Windows
+            const numWindows = 3;
+            const windowWidth = gondolaWidth / (numWindows + 2); 
+            const windowHeight = gondolaHeight * 0.35;
+            const windowSpacing = (gondolaWidth - (numWindows * windowWidth)) / (numWindows + 1);
+            const windowBaseY = gondolaY + gondolaHeight * 0.2; 
             
-            const bannerStartX = this.x + this.width + 20; // Start banner to the right of blimp
-            const waveOffsetY = Math.sin(this.bannerWavePhase) * this.bannerWaveAmplitude;
-            const bannerStartY = this.y + this.height / 2 - bannerHeight / 2 + waveOffsetY;
+            const pulseBrightness = 0.7 + Math.sin(this.windowPulsePhase) * 0.3; // 0.4 to 1.0
+            const windowColor = `rgba(204, 255, 255, ${pulseBrightness})`; // Pulsing Cyan: #ccffff
+            
+            for (let i = 0; i < numWindows; i++) {
+                const currentWindowX = gondolaX + windowSpacing + (i * (windowWidth + windowSpacing));
+                // Glowing Ellipses
+                ctx.fillStyle = windowColor;
+                ctx.beginPath();
+                ctx.ellipse(currentWindowX + windowWidth/2, windowBaseY + windowHeight/2, windowWidth/2.2, windowHeight/2.2, 0, 0, Math.PI*2);
+                ctx.fill();
+                // Optional soft shadow/outer glow for windows
+                ctx.shadowColor = 'rgba(204, 255, 255, 0.5)';
+                ctx.shadowBlur = 3 * pulseBrightness;
+                ctx.fill(); // Fill again to apply shadow
+                ctx.shadowBlur = 0; // Reset shadow
+            }
 
-            // Connecting lines
+            // Banner (trailing to the right with wave effect)
+            const bannerHeight = this.height * 0.3; 
+            const bannerWidth = this.width * 0.7;
+            const bannerAttachX = centerX + this.width * 0.45; 
+            const bannerAttachY = centerY;
+            const bannerStartX = this.x + this.width + 20; 
+             // Waving Banner Logic
+            const bannerSegments = 10; // Number of vertical segments for waving
+            const segmentWidth = bannerWidth / bannerSegments;
+
+            // Connecting lines (static for now, could also wave slightly)
+            const staticWaveOffsetYForAttach = Math.sin(this.bannerWavePhase) * this.bannerWaveAmplitude;
+            const bannerBaseYForAttach = this.y + this.height / 2 - bannerHeight / 2 + staticWaveOffsetYForAttach;
             ctx.strokeStyle = '#555';
             ctx.lineWidth = 1.5;
             ctx.beginPath();
             ctx.moveTo(bannerAttachX, bannerAttachY - this.height * 0.05);
-            ctx.lineTo(bannerStartX, bannerStartY + bannerHeight * 0.2);
+            ctx.lineTo(bannerStartX, bannerBaseYForAttach + bannerHeight * 0.2);
             ctx.stroke();
             ctx.beginPath();
             ctx.moveTo(bannerAttachX, bannerAttachY + this.height * 0.05);
-            ctx.lineTo(bannerStartX, bannerStartY + bannerHeight * 0.8);
+            ctx.lineTo(bannerStartX, bannerBaseYForAttach + bannerHeight * 0.8);
             ctx.stroke();
             
-            ctx.fillStyle = '#FFF'; // Banner background
-            ctx.fillRect(bannerStartX, bannerStartY, bannerWidth, bannerHeight);
+            ctx.fillStyle = '#FFF'; 
             ctx.strokeStyle = '#555';
             ctx.lineWidth = 1;
-            ctx.strokeRect(bannerStartX, bannerStartY, bannerWidth, bannerHeight);
+            ctx.beginPath();
+            let firstY = 0;
+            for (let i = 0; i <= bannerSegments; i++) {
+                const waveOffset = Math.sin(this.bannerWavePhase + i * 0.5) * this.bannerWaveAmplitude; // Wave per segment
+                const currentBannerX = bannerStartX + i * segmentWidth;
+                const currentBannerTopY = this.y + this.height / 2 - bannerHeight / 2 + waveOffset;
+                if (i === 0) {
+                    ctx.moveTo(currentBannerX, currentBannerTopY);
+                    firstY = currentBannerTopY;
+                } else {
+                    ctx.lineTo(currentBannerX, currentBannerTopY);
+                }
+            }
+            for (let i = bannerSegments; i >= 0; i--) {
+                 const waveOffset = Math.sin(this.bannerWavePhase + i * 0.5) * this.bannerWaveAmplitude;
+                 const currentBannerX = bannerStartX + i * segmentWidth;
+                 const currentBannerBottomY = this.y + this.height / 2 + bannerHeight / 2 + waveOffset;
+                 ctx.lineTo(currentBannerX, currentBannerBottomY);
+            }
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
 
-            // Placeholder text on banner
+
+            // Placeholder text on banner (centered on average banner Y)
+            const avgBannerY = this.y + this.height / 2; // Approximate center
             ctx.fillStyle = '#d9534f'; 
             const fontSize = Math.max(8, Math.min(16, bannerHeight * 0.35)); 
             ctx.font = `bold ${fontSize}px 'Courier New', Courier, monospace`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            // // TODO: Replace 'TEMP_B64_LOGO_BANNER_PLACEHOLDER' with real base64 logo or image drawing logic
-            ctx.fillText(this.bannerLogo, bannerStartX + bannerWidth / 2, bannerStartY + bannerHeight / 2);
+            ctx.fillText(this.bannerLogo, bannerStartX + bannerWidth / 2, avgBannerY);
             ctx.textAlign = 'left'; 
             ctx.textBaseline = 'alphabetic';
         }
 
         collidesWith(rect) {
-            // Simplified collision for main body, more generous
             return rect.x < this.x + this.width &&
                    rect.x + rect.width > this.x &&
                    rect.y < this.y + this.height && 
                    rect.y + rect.height > this.y;
-            // Note: Banner collision could be added but might be too punishing for a trailing element
         }
     }
 
@@ -939,17 +994,23 @@
                 if (p.type === 'OldLady') {
                     const itemType = Math.random() < 0.5 ? 'ChickenLeg' : 'CornCob';
                     
-                    // PROJECTILE ARC FIX: Spawn higher, adjust initial velocity
-                    let spawnY = gameCanvas.height * 0.5 + Math.random() * 50; // Spawn mid-sky
-                    let initialVy = -7 - Math.random() * 3; // Adjusted vertical velocity for visible arc
+                    // PROJECTILE SPAWN HEIGHT RANDOMIZATION
+                    let spawnY;
+                    if (Math.random() < 0.2) { // 20% chance for high arc
+                        spawnY = gameCanvas.height * 0.1 + Math.random() * 20; 
+                    } else { // 80% chance for mid-air arc
+                        spawnY = gameCanvas.height * 0.5 + Math.random() * 50;
+                    }
+                    
+                    let initialVy = -7 - Math.random() * 3; 
                     let initialVx = -1.0 - Math.random() * 1.0; 
 
                     projectiles.push({ 
                         type: itemType, 
-                        x: p.x, // Still originates from pedestrian's horizontal position
-                        y: spawnY, // FIXED: Spawn higher
+                        x: p.x, 
+                        y: spawnY, 
                         vx: initialVx, 
-                        vy: initialVy, // FIXED: Adjusted Vy
+                        vy: initialVy, 
                         size: {w: 4, h: (itemType === 'CornCob' ? 8 : 6)}, 
                         maxSize: 30 + Math.random() * 15, 
                         currentSize: 4, 
