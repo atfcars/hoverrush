@@ -904,7 +904,7 @@
         nextMusicScheduleTime = 0; currentLoopLengthSeconds = 0;
     }
 
-    function playBlimpTheme() { // New melodic, high-pitched arpeggio
+    function playBlimpTheme() { 
         if (!audioInitialized || !audioCtx || audioCtx.state !== 'running' || blimpThemeIsPlaying) return;
         
         blimpThemeIsPlaying = true;
@@ -915,7 +915,6 @@
             blimpThemeGainNode.gain.linearRampToValueAtTime(BLIMP_THEME_VOLUME, audioCtx.currentTime + BLIMP_THEME_FADE_DURATION);
 
             scheduleBlimpArpeggio();
-            // console.log("New blimp arpeggio theme started.");
         } catch (e) {
             console.error("Error playing new blimp theme:", e);
             blimpThemeIsPlaying = false;
@@ -935,23 +934,29 @@
         });
         blimpThemeNodes = [];
 
-        // Arpeggio: C E G C' (C Major chord) - high pitched
-        const arpNotes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
-        const noteDuration = 0.15; 
-        const loopInterval = (arpNotes.length * (noteDuration + 0.05)) * 2; // Two full arpeggios per loop cycle
+        const arpSequence = [
+            { freq: 659.25, dur: 0.15, type: 'sine', vol: 0.7 },  // E5
+            { freq: 783.99, dur: 0.15, type: 'sine', vol: 0.6 },  // G5
+            { freq: 1046.50, dur: 0.15, type: 'sine', vol: 0.5 }, // C6
+            { freq: 783.99, dur: 0.15, type: 'sine', vol: 0.6 },  // G5
+        ];
+        const arpPatternLength = arpSequence.reduce((sum, note) => sum + note.dur + 0.05, 0); 
+        const loopDuration = arpPatternLength * 2; 
+        
         let accumulatedDelay = 0;
         const arpStartTime = audioCtx.currentTime;
 
-        for (let repeat = 0; repeat < 2; repeat++) { // Repeat arpeggio twice for a decent loop length
-            for (let i = 0; i < arpNotes.length; i++) {
-                const node = playTone(arpNotes[i], noteDuration, 'sine', 0.6, // Soft sine wave for bell/chime
+        for (let repeat = 0; repeat < 2; repeat++) { 
+            for (let i = 0; i < arpSequence.length; i++) {
+                const note = arpSequence[i];
+                const node = playTone(note.freq, note.dur, note.type, note.vol, 
                                     accumulatedDelay, 
                                     { outputNode: blimpThemeGainNode, 
                                       absoluteTime: arpStartTime + accumulatedDelay,
-                                      rampTo: 0.01 // Quick fade for pluckiness
+                                      rampTo: 0.01 
                                     });
                 if (node) blimpThemeNodes.push(node);
-                accumulatedDelay += noteDuration + 0.05; // Small gap between notes
+                accumulatedDelay += note.dur + 0.05; 
             }
         }
         
@@ -986,7 +991,6 @@
                 blimpThemeNodes = [];
                 if (blimpThemeGainNode) try { blimpThemeGainNode.disconnect(); } catch(_) {}
                 blimpThemeGainNode = null;
-                // console.log("Blimp theme stopped and cleaned up.");
             }, cleanupTime);
         } catch(e) {
             console.error("Error stopping blimp theme:", e);
