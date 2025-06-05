@@ -929,6 +929,7 @@
     function updateBuildings() { for (let i = buildings.length - 1; i >= 0; i--) { const b = buildings[i]; b.x -= currentScrollSpeed; if (b.isVertiport) b.wavePhase += 0.1; if (b.x + b.width < 0) buildings.splice(i, 1); } const lastBuilding = buildings[buildings.length - 1]; if (!lastBuilding || lastBuilding.x + lastBuilding.width < gameCanvas.width + 100) { spawnBuilding(); } }
     function drawBuildings() { buildings.forEach(b => { ctx.fillStyle = b.color; ctx.fillRect(b.x, b.y, b.width, b.height); if (b.isVertiport) { const platformY = b.y - 15; ctx.fillStyle = '#455A64'; ctx.fillRect(b.x - 10, platformY, b.width + 20, 15); ctx.fillStyle = '#B0BEC5'; ctx.beginPath(); ctx.arc(b.x + b.width / 2, platformY + 7.5, b.width * 0.3, 0, Math.PI * 2); ctx.fill(); const lightColor = (Math.sin(b.wavePhase * 2) > 0) ? '#0ff' : '#ff0'; ctx.fillStyle = lightColor; ctx.fillRect(b.x, platformY + 5, 10, 5); ctx.fillRect(b.x + b.width - 10, platformY + 5, 10, 5); const waveWidth = b.width * 0.6; const waveX = b.x + (b.width - waveWidth) / 2; const waveSegmentHeight = 20; const numSegments = Math.ceil(platformY / waveSegmentHeight); for(let i=0; i<numSegments; i++) { const segmentY = platformY - (i + 1) * waveSegmentHeight; const alpha = 0.1 + Math.abs(Math.sin(b.wavePhase + i * 0.5)) * 0.2; const hue = 180 + Math.sin(b.wavePhase + i*0.3) * 20; ctx.fillStyle = `hsla(${hue}, 100%, 70%, ${alpha})`; ctx.fillRect(waveX, segmentY, waveWidth, waveSegmentHeight - 2); } } else { ctx.fillStyle = 'rgba(255, 255, 180, 0.2)'; for(let wy = b.y + 10; wy < b.y + b.height - 10; wy += 25) { for(let wx = b.x + 10; wx < b.x + b.width - 10; wx += 25) { if(Math.random() > 0.4) { ctx.fillRect(wx, wy, 10, 15); } } } } }); }
     function spawnPedestrian() { const type = Math.random() > 0.4 ? 'OldLady' : 'BalloonPerson'; pedestrians.push({ x: gameCanvas.width + 50 + Math.random() * 100, y: gameCanvas.height - SIDEWALK_HEIGHT + 5 + Math.random() * (SIDEWALK_HEIGHT - 20), type: type, size: type === 'OldLady' ? {w: 8, h: 16} : {w: 10, h: 18}, color: type === 'OldLady' ? 'pink' : `hsl(${Math.random()*360}, 60%, 70%)`, throwCooldown: 60 + Math.random() * 120, speed: currentScrollSpeed * PEDESTRIAN_SPEED_MULTIPLIER * (0.8 + Math.random() * 0.4), lastActionFrame: 0 }); }
+    
     function updatePedestriansAndProjectiles() {
         const currentPedestrianSpawnChance = BASE_PEDESTRIAN_SPAWN_CHANCE * difficultyMultiplier;
         const currentProjectileThrowChance = BASE_PROJECTILE_THROW_CHANCE * difficultyMultiplier; 
@@ -937,15 +938,18 @@
             if (p.throwCooldown === 0 && Math.random() < currentProjectileThrowChance) {
                 if (p.type === 'OldLady') {
                     const itemType = Math.random() < 0.5 ? 'ChickenLeg' : 'CornCob';
-                    // Increased vertical velocity for higher arcs (target 70-85% screen height)
-                    let initialVy = -10 - Math.random() * 3; // Range -13 to -10 
-                    let initialVx = -1.0 - Math.random() * 1.0; // Slightly reduced horizontal for higher arc
+                    
+                    // PROJECTILE ARC FIX: Spawn higher, adjust initial velocity
+                    let spawnY = gameCanvas.height * 0.5 + Math.random() * 50; // Spawn mid-sky
+                    let initialVy = -7 - Math.random() * 3; // Adjusted vertical velocity for visible arc
+                    let initialVx = -1.0 - Math.random() * 1.0; 
+
                     projectiles.push({ 
                         type: itemType, 
-                        x: p.x, 
-                        y: p.y - 10, 
+                        x: p.x, // Still originates from pedestrian's horizontal position
+                        y: spawnY, // FIXED: Spawn higher
                         vx: initialVx, 
-                        vy: initialVy, 
+                        vy: initialVy, // FIXED: Adjusted Vy
                         size: {w: 4, h: (itemType === 'CornCob' ? 8 : 6)}, 
                         maxSize: 30 + Math.random() * 15, 
                         currentSize: 4, 
@@ -986,6 +990,7 @@
             if (proj.x + proj.size.w < 0 || proj.y + proj.size.h < -50 || proj.y > gameCanvas.height + 50) { projectiles.splice(i, 1); }
         }
     }
+
     function drawPedestriansAndProjectiles() { pedestrians.forEach(p => { ctx.fillStyle = p.color; ctx.fillRect(p.x, p.y, p.size.w, p.size.h); const timeSinceAction = frameCount - p.lastActionFrame; const hintDuration = 30; if (p.lastActionFrame > 0 && timeSinceAction < hintDuration) { const alpha = 1 - (timeSinceAction / hintDuration); ctx.globalAlpha = alpha * 0.8; ctx.font = "12px 'Courier New', Courier, monospace"; ctx.textAlign = 'center'; if (p.type === 'OldLady') { ctx.fillStyle = 'orange'; ctx.fillText("🍗", p.x + p.size.w / 2, p.y - 5); } else { ctx.fillStyle = '#ccc'; ctx.fillText("o", p.x + p.size.w / 2, p.y - 5); } ctx.globalAlpha = 1.0; ctx.textAlign = 'left'; } }); projectiles.forEach(p => { ctx.save(); ctx.translate(p.x + p.size.w / 2, p.y + p.size.h / 2); if (p.type === 'ChickenLeg') { ctx.rotate(p.rotation); const meatWidth = p.size.w; const meatHeight = p.size.h * 0.65; const boneWidth = p.size.w * 0.25; const boneHeight = p.size.h * 0.4; const boneY = meatHeight / 2; ctx.fillStyle = '#D2691E'; ctx.beginPath(); ctx.ellipse(0, -meatHeight/4, meatWidth / 2, meatHeight / 2, 0, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = '#eee'; ctx.fillRect(-boneWidth / 2, boneY - boneHeight / 2, boneWidth, boneHeight); ctx.beginPath(); ctx.arc(-boneWidth / 2, boneY + boneHeight / 2, boneWidth * 0.4, 0, Math.PI * 2); ctx.arc(boneWidth / 2, boneY + boneHeight / 2, boneWidth * 0.4, 0, Math.PI * 2); ctx.fill(); } else if (p.type === 'CornCob') { ctx.rotate(p.rotation); const cobWidth = p.size.w; const cobHeight = p.size.h; const stickWidth = cobWidth * 0.3; const stickHeight = cobHeight * 0.3; const stickY = cobHeight * 0.35; ctx.fillStyle = '#FFC107'; ctx.beginPath(); ctx.ellipse(0, 0, cobWidth / 2, cobHeight / 2, 0, 0, Math.PI * 2); ctx.fill(); ctx.strokeStyle = 'rgba(139, 69, 19, 0.5)'; ctx.lineWidth = Math.max(1, cobWidth * 0.05); for(let i = -cobWidth/2 + 3; i < cobWidth/2 - 3; i += cobWidth * 0.15) { ctx.beginPath(); ctx.moveTo(i, -cobHeight/2.5); ctx.lineTo(i + cobWidth*0.05, cobHeight/2.5); ctx.stroke(); ctx.beginPath(); ctx.moveTo(i+cobWidth*0.05, -cobHeight/2.5); ctx.lineTo(i, cobHeight/2.5); ctx.stroke(); } ctx.fillStyle = '#D2B48C'; ctx.fillRect(-stickWidth / 2, stickY, stickWidth, stickHeight); } else if (p.type === 'Balloon') { ctx.fillStyle = p.color; ctx.beginPath(); ctx.ellipse(0, 0, p.size.w / 2, p.size.h / 2, 0, 0, Math.PI * 2); ctx.fill(); ctx.strokeStyle = '#ccc'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, p.size.h / 2); ctx.lineTo(0, p.size.h / 2 + 10); ctx.stroke(); } else { ctx.fillStyle = p.color; ctx.fillRect(-p.size.w / 2, -p.size.h / 2, p.size.w, p.size.h); } ctx.restore(); }); }
     function spawnBonus() { const isChargingTrigger = Math.random() < CHARGING_TRIGGER_SPAWN_CHANCE && !isChargingSequence; bonuses.push({ type: isChargingTrigger ? 'ChargingTrigger' : 'Battery', x: gameCanvas.width + 100 + Math.random() * 200, y: isChargingTrigger ? playableHeight * 0.1 + Math.random() * playableHeight * 0.3 : Math.random() * (playableHeight * 0.8), size: isChargingTrigger ? 30 : 20, speed: currentScrollSpeed * BONUS_SPEED_MULTIPLIER }); }
     function updateBonuses() { for (let i = bonuses.length - 1; i >= 0; i--) { const b = bonuses[i]; b.x -= b.speed; if (b.x + b.size < 0) bonuses.splice(i, 1); } const batteryCount = bonuses.filter(b => b.type === 'Battery').length; const triggerCount = bonuses.filter(b => b.type === 'ChargingTrigger').length; if (batteryCount < 3 && Math.random() < 0.005) spawnBonus(); if (triggerCount === 0 && Math.random() < CHARGING_TRIGGER_SPAWN_CHANCE) spawnBonus(); }
