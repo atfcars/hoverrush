@@ -385,10 +385,6 @@
     const touchRightButton = document.getElementById('touch-right');
     const brandingWatermark = document.getElementById('branding-watermark');
     const gameOverBranding = document.getElementById('game-over-branding');
-    const LOGO_BASE64 = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCI+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNDUiIGZpbGw9IndoaXRlIi8+PC9zdmc+";
-    const blimpLogo = new Image();
-    blimpLogo.src = LOGO_BASE64;
-    blimpLogo.onload = () => { console.log("Blimp logo loaded successfully."); };
 
 
     // Game State
@@ -503,24 +499,19 @@
             ctx.ellipse(centerX, centerY, this.width / 2, this.height / 2, 0, 0, Math.PI * 2);
             ctx.fill();
 
-            // Subtle Highlight on top
+            // ... (rest of the blimp body drawing code is unchanged)
             ctx.save();
             ctx.fillStyle = 'rgba(255, 255, 255, 0.06)';
             ctx.beginPath();
             ctx.ellipse(centerX, centerY - this.height * 0.20, this.width / 2 * 0.95, this.height / 2 * 0.35, 0, 0, Math.PI * 2);
             ctx.fill();
             ctx.restore();
-
-            // Subtle Shadow on bottom
             ctx.save();
             ctx.fillStyle = 'rgba(0, 0, 0, 0.06)';
             ctx.beginPath();
             ctx.ellipse(centerX, centerY + this.height * 0.20, this.width / 2 * 0.95, this.height / 2 * 0.35, 0, 0, Math.PI * 2);
             ctx.fill();
             ctx.restore();
-
-
-            // Curved Rib Lines
             ctx.strokeStyle = 'rgba(100, 80, 30, 0.35)';
             ctx.lineWidth = 2;
             const numRibs = 6;
@@ -534,39 +525,16 @@
                 ctx.quadraticCurveTo(centerX + xOffset + (Math.random()-0.5)*3 , centerY, centerX + xOffset, centerY + yRadius + shimmer);
                 ctx.stroke();
             }
-            // Nose cone line
             ctx.strokeStyle = 'rgba(139, 69, 19, 0.4)';
             ctx.beginPath();
             ctx.moveTo(centerX - this.width * 0.48, centerY - this.height * 0.2);
             ctx.quadraticCurveTo(centerX - this.width * 0.52, centerY, centerX - this.width * 0.48, centerY + this.height * 0.2);
             ctx.stroke();
-
-
-            // Main Body Outline
             ctx.strokeStyle = '#8B4513';
             ctx.lineWidth = 2.5;
             ctx.beginPath();
             ctx.ellipse(centerX, centerY, this.width / 2, this.height / 2, 0, 0, Math.PI * 2);
             ctx.stroke();
-
-            // Draw the centered logo on the blimp body
-            if (blimpLogo.complete && blimpLogo.naturalWidth > 0) {
-                ctx.save();
-                const logoWidth = 80;
-                const logoHeight = (blimpLogo.naturalHeight / blimpLogo.naturalWidth) * logoWidth;
-                const logoX = centerX - logoWidth / 2;
-                const logoY = centerY - logoHeight / 2;
-
-                ctx.globalAlpha = 0.9;
-                ctx.shadowColor = 'white';
-                ctx.shadowBlur = 5;
-                
-                ctx.drawImage(blimpLogo, logoX, logoY, logoWidth, logoHeight);
-                
-                ctx.restore();
-            }
-
-             // Gondola (Dark Gray with Shadow)
             const gondolaWidth = this.width * 0.3;
             const gondolaHeight = this.height * 0.25;
             const gondolaX = centerX - gondolaWidth / 2;
@@ -581,9 +549,6 @@
             ctx.restore();
             ctx.strokeStyle = '#333';
             ctx.strokeRect(gondolaX, gondolaY, gondolaWidth, gondolaHeight);
-
-
-            // Animated Gondola Windows
             const numWindows = 3;
             const windowWidth = gondolaWidth / (numWindows + 2);
             const windowHeight = gondolaHeight * 0.4;
@@ -606,9 +571,6 @@
                 ctx.ellipse(currentWindowX + windowWidth/2, windowBaseY + windowHeight/2, windowWidth/2.5, windowHeight/2.5, 0, 0, Math.PI*2);
                 ctx.fill();
             }
-
-
-            // Tail Fins (Softer Orange with Shadow)
             ctx.save();
             ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
             ctx.shadowBlur = 5;
@@ -626,15 +588,29 @@
             ctx.closePath();
             ctx.fill();
             ctx.restore();
-
-
-            // Horizontal Center Line (Reinforced)
             ctx.strokeStyle = '#A0522D';
             ctx.lineWidth = 1.5;
             ctx.beginPath();
             ctx.moveTo(centerX - this.width/2 * 0.75, centerY);
             ctx.lineTo(centerX + this.width/2 * 0.7, centerY);
             ctx.stroke();
+            ctx.fillStyle = 'rgba(100, 100, 100, 0.1)';
+            ctx.beginPath();
+            ctx.arc(centerX - this.width * 0.1, centerY, this.height * 0.2, 0, Math.PI * 2);
+            ctx.fill();
+            const blinkInterval = 1500;
+            const blinkOn = (Math.floor(performance.now() / (blinkInterval / 2)) % 2 === 0);
+            if (blinkOn) {
+                const lightRadius = Math.max(1.5, this.width * 0.006);
+                const topFinLightX = finTipX;
+                const topFinLightY = centerY - finH / 2;
+                ctx.fillStyle = 'white';
+                ctx.beginPath();
+                ctx.arc(topFinLightX, topFinLightY, lightRadius, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            // --- End of Unchanged Blimp Drawing ---
+
 
             // --- NEW LED BANNER DRAWING LOGIC ---
             ctx.save();
@@ -691,20 +667,6 @@
             }
             
             ctx.restore(); // Restore context to remove clipping and shadow effects
-
-             // Animated Marker Lights
-            const blinkInterval = 1500;
-            const blinkOn = (Math.floor(performance.now() / (blinkInterval / 2)) % 2 === 0);
-
-            if (blinkOn) {
-                const lightRadius = Math.max(1.5, this.width * 0.006);
-                const topFinLightX = finTipX;
-                const topFinLightY = centerY - finH / 2;
-                ctx.fillStyle = 'white';
-                ctx.beginPath();
-                ctx.arc(topFinLightX, topFinLightY, lightRadius, 0, Math.PI * 2);
-                ctx.fill();
-            }
         }
 
         collidesWith(rect) {
