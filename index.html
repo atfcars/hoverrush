@@ -419,8 +419,6 @@
     let cityHeight = 450, playableHeight = 450;
     const PROJECTILE_GRAVITY = 0.15;
     let difficultyMultiplier = 1.0;
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
 
     // --- Blimp Variables ---
     let blimp = null;
@@ -462,16 +460,6 @@
             this.windowPulseSpeed = 0.05 + Math.random() * 0.03;
             this.ribPhase = Math.random() * Math.PI * 2;
             this.ribSpeed = 0.02 + Math.random() * 0.01;
-            
-            // Banner properties
-            this.bannerTextOffset = 0;
-            this.prefersReducedMotion = prefersReducedMotion;
-            
-            const isNarrowScreen = window.innerWidth < 480;
-            this.bannerScrollSpeed = isNarrowScreen ? 0.8 : 1.2;
-            this.bannerFontSize = isNarrowScreen ? 16 : 14;
-            this.bannerWidth = isNarrowScreen ? 280 : 240;
-            this.bannerHeight = 45;
         }
 
         update() {
@@ -479,10 +467,6 @@
             this.bannerWavePhase += this.bannerWaveSpeed;
             this.windowPulsePhase += this.windowPulseSpeed;
             this.ribPhase += this.ribSpeed;
-
-            if (!this.prefersReducedMotion) {
-                this.bannerTextOffset += this.bannerScrollSpeed;
-            }
         }
 
         draw(ctx) {
@@ -490,118 +474,216 @@
             const centerY = this.y + this.height / 2;
 
             // Blimp Body (Yellow with Gradient)
-            const bodyGradient = ctx.createLinearGradient(centerX - this.width * 0.2, centerY - this.height * 0.3, centerX + this.width * 0.2, centerY + this.height * 0.3);
-            bodyGradient.addColorStop(0, '#FFFDE7');
-            bodyGradient.addColorStop(0.5, '#FFDB58');
-            bodyGradient.addColorStop(1, '#B8860B');
+            const bodyGradient = ctx.createLinearGradient(centerX - this.width * 0.2, centerY - this.height * 0.3, centerX + this.width * 0.2, centerY + this.height * 0.3); // Top-left to bottom-right
+            bodyGradient.addColorStop(0, '#FFFDE7'); // Lighter yellow (almost white)
+            bodyGradient.addColorStop(0.5, '#FFDB58'); // Mustard Yellow
+            bodyGradient.addColorStop(1, '#B8860B');   // Darker GoldenRod
             ctx.fillStyle = bodyGradient;
             ctx.beginPath();
             ctx.ellipse(centerX, centerY, this.width / 2, this.height / 2, 0, 0, Math.PI * 2);
             ctx.fill();
 
-            // ... (rest of the blimp body drawing code is unchanged)
+            // Subtle Highlight on top
             ctx.save();
             ctx.fillStyle = 'rgba(255, 255, 255, 0.06)';
             ctx.beginPath();
             ctx.ellipse(centerX, centerY - this.height * 0.20, this.width / 2 * 0.95, this.height / 2 * 0.35, 0, 0, Math.PI * 2);
             ctx.fill();
             ctx.restore();
+
+            // Subtle Shadow on bottom
             ctx.save();
             ctx.fillStyle = 'rgba(0, 0, 0, 0.06)';
             ctx.beginPath();
             ctx.ellipse(centerX, centerY + this.height * 0.20, this.width / 2 * 0.95, this.height / 2 * 0.35, 0, 0, Math.PI * 2);
             ctx.fill();
             ctx.restore();
-            ctx.strokeStyle = 'rgba(100, 80, 30, 0.35)';
-            ctx.lineWidth = 2;
+
+
+            // Curved Rib Lines
+            ctx.strokeStyle = 'rgba(100, 80, 30, 0.35)'; // Darker, more subtle rib color
+            ctx.lineWidth = 2; // Slightly thicker ribs
             const numRibs = 6;
             for (let i = 1; i <= numRibs; i++) {
                 const ribProgress = i / (numRibs + 1);
                 const xOffset = (ribProgress - 0.5) * this.width * 0.9;
-                const yRadius = this.height / 2 * Math.sqrt(1 - Math.pow(xOffset / (this.width / 2 * 0.95), 2));
-                const shimmer = Math.sin(this.ribPhase + i * 0.6) * 1.5;
+                const yRadius = this.height / 2 * Math.sqrt(1 - Math.pow(xOffset / (this.width / 2 * 0.95), 2)); // Ensure ellipse bounds
+
+                const shimmer = Math.sin(this.ribPhase + i * 0.6) * 1.5; // Reduced shimmer
+
                 ctx.beginPath();
                 ctx.moveTo(centerX + xOffset, centerY - yRadius + shimmer);
                 ctx.quadraticCurveTo(centerX + xOffset + (Math.random()-0.5)*3 , centerY, centerX + xOffset, centerY + yRadius + shimmer);
                 ctx.stroke();
             }
+            // Nose cone line
             ctx.strokeStyle = 'rgba(139, 69, 19, 0.4)';
             ctx.beginPath();
             ctx.moveTo(centerX - this.width * 0.48, centerY - this.height * 0.2);
             ctx.quadraticCurveTo(centerX - this.width * 0.52, centerY, centerX - this.width * 0.48, centerY + this.height * 0.2);
             ctx.stroke();
+
+
+            // Main Body Outline
             ctx.strokeStyle = '#8B4513';
             ctx.lineWidth = 2.5;
             ctx.beginPath();
             ctx.ellipse(centerX, centerY, this.width / 2, this.height / 2, 0, 0, Math.PI * 2);
             ctx.stroke();
+
+             // Gondola (Dark Gray with Shadow)
             const gondolaWidth = this.width * 0.3;
             const gondolaHeight = this.height * 0.25;
             const gondolaX = centerX - gondolaWidth / 2;
-            const gondolaY = centerY + this.height * 0.35;
-            ctx.save();
+            const gondolaY = centerY + this.height * 0.35; // Lowered slightly
+
+            ctx.save(); // Save context for shadow
             ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
             ctx.shadowBlur = 8;
             ctx.shadowOffsetX = 2;
             ctx.shadowOffsetY = 4;
-            ctx.fillStyle = '#555';
+            ctx.fillStyle = '#555'; // Darker gondola
             ctx.fillRect(gondolaX, gondolaY, gondolaWidth, gondolaHeight);
-            ctx.restore();
-            ctx.strokeStyle = '#333';
+            ctx.restore(); // Restore context to remove shadow for other elements
+
+            ctx.strokeStyle = '#333'; // Darker outline for gondola
             ctx.strokeRect(gondolaX, gondolaY, gondolaWidth, gondolaHeight);
+
+
+            // Animated Gondola Windows
             const numWindows = 3;
             const windowWidth = gondolaWidth / (numWindows + 2);
             const windowHeight = gondolaHeight * 0.4;
             const windowSpacing = (gondolaWidth - (numWindows * windowWidth)) / (numWindows + 1);
             const windowBaseY = gondolaY + gondolaHeight * 0.25;
-            const pulseBrightness = 0.6 + Math.sin(this.windowPulsePhase) * 0.4;
-            const windowGlowColor = `rgba(173, 216, 230, ${pulseBrightness * 0.7})`;
+
+            const pulseBrightness = 0.6 + Math.sin(this.windowPulsePhase) * 0.4; // Range 0.2 to 1.0
+            const windowGlowColor = `rgba(173, 216, 230, ${pulseBrightness * 0.7})`; // #aaddff with alpha
             const windowCoreColor = `rgba(220, 240, 255, ${pulseBrightness})`;
+
             for (let i = 0; i < numWindows; i++) {
                 const currentWindowX = gondolaX + windowSpacing + (i * (windowWidth + windowSpacing));
+                // Draw glow first
                 ctx.fillStyle = windowGlowColor;
                 ctx.shadowColor = windowGlowColor;
-                ctx.shadowBlur = 6 * pulseBrightness;
+                ctx.shadowBlur = 6 * pulseBrightness; // Subtle glow
                 ctx.beginPath();
                 ctx.ellipse(currentWindowX + windowWidth/2, windowBaseY + windowHeight/2, windowWidth/2, windowHeight/2, 0, 0, Math.PI*2);
                 ctx.fill();
-                ctx.shadowBlur = 0;
+                ctx.shadowBlur = 0; // Reset shadow for core window
+
+                // Draw core window
                 ctx.fillStyle = windowCoreColor;
                  ctx.beginPath();
-                ctx.ellipse(currentWindowX + windowWidth/2, windowBaseY + windowHeight/2, windowWidth/2.5, windowHeight/2.5, 0, 0, Math.PI*2);
+                ctx.ellipse(currentWindowX + windowWidth/2, windowBaseY + windowHeight/2, windowWidth/2.5, windowHeight/2.5, 0, 0, Math.PI*2); // Slightly smaller core
                 ctx.fill();
             }
+
+
+            // Tail Fins (Softer Orange with Shadow)
             ctx.save();
             ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
             ctx.shadowBlur = 5;
             ctx.shadowOffsetX = -2;
             ctx.shadowOffsetY = 2;
-            ctx.fillStyle = '#FF8C00';
+            ctx.fillStyle = '#FF8C00'; // Softer Orange
             const finBaseX = centerX + this.width * 0.35;
             const finTipX = centerX + this.width * 0.50;
             const finW = this.width * 0.15;
             const finH = this.height * 0.45;
+
+            // Top fin (remains)
             ctx.beginPath();
             ctx.moveTo(finBaseX - finW, centerY - this.height * 0.1);
             ctx.quadraticCurveTo(finBaseX + finW * 0.2, centerY - finH * 0.8, finTipX, centerY - finH/2);
             ctx.quadraticCurveTo(finBaseX + finW * 0.3, centerY, finBaseX, centerY + this.height * 0.1);
             ctx.closePath();
             ctx.fill();
+
             ctx.restore();
+
+
+            // Horizontal Center Line (Reinforced)
             ctx.strokeStyle = '#A0522D';
             ctx.lineWidth = 1.5;
             ctx.beginPath();
             ctx.moveTo(centerX - this.width/2 * 0.75, centerY);
             ctx.lineTo(centerX + this.width/2 * 0.7, centerY);
             ctx.stroke();
+
+            // Optional faint logo silhouette on body
             ctx.fillStyle = 'rgba(100, 100, 100, 0.1)';
             ctx.beginPath();
             ctx.arc(centerX - this.width * 0.1, centerY, this.height * 0.2, 0, Math.PI * 2);
             ctx.fill();
-            const blinkInterval = 1500;
+
+            // Banner (trailing to the right with wave effect)
+            const bannerHeight = this.height * 0.3;
+            const bannerWidth = this.width * 0.9;
+            const bannerAttachX = centerX + this.width * 0.45;
+            const bannerAttachY = centerY;
+            const bannerStartX = this.x + this.width + 20;
+            const bannerSegments = 10;
+            const segmentWidth = bannerWidth / bannerSegments;
+
+            const perfNow = performance.now();
+
+            const staticWaveOffsetYForAttach = Math.sin(this.bannerWavePhase) * this.bannerWaveAmplitude;
+            const bannerBaseYForAttach = this.y + this.height / 2 - bannerHeight / 2 + staticWaveOffsetYForAttach;
+            ctx.strokeStyle = '#555';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(bannerAttachX, bannerAttachY - this.height * 0.05);
+            ctx.lineTo(bannerStartX, bannerBaseYForAttach + bannerHeight * 0.2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(bannerAttachX, bannerAttachY + this.height * 0.05);
+            ctx.lineTo(bannerStartX, bannerBaseYForAttach + bannerHeight * 0.8);
+            ctx.stroke();
+
+            ctx.fillStyle = '#FFF';
+            ctx.strokeStyle = '#555';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            for (let i = 0; i <= bannerSegments; i++) {
+                const waveOffset = Math.sin(perfNow / 200 + i * 0.5) * this.bannerWaveAmplitude * (i / bannerSegments); // Amplitude increases towards end
+                const currentBannerX = bannerStartX + i * segmentWidth;
+                const currentBannerTopY = this.y + this.height / 2 - bannerHeight / 2 + waveOffset;
+                if (i === 0) {
+                    ctx.moveTo(currentBannerX, currentBannerTopY);
+                } else {
+                    ctx.lineTo(currentBannerX, currentBannerTopY);
+                }
+            }
+            for (let i = bannerSegments; i >= 0; i--) {
+                 const waveOffset = Math.sin(perfNow / 200 + i * 0.5) * this.bannerWaveAmplitude * (i / bannerSegments);
+                 const currentBannerX = bannerStartX + i * segmentWidth;
+                 const currentBannerBottomY = this.y + this.height / 2 + bannerHeight / 2 + waveOffset;
+                 ctx.lineTo(currentBannerX, currentBannerBottomY);
+            }
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            const avgBannerY = this.y + this.height / 2;
+            ctx.fillStyle = '#d9534f';
+            const fontSize = Math.max(8, Math.min(14, bannerHeight * 0.35));
+            ctx.font = `bold ${fontSize}px 'Courier New', Courier, monospace`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(this.bannerLogo, bannerStartX + bannerWidth / 2, avgBannerY);
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'alphabetic';
+
+             // Animated Marker Lights
+            const blinkInterval = 1500; // ms
             const blinkOn = (Math.floor(performance.now() / (blinkInterval / 2)) % 2 === 0);
+
             if (blinkOn) {
                 const lightRadius = Math.max(1.5, this.width * 0.006);
+
+                // Top Fin Tip Light (White)
+                // finTipX and finH are defined where the top fin is drawn
                 const topFinLightX = finTipX;
                 const topFinLightY = centerY - finH / 2;
                 ctx.fillStyle = 'white';
@@ -609,64 +691,6 @@
                 ctx.arc(topFinLightX, topFinLightY, lightRadius, 0, Math.PI * 2);
                 ctx.fill();
             }
-            // --- End of Unchanged Blimp Drawing ---
-
-
-            // --- NEW LED BANNER DRAWING LOGIC ---
-            ctx.save();
-            
-            const bannerAttachX = centerX + this.width * 0.45;
-            const bannerWaveY = centerY + Math.sin(this.bannerWavePhase) * this.bannerWaveAmplitude;
-            const bannerStartX = this.x + this.width + 20;
-            
-            // Draw attachment lines
-            ctx.strokeStyle = '#555';
-            ctx.lineWidth = 1.5;
-            ctx.beginPath();
-            ctx.moveTo(bannerAttachX, centerY - this.height * 0.05);
-            ctx.lineTo(bannerStartX, bannerWaveY - this.bannerHeight / 2 + 5);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(bannerAttachX, centerY + this.height * 0.05);
-            ctx.lineTo(bannerStartX, bannerWaveY + this.bannerHeight / 2 - 5);
-            ctx.stroke();
-
-            // Draw banner background
-            ctx.fillStyle = '#1a1a1a';
-            ctx.strokeStyle = '#333';
-            ctx.lineWidth = 2;
-            ctx.shadowColor = 'rgba(0,0,0,0.5)';
-            ctx.shadowBlur = 5;
-            ctx.fillRect(bannerStartX, bannerWaveY - this.bannerHeight / 2, this.bannerWidth, this.bannerHeight);
-            ctx.strokeRect(bannerStartX, bannerWaveY - this.bannerHeight / 2, this.bannerWidth, this.bannerHeight);
-
-            // Set up clipping region for the text
-            ctx.beginPath();
-            ctx.rect(bannerStartX, bannerWaveY - this.bannerHeight / 2, this.bannerWidth, this.bannerHeight);
-            ctx.clip();
-
-            // Draw the text
-            ctx.font = `bold ${this.bannerFontSize}px 'Courier New', Courier, monospace`;
-            ctx.fillStyle = '#39ff14';
-            ctx.shadowColor = '#39ff14';
-            ctx.shadowBlur = 5;
-            ctx.textBaseline = 'middle';
-
-            if (this.prefersReducedMotion) {
-                // Static, centered text
-                ctx.textAlign = 'center';
-                ctx.fillText(this.bannerLogo, bannerStartX + this.bannerWidth / 2, bannerWaveY);
-            } else {
-                // Scrolling text
-                ctx.textAlign = 'left';
-                const textMetrics = ctx.measureText(this.bannerLogo);
-                const textWidth = textMetrics.width;
-                const scrollCycleWidth = this.bannerWidth + textWidth;
-                const textX = this.bannerWidth - (this.bannerTextOffset % scrollCycleWidth);
-                ctx.fillText(this.bannerLogo, bannerStartX + textX, bannerWaveY);
-            }
-            
-            ctx.restore(); // Restore context to remove clipping and shadow effects
         }
 
         collidesWith(rect) {
@@ -1292,7 +1316,7 @@
 
        if (blimp) {
             blimp.update();
-            if (blimp.x + blimp.width + blimp.bannerWidth + 20 < 0) { // Check if blimp + banner are off-screen
+            if (blimp.x + blimp.width + (blimp.width * 0.7 + 20) < 0) { // Check if blimp + banner are off-screen
                 blimp = null;
                 stopBlimpTheme();
             }
