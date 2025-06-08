@@ -305,7 +305,7 @@
 <body>
 
 <canvas id="gameCanvas"></canvas>
-<img src="https://via.placeholder.com/800x400" id="branding-watermark" alt="HoverRush Logo" style="display: none;" />
+<img src="https://placehold.co/800x400/000000/FFFFFF/png?text=HoverRush" id="branding-watermark" alt="HoverRush Logo" style="display: none;" />
 
 <div id="start-screen">
 <h1>HoverRush</h1>
@@ -349,7 +349,7 @@
 </div>
 </div>
 <div id="game-over-screen">
-<img alt="HoverRush Logo" id="game-over-branding" src="https://via.placeholder.com/550x200"/>
+<img alt="HoverRush Logo" id="game-over-branding" src="https://placehold.co/550x200/000000/FFFFFF/png?text=HoverRush"/>
 <h2>Game Over!</h2>
 <p id="final-score">Final Score: 0</p>
 <p class="branding-message">🚀 Want to keep flying? <br/> Visit <a href="https://AllThingsFlyingCars.com" target="_blank">AllThingsFlyingCars.com</a> and ride the skyway of the future!</p>
@@ -429,10 +429,12 @@
 
     // --- Blimp Theme Audio Variables ---
     let blimpThemeGainNode = null;
+    let blimpThemeHighPassFilter = null;
+    let blimpThemePeakingFilter = null;
     let blimpThemeNodes = [];
     let blimpThemeLoopTimeoutId = null;
     let blimpThemeIsPlaying = false;
-    const BLIMP_THEME_VOLUME = 0.15;
+    const BLIMP_THEME_VOLUME = 0.22; // Increased from 0.15
     const BLIMP_THEME_FADE_DURATION = 1.5;
     let blimpThemeNextPlayTime = 0; // Earliest time the theme can play again
     const BLIMP_THEME_REPLAY_MIN_DELAY = 15000; // 15 seconds
@@ -448,12 +450,12 @@
             this.height = this.width * 0.35;
             this.x = this.canvas.width;
             this.y = this.playableHeight * 0.1 + Math.random() * (this.playableHeight * 0.15);
-            this.vx = -0.25 - Math.random() * 0.3;
-            this.bannerLogo = 'TEMP_B64_LOGO_BANNER_PLACEHOLDER';
+            this.vx = -2.5 - Math.random() * 0.5;
+            this.bannerLogo = 'ATFCars Blimp'; // Placeholder text banner
             this.collisionDamage = BLIMP_COLLISION_DAMAGE;
             this.bannerWavePhase = Math.random() * Math.PI * 2;
             this.bannerWaveSpeed = 0.04 + Math.random() * 0.02;
-            this.bannerWaveAmplitude = 4 + Math.random() * 2; // Waving banner amplitude: 4-6px
+            this.bannerWaveAmplitude = 6 + Math.random() * 3; // Increased from 4-6 to 6-9
             this.windowPulsePhase = Math.random() * Math.PI * 2;
             this.windowPulseSpeed = 0.05 + Math.random() * 0.03;
             this.ribPhase = Math.random() * Math.PI * 2;
@@ -480,6 +482,23 @@
             ctx.beginPath();
             ctx.ellipse(centerX, centerY, this.width / 2, this.height / 2, 0, 0, Math.PI * 2);
             ctx.fill();
+
+            // Subtle Highlight on top
+            ctx.save();
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.06)';
+            ctx.beginPath();
+            ctx.ellipse(centerX, centerY - this.height * 0.20, this.width / 2 * 0.95, this.height / 2 * 0.35, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+
+            // Subtle Shadow on bottom
+            ctx.save();
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.06)';
+            ctx.beginPath();
+            ctx.ellipse(centerX, centerY + this.height * 0.20, this.width / 2 * 0.95, this.height / 2 * 0.35, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+
 
             // Curved Rib Lines
             ctx.strokeStyle = 'rgba(100, 80, 30, 0.35)'; // Darker, more subtle rib color
@@ -567,12 +586,13 @@
             ctx.shadowBlur = 5;
             ctx.shadowOffsetX = -2;
             ctx.shadowOffsetY = 2;
-            ctx.fillStyle = '#FF8C00';
+            ctx.fillStyle = '#FF8C00'; // Softer Orange
             const finBaseX = centerX + this.width * 0.35;
             const finTipX = centerX + this.width * 0.50;
             const finW = this.width * 0.15;
             const finH = this.height * 0.45;
-            // Top fin
+
+            // Top fin (remains)
             ctx.beginPath();
             ctx.moveTo(finBaseX - finW, centerY - this.height * 0.1);
             ctx.quadraticCurveTo(finBaseX + finW * 0.2, centerY - finH * 0.8, finTipX, centerY - finH/2);
@@ -580,38 +600,8 @@
             ctx.closePath();
             ctx.fill();
 
-            // Horizontal fins
-             const hFinW = this.width * 0.15;
-             const hFinH = this.height * 0.7;
-             ctx.beginPath();
-             ctx.moveTo(centerX + this.width * 0.30, centerY - hFinH/2 * 0.8);
-             ctx.lineTo(centerX + this.width * 0.45, centerY - hFinH/2 * 0.7);
-             ctx.lineTo(centerX + this.width * 0.45, centerY + hFinH/2 * 0.7);
-             ctx.lineTo(centerX + this.width * 0.30, centerY + hFinH/2 * 0.8);
-             ctx.closePath();
-             ctx.fill();
-            ctx.restore(); // Restore context from shadow
-
-            // Air Rudder (Vertical Fin)
-            ctx.save();
-            ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
-            ctx.shadowBlur = 4;
-            ctx.shadowOffsetX = -1;
-            ctx.shadowOffsetY = 1;
-            ctx.fillStyle = '#FF8C00';
-            const rudderBaseYTop = centerY - this.height * 0.1;
-            const rudderBaseYBottom = centerY + this.height * 0.1;
-            const rudderTipY = centerY;
-            const rudderBackX = centerX + this.width * 0.52;
-            const rudderFrontX = centerX + this.width * 0.38;
-            ctx.beginPath();
-            ctx.moveTo(rudderFrontX, rudderBaseYTop);
-            ctx.lineTo(rudderBackX, rudderTipY - this.height * 0.3);
-            ctx.lineTo(rudderBackX, rudderTipY + this.height * 0.3);
-            ctx.lineTo(rudderFrontX, rudderBaseYBottom);
-            ctx.closePath();
-            ctx.fill();
             ctx.restore();
+
 
             // Horizontal Center Line (Reinforced)
             ctx.strokeStyle = '#A0522D';
@@ -684,6 +674,23 @@
             ctx.fillText(this.bannerLogo, bannerStartX + bannerWidth / 2, avgBannerY);
             ctx.textAlign = 'left';
             ctx.textBaseline = 'alphabetic';
+
+             // Animated Marker Lights
+            const blinkInterval = 1500; // ms
+            const blinkOn = (Math.floor(performance.now() / (blinkInterval / 2)) % 2 === 0);
+
+            if (blinkOn) {
+                const lightRadius = Math.max(1.5, this.width * 0.006);
+
+                // Top Fin Tip Light (White)
+                // finTipX and finH are defined where the top fin is drawn
+                const topFinLightX = finTipX;
+                const topFinLightY = centerY - finH / 2;
+                ctx.fillStyle = 'white';
+                ctx.beginPath();
+                ctx.arc(topFinLightX, topFinLightY, lightRadius, 0, Math.PI * 2);
+                ctx.fill();
+            }
         }
 
         collidesWith(rect) {
@@ -936,54 +943,62 @@
     function playBlimpTheme() {
         if (!audioInitialized || !audioCtx || audioCtx.state !== 'running') return;
 
-        // PRIMARY GATE: Has enough time passed for ANY blimp theme to play?
-        // This check now correctly gates new theme initiations even if blimpThemeIsPlaying was false previously.
         if (audioCtx.currentTime < blimpThemeNextPlayTime) {
-            // console.log(`Blimp theme: Play attempted at ${audioCtx.currentTime.toFixed(2)} but cooldown active until ${blimpThemeNextPlayTime.toFixed(2)}. No new theme started.`);
-            // If a theme is already considered "playing" (blimpThemeIsPlaying is true),
-            // its own loop (via setTimeout in scheduleBlimpArpeggio calling this function)
-            // will handle re-triggering if conditions (blimp still exists, etc.) are met.
-            // We don't need to reschedule a check here explicitly.
-            // If no theme is "playing" (blimpThemeIsPlaying is false), it means this call
-            // is likely from a new blimp spawning during cooldown. We simply return, and no theme starts.
             return;
         }
-
-        // If we reach here, the global cooldown has passed.
-        // A blimp theme sequence (either new or a loop of an existing one) can now proceed.
-        blimpThemeIsPlaying = true; // Mark that a blimp theme audio sequence is now active or continuing.
+        blimpThemeIsPlaying = true;
 
         try {
             if (!blimpThemeGainNode) {
                 blimpThemeGainNode = audioCtx.createGain();
-                blimpThemeGainNode.connect(audioCtx.destination);
                 blimpThemeGainNode.gain.setValueAtTime(0, audioCtx.currentTime); // Start silent for fade-in
             }
-            // Ensure gain is at current value before ramping, to avoid jumps if already fading in/out
+
+            // Ensure filters are (re)created and connected correctly if not already
+            if (!blimpThemeHighPassFilter) {
+                blimpThemeHighPassFilter = audioCtx.createBiquadFilter();
+                blimpThemeHighPassFilter.type = 'highpass';
+                blimpThemeHighPassFilter.frequency.setValueAtTime(400, audioCtx.currentTime);
+            }
+            if (!blimpThemePeakingFilter) {
+                blimpThemePeakingFilter = audioCtx.createBiquadFilter();
+                blimpThemePeakingFilter.type = 'peaking';
+                blimpThemePeakingFilter.frequency.setValueAtTime(2500, audioCtx.currentTime);
+                blimpThemePeakingFilter.Q.setValueAtTime(1.5, audioCtx.currentTime);
+                blimpThemePeakingFilter.gain.setValueAtTime(3, audioCtx.currentTime); // +3dB gain
+            }
+
+            // Ensure correct connection path: Gain -> HPF -> Peaking -> Destination
+            try { blimpThemeGainNode.disconnect(); } catch(e) {} // Disconnect from any previous routes
+            try { blimpThemeHighPassFilter.disconnect(); } catch(e) {}
+            try { blimpThemePeakingFilter.disconnect(); } catch(e) {}
+
+            blimpThemeGainNode.connect(blimpThemeHighPassFilter);
+            blimpThemeHighPassFilter.connect(blimpThemePeakingFilter);
+            blimpThemePeakingFilter.connect(audioCtx.destination);
+
+            // Fade in the main blimp theme volume (controlled by blimpThemeGainNode)
             blimpThemeGainNode.gain.cancelScheduledValues(audioCtx.currentTime);
-            blimpThemeGainNode.gain.setValueAtTime(blimpThemeGainNode.gain.value, audioCtx.currentTime); // Set to current value
+            blimpThemeGainNode.gain.setValueAtTime(blimpThemeGainNode.gain.value, audioCtx.currentTime); // Set to current value to avoid clicks
             blimpThemeGainNode.gain.linearRampToValueAtTime(BLIMP_THEME_VOLUME, audioCtx.currentTime + BLIMP_THEME_FADE_DURATION);
 
-            scheduleBlimpArpeggio(); // This will play the arpeggio and importantly set the *next* blimpThemeNextPlayTime.
+            scheduleBlimpArpeggio();
         } catch (e) {
             console.error("Error in playBlimpTheme setup:", e);
-            blimpThemeIsPlaying = false; // Reset on error
-            if (blimpThemeGainNode) {
-                try { blimpThemeGainNode.disconnect(); } catch(_) {}
-                blimpThemeGainNode = null; // Allow recreation
-            }
+            blimpThemeIsPlaying = false;
+            if (blimpThemeGainNode) { try { blimpThemeGainNode.disconnect(); } catch(_) {} blimpThemeGainNode = null; }
+            if (blimpThemeHighPassFilter) { try { blimpThemeHighPassFilter.disconnect(); } catch(_) {} blimpThemeHighPassFilter = null; }
+            if (blimpThemePeakingFilter) { try { blimpThemePeakingFilter.disconnect(); } catch(_) {} blimpThemePeakingFilter = null; }
         }
     }
 
 
     function scheduleBlimpArpeggio() {
         if (!blimpThemeIsPlaying || !blimpThemeGainNode || !audioCtx || audioCtx.state !== 'running' || !blimp) {
-            // console.log("scheduleBlimpArpeggio: Conditions not met (blimp gone, theme stopped, or audio issue). Stopping.");
             stopBlimpTheme(true);
             return;
         }
 
-        // Clean up previous notes related to this theme instance
         blimpThemeNodes.forEach(item => {
             if (item && item.osc) try { item.osc.stop(audioCtx.currentTime); } catch (e) {}
         });
@@ -999,74 +1014,63 @@
         const shortPauseBetweenNotes = 0.04;
 
         let currentArpeggioPlayDuration = 0;
-        const arpPlayStartTime = audioCtx.currentTime; // Base time for this specific arpeggio sequence
+        const arpPlayStartTime = audioCtx.currentTime;
 
         for (let i = 0; i < arpSequence.length; i++) {
             const note = arpSequence[i];
             const node = playTone(note.freq, note.dur, note.type, note.vol,
-                                0, // 'when' is relative to absoluteTime if provided
+                                0,
                                 {
-                                  outputNode: blimpThemeGainNode,
-                                  absoluteTime: arpPlayStartTime + currentArpeggioPlayDuration, // Schedule precisely
+                                  outputNode: blimpThemeGainNode, // Notes go into the GainNode, which is then filtered
+                                  absoluteTime: arpPlayStartTime + currentArpeggioPlayDuration,
                                   rampTo: 0.005
                                 });
             if (node) blimpThemeNodes.push(node);
             currentArpeggioPlayDuration += note.dur + shortPauseBetweenNotes;
         }
-        // currentArpeggioPlayDuration now holds the total time for this arpeggio to play out (notes + pauses).
 
-        // Calculate when the NEXT theme play (either loop of current, or new blimp) can happen.
         const randomCooldownDurationSeconds = (BLIMP_THEME_REPLAY_MIN_DELAY + Math.random() * (BLIMP_THEME_REPLAY_MAX_DELAY - BLIMP_THEME_REPLAY_MIN_DELAY)) / 1000;
-        // The next global play time is after the current arpeggio finishes AND the cooldown passes.
         blimpThemeNextPlayTime = arpPlayStartTime + currentArpeggioPlayDuration + randomCooldownDurationSeconds;
-        // console.log(`Arpeggio scheduled. Start: ${arpPlayStartTime.toFixed(2)}, Duration: ${currentArpeggioPlayDuration.toFixed(2)}. Next theme play allowed globally at: ${blimpThemeNextPlayTime.toFixed(2)}`);
 
         if (blimpThemeLoopTimeoutId) clearTimeout(blimpThemeLoopTimeoutId);
 
-        // This timeout is for the *current* blimp's theme to attempt to loop.
-        // It should try to play again after its current arpeggio + cooldown.
         const delayForThisLoopIterationSeconds = currentArpeggioPlayDuration + randomCooldownDurationSeconds;
 
         blimpThemeLoopTimeoutId = setTimeout(() => {
             if (blimp && blimpThemeIsPlaying && audioCtx.state === 'running') {
-                // When this timeout fires, it means *this specific blimp's theme* wants to play its next arpeggio.
-                // Call playBlimpTheme(), which contains the master gate (audioCtx.currentTime < blimpThemeNextPlayTime).
-                // This ensures that even if this blimp's theme wants to loop, it won't if another
-                // blimp theme (or even this one, if logic was slightly different) has recently played
-                // and set a future blimpThemeNextPlayTime.
-                // console.log(`Blimp theme loop for current blimp: Attempting next arpeggio via playBlimpTheme() at ${audioCtx.currentTime.toFixed(2)}`);
                 playBlimpTheme();
-            } else {
-                // console.log("Blimp theme loop: Conditions not met for replay (blimp gone or theme stopped by stopBlimpTheme).");
             }
         }, delayForThisLoopIterationSeconds * 1000);
     }
 
 
     function stopBlimpTheme(immediate = false) {
-        if (!blimpThemeIsPlaying && !blimpThemeGainNode) {
-            // console.log("stopBlimpTheme: Called when theme not playing or no gain node. Already effectively stopped.");
+        if (!blimpThemeIsPlaying && !blimpThemeGainNode && !blimpThemeHighPassFilter && !blimpThemePeakingFilter) {
             return;
         }
 
-        blimpThemeIsPlaying = false; // This is the master switch to stop loops/replays.
+        blimpThemeIsPlaying = false;
 
         if (blimpThemeLoopTimeoutId) {
             clearTimeout(blimpThemeLoopTimeoutId);
             blimpThemeLoopTimeoutId = null;
-            // console.log("stopBlimpTheme: Cleared blimp theme loop timeout.");
         }
 
-        if (!audioCtx || audioCtx.state !== 'running' || !blimpThemeGainNode) {
-            // console.log("stopBlimpTheme: No gain node to fade out or audio context not running.");
-             blimpThemeNodes.forEach(item => {
-                if (item && item.osc) try { item.osc.stop(); } catch(_) {}
-            });
-            blimpThemeNodes = [];
-            if (blimpThemeGainNode) { // If gain node exists but context isn't running, try to disconnect.
-                try { blimpThemeGainNode.disconnect(); } catch(_) {}
-                blimpThemeGainNode = null;
+        const cleanupAudioNode = (nodeRef) => {
+            if (nodeRef.node) {
+                try { nodeRef.node.disconnect(); } catch(_) {}
+                nodeRef.node = null;
             }
+        };
+        
+        let gainNodeToFade = blimpThemeGainNode;
+
+        if (!audioCtx || audioCtx.state !== 'running' || !gainNodeToFade) {
+            blimpThemeNodes.forEach(item => { if (item && item.osc) try { item.osc.stop(); } catch(_) {} });
+            blimpThemeNodes = [];
+            cleanupAudioNode({node: blimpThemeGainNode}); blimpThemeGainNode = null;
+            cleanupAudioNode({node: blimpThemeHighPassFilter}); blimpThemeHighPassFilter = null;
+            cleanupAudioNode({node: blimpThemePeakingFilter}); blimpThemePeakingFilter = null;
             return;
         }
 
@@ -1074,34 +1078,25 @@
         const now = audioCtx.currentTime;
 
         try {
-            blimpThemeGainNode.gain.cancelScheduledValues(now);
-            blimpThemeGainNode.gain.setValueAtTime(blimpThemeGainNode.gain.value, now);
-            blimpThemeGainNode.gain.linearRampToValueAtTime(0.0001, now + fadeDuration);
+            gainNodeToFade.gain.cancelScheduledValues(now);
+            gainNodeToFade.gain.setValueAtTime(gainNodeToFade.gain.value, now);
+            gainNodeToFade.gain.linearRampToValueAtTime(0.0001, now + fadeDuration);
 
             const cleanupTime = (fadeDuration + 0.2) * 1000;
             setTimeout(() => {
-                blimpThemeNodes.forEach(item => {
-                    if (item && item.osc) try { item.osc.stop(); } catch(_) {}
-                });
+                blimpThemeNodes.forEach(item => { if (item && item.osc) try { item.osc.stop(); } catch(_) {} });
                 blimpThemeNodes = [];
-                if (blimpThemeGainNode) {
-                    try {
-                        blimpThemeGainNode.disconnect();
-                    } catch(_) {}
-                    blimpThemeGainNode = null;
-                }
-                // console.log("stopBlimpTheme: Blimp theme fully stopped and cleaned up.");
+                cleanupAudioNode({node: blimpThemeGainNode}); blimpThemeGainNode = null;
+                cleanupAudioNode({node: blimpThemeHighPassFilter}); blimpThemeHighPassFilter = null;
+                cleanupAudioNode({node: blimpThemePeakingFilter}); blimpThemePeakingFilter = null;
             }, cleanupTime);
         } catch(e) {
             console.error("Error stopping blimp theme audio components:", e);
-            blimpThemeNodes.forEach(item => {
-                 if (item && item.osc) try { item.osc.stop(); } catch(_) {}
-            });
+            blimpThemeNodes.forEach(item => { if (item && item.osc) try { item.osc.stop(); } catch(_) {} });
             blimpThemeNodes = [];
-            if (blimpThemeGainNode) {
-                try { blimpThemeGainNode.disconnect(); } catch(_) {}
-                blimpThemeGainNode = null;
-            }
+            cleanupAudioNode({node: blimpThemeGainNode}); blimpThemeGainNode = null;
+            cleanupAudioNode({node: blimpThemeHighPassFilter}); blimpThemeHighPassFilter = null;
+            cleanupAudioNode({node: blimpThemePeakingFilter}); blimpThemePeakingFilter = null;
         }
     }
 
@@ -1178,10 +1173,11 @@
                 proj.vy += PROJECTILE_GRAVITY; proj.rotation += proj.rotationSpeed;
                 if (proj.vy < 0 && proj.currentSize < proj.maxSize) { proj.currentSize += proj.growthRate; proj.size.w = proj.currentSize * (proj.type === 'CornCob' ? 0.6 : 1.0); proj.size.h = proj.currentSize * (proj.type === 'CornCob' ? 1.2 : 1.5); }
 
-                if (proj.y < 0 && proj.vy < 0) {
-                    proj.y = 0;
-                    proj.vy *= -0.3;
-                }
+                // Removed bounce from top of screen for ChickenLeg and CornCob
+                // if (proj.y < 0 && proj.vy < 0) {
+                //     proj.y = 0;
+                //     proj.vy *= -0.3;
+                // }
 
                 const groundLevel = playableHeight - proj.size.h;
                 if (proj.y >= groundLevel - 5) { if (Math.abs(proj.vy) < 0.5) { if (proj.stuckFrames !== undefined) { proj.stuckFrames++; }} else { proj.stuckFrames = 0; } if (proj.y >= groundLevel && proj.removeAfterFrames === -1) { proj.removeAfterFrames = 3; } proj.y = Math.min(proj.y, groundLevel); } else { proj.stuckFrames = 0; }
@@ -1485,7 +1481,19 @@
     }
     startButton.addEventListener('click', handleStartOrReplay);
     replayButton.addEventListener('click', handleStartOrReplay);
-    window.addEventListener('keydown', (e) => { if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 's', 'a', 'd', ' '].includes(e.key)) { e.preventDefault(); } keys[e.key] = true; });
+
+    window.addEventListener('keydown', (e) => {
+        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 's', 'a', 'd', ' '].includes(e.key)) {
+            e.preventDefault(); // Prevent scrolling for game keys
+        }
+        keys[e.key] = true;
+
+        // Start game with Enter key if start screen is visible and game not running
+        if ((e.key === 'Enter' || e.key === 'Return') && startScreen.style.display === 'flex' && !gameRunning) {
+            e.preventDefault(); // Prevent any default Enter key behavior
+            startButton.click();
+        }
+    });
     window.addEventListener('keyup', (e) => { keys[e.key] = false; });
 
     function handleTouchStart(key, event) { event.preventDefault(); keys[key] = true; }
@@ -1590,3 +1598,4 @@
 
 </body>
 </html>
+```
