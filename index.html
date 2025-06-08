@@ -393,6 +393,42 @@
     #mobile-controls-right .mobile-button { margin-left: clamp(12px, 2.5vw, 18px); }
     #mobile-controls-right .mobile-button:first-child { margin-left: 0; }
     .mobile-button:active { background-color: rgba(255, 255, 255, 0.5); }
+
+    .explosion {
+        position: absolute;
+        width: 100px;
+        height: 100px;
+        pointer-events: none;
+        z-index: 100;
+        transform: translate(-50%, -50%); /* Center on the collision point */
+        border-radius: 50%;
+        animation: boom 600ms ease-out forwards;
+    }
+
+    @keyframes boom {
+        0% {
+            transform: translate(-50%, -50%) scale(0);
+            box-shadow: 
+                0 0 0 5px rgba(255, 255, 255, 1),
+                0 0 0 10px rgba(255, 255, 0, 0.8),
+                0 0 0 15px rgba(255, 165, 0, 0.6);
+            opacity: 1;
+        }
+        50% {
+            box-shadow: 
+                0 0 0 25px rgba(255, 255, 255, 0),
+                0 0 0 40px rgba(255, 165, 0, 0.4),
+                0 0 0 60px rgba(255, 0, 0, 0.2);
+        }
+        100% {
+            transform: translate(-50%, -50%) scale(1.5);
+            box-shadow: 
+                0 0 0 30px rgba(255, 255, 255, 0),
+                0 0 0 50px rgba(255, 165, 0, 0),
+                0 0 0 70px rgba(255, 0, 0, 0);
+            opacity: 0;
+        }
+    }
 </style>
 </head>
 <body>
@@ -551,7 +587,6 @@
 
     // --- HOT DAWG Obstacle ---
     let hotDawgs = [];
-    let explosions = [];
     const HOT_DAWG_SPAWN_CHANCE = 0.008;
     const HOT_DAWG_BATTERY_COST = 25;
 
@@ -999,7 +1034,45 @@
     function playCollisionDissonance() { playTone(450, 0.15, 'sawtooth', 0.2, 0, { detune: 50 }); playTone(150, 0.2, 'square', 0.15, 0.02); }
     function applyLowBatteryMusicFilter(isLow) { if (!musicLowPassFilter || !audioInitialized || !audioCtx || audioCtx.state !== 'running') return; const targetFreq = isLow ? 800 : 20000; const targetQ = isLow ? 5 : 1; const now = audioCtx.currentTime; try { musicLowPassFilter.frequency.cancelScheduledValues(now); musicLowPassFilter.Q.cancelScheduledValues(now); musicLowPassFilter.frequency.linearRampToValueAtTime(targetFreq, now + 0.5); musicLowPassFilter.Q.linearRampToValueAtTime(targetQ, now + 0.5); } catch(e) { console.error("Error applying low battery filter:", e); } }
 
-    function playExplosionSound() { if (!audioInitialized) return; playTone(100, 0.3, 'noise', 0.5, 0); playTone(400, 0.2, 'sawtooth', 0.3, 0, { rampTo: 50 }); }
+    function playExplosionSound() {
+        if (!audioInitialized) return;
+        const now = audioCtx.currentTime;
+        const vol = 0.5;
+
+        // Low frequency thump
+        playTone(60, 0.1, 'sine', vol, now, { rampTo: 0.01 });
+        playTone(100, 0.2, 'triangle', vol * 0.6, now + 0.01, { rampTo: 0.01 });
+
+        // Crackle
+        const noiseDur = 0.5;
+        const noiseEnv = audioCtx.createGain();
+        const noiseFilter = audioCtx.createBiquadFilter();
+        noiseFilter.type = 'bandpass';
+        noiseFilter.frequency.setValueAtTime(1200, now);
+        noiseFilter.Q.setValueAtTime(1, now);
+        noiseFilter.frequency.exponentialRampToValueAtTime(400, now + noiseDur * 0.7);
+
+        noiseEnv.gain.setValueAtTime(vol, now);
+        noiseEnv.gain.exponentialRampToValueAtTime(0.001, now + noiseDur);
+
+        const noiseSrc = audioCtx.createBufferSource();
+        const bufferSize = audioCtx.sampleRate * noiseDur;
+        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+        noiseSrc.buffer = buffer;
+        noiseSrc.connect(noiseEnv).connect(noiseFilter).connect(audioCtx.destination);
+
+        // Reverb connection
+        if (reverbNode) {
+            const reverbGain = audioCtx.createGain();
+            reverbGain.gain.value = 0.3; // Amount of signal to send to reverb
+            noiseFilter.connect(reverbGain).connect(reverbNode.input);
+        }
+
+        noiseSrc.start(now);
+        noiseSrc.stop(now + noiseDur);
+    }
     function playSurgeSound() { if (!audioInitialized) return; playTone(40, 2.0, 'sine', 0.2, 0, { rampTo: 0.01 }); }
 
     function scheduleMusicBlock() {
@@ -1297,7 +1370,7 @@
     function spawnHotDawg() {
         const sizeW = 15;
         const sizeH = 40;
-        hotDawgs.push({
+        const dawg = {
             x: Math.random() * gameCanvas.width * 0.8,
             y: gameCanvas.height + sizeH,
             vx: (Math.random() - 0.5) * 2,
@@ -1308,8 +1381,15 @@
             scaleRate: 0.005,
             fusePhase: 0,
             gravity: 0.05,
-            wigglePhase: Math.random() * Math.PI * 2 // HOT Dawg wiggle added
-        });
+            wigglePhase: Math.random() * Math.PI * 2
+        };
+
+        if (playerControlEnabled && Math.random() < 0.3) {
+            const aimAdjust = (carX > dawg.x ? 0.4 : -0.4) * difficultyMultiplier;
+            dawg.vx += aimAdjust;
+        }
+        
+        hotDawgs.push(dawg);
     }
 
     function updateHotDawgs() {
@@ -1387,34 +1467,15 @@
     }
 
     function spawnExplosion(x, y) {
-        explosions.push({ x, y, radius: 5, maxRadius: 40, life: 20 });
-    }
+        const explosionEl = document.createElement('div');
+        explosionEl.className = 'explosion';
+        explosionEl.style.left = `${x}px`;
+        explosionEl.style.top = `${y}px`;
+        document.body.appendChild(explosionEl);
 
-    function updateExplosions() {
-        for (let i = explosions.length - 1; i >= 0; i--) {
-            const exp = explosions[i];
-            exp.life--;
-            exp.radius += (exp.maxRadius - exp.radius) * 0.2;
-            if (exp.life <= 0) {
-                explosions.splice(i, 1);
-            }
-        }
-    }
-
-    function drawExplosions() {
-        explosions.forEach(exp => {
-            ctx.save();
-            const alpha = exp.life / 20;
-            ctx.fillStyle = `rgba(255, 200, 0, ${alpha * 0.8})`;
-            ctx.beginPath();
-            ctx.arc(exp.x, exp.y, exp.radius, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.fillStyle = `rgba(255, 100, 0, ${alpha * 0.6})`;
-            ctx.beginPath();
-            ctx.arc(exp.x, exp.y, exp.radius * 0.6, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.restore();
-        });
+        setTimeout(() => {
+            explosionEl.remove();
+        }, 600);
     }
     // HOT Dawg logic ends here
 
@@ -1541,7 +1602,7 @@
            carX += horzDelta; carX = Math.max(MIN_CAR_X, Math.min(carX, MAX_CAR_X));
            modulateEngineHum(battery, vertDelta, horzDelta);
        }
-       updateBuildings(); updatePedestriansAndProjectiles(); updateBonuses(); updateBirds(); updateClouds(); updateSwarmVehicles(); updateHotDawgs(); updateExplosions();
+       updateBuildings(); updatePedestriansAndProjectiles(); updateBonuses(); updateBirds(); updateClouds(); updateSwarmVehicles(); updateHotDawgs();
 
        for (let i = blimps.length - 1; i >= 0; i--) {
             const blimp = blimps[i];
@@ -1621,7 +1682,6 @@
         drawBonuses();
         drawBirds();
         drawHotDawgs();
-        drawExplosions();
         drawCar();
         updateBatteryUI(); updateScoreUI();
         prevCarX = carX; prevCarY = carY; prevKeys = { ...keys };
@@ -1634,7 +1694,7 @@
         stopAllSounds();
 
         battery = 100; score = 0; calculateDimensions(); carY = playableHeight / 2; carX = 80; carColor = 'white'; keys = {}; prevKeys = {}; buildings = []; pedestrians = []; projectiles = []; bonuses = []; birds = []; clouds = []; swarmVehicles = []; carShake = 0; frameCount = 0; lowBatteryWarningPlayed = false; isChargingSequence = false; chargingPhase = null; targetChargeStation = null; isCaptured = false; capturePhase = null; captureTargetBuilding = null; playerControlEnabled = true; prevCarX = carX; prevCarY = carY;
-        hotDawgs = []; explosions = [];
+        hotDawgs = [];
         spawnBuilding(gameCanvas.width * 0.6); spawnBuilding(); for(let i=0; i<5; i++) spawnCloud(); for(let i=0; i<20; i++) spawnSwarmVehicle();
         currentScrollSpeed = BASE_SCROLL_SPEED; currentMusicTempo = BASE_MUSIC_TEMPO;
         difficultyMultiplier = 1.0;
