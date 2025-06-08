@@ -427,7 +427,7 @@
     const BLIMP_SCORE_INTERVAL_MAX = 5000;
     const BLIMP_COLLISION_DAMAGE = 25;
     const blimpLogoImage = new Image();
-    blimpLogoImage.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCI+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNDUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSI1Ii8+PHRleHQgeD0iNTAiIHk9IjYyIiBmb250LWZhbWlseT0iQ291cmllciwgbW9ub3NwYWNlIiBmb250LXNpemU9IjMwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSJ3aGl0ZSI+QVRGQzwvdGV4dD48L3N2Zz4=';
+    blimpLogoImage.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgdmlld0JveD0iMCAwIDEwMCAxMDAiPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAsNSkiPjxwYXRoIGQ9Ik01MCAxMEE0MCA0MCAwIDEgMCA1MCA5MEE0MCA0MCAwIDAgMCA1MCAxMFptMCA3NkEyNiAyNiAwIDEgMSA1MCAyNEEyNiAyNiAwIDAgMSA1MCA4NloiIGZpbGw9IiNmZmYiLz48cGF0aCBkPSJNNjIgMzVINThMNDQgNTlWNDRIMzVWNjVIMzlMNTMgNDFWNTdoOVY2NWg1VjM1WiIgZmlsbD0iI2ZmZiIvPjwvZz48L3N2Zz4=';
 
 
     // --- Blimp Theme Audio Variables ---
@@ -437,11 +437,11 @@
     let blimpThemeNodes = [];
     let blimpThemeLoopTimeoutId = null;
     let blimpThemeIsPlaying = false;
-    const BLIMP_THEME_VOLUME = 0.22; // Increased from 0.15
+    const BLIMP_THEME_VOLUME = 0.22;
     const BLIMP_THEME_FADE_DURATION = 1.5;
-    let blimpThemeNextPlayTime = 0; // Earliest time the theme can play again
-    const BLIMP_THEME_REPLAY_MIN_DELAY = 15000; // 15 seconds
-    const BLIMP_THEME_REPLAY_MAX_DELAY = 30000; // 30 seconds
+    let blimpThemeNextPlayTime = 0;
+    const BLIMP_THEME_REPLAY_MIN_DELAY = 15000;
+    const BLIMP_THEME_REPLAY_MAX_DELAY = 30000;
 
 
     // --- Blimp Class ---
@@ -455,7 +455,7 @@
             this.x = this.canvas.width;
             this.y = this.playableHeight * 0.1 + Math.random() * (this.playableHeight * 0.15);
             this.vx = -2.5 - Math.random() * 0.5;
-            this.bannerLogo = 'ALLTHINGSFLYINGCARS.com '; // Text for scrolling banner
+            this.bannerLogo = 'ALLTHINGSFLYINGCARS.com ';
             this.collisionDamage = BLIMP_COLLISION_DAMAGE;
             this.bannerWavePhase = Math.random() * Math.PI * 2;
             this.bannerWaveSpeed = 0.04 + Math.random() * 0.02;
@@ -476,7 +476,6 @@
 
             if (!this.prefersReducedMotion) {
                 const isSmallScreen = this.canvas.width <= 480;
-                // Slower speed for smaller screens to approximate the 14s duration request
                 const scrollSpeed = isSmallScreen ? 0.35 : 0.8;
                 this.bannerScrollOffset += scrollSpeed;
             }
@@ -544,10 +543,7 @@
             if (this.logoImage && this.logoImage.complete) {
                 ctx.save();
                 ctx.globalAlpha = 0.9;
-                ctx.shadowColor = 'white';
-                ctx.shadowBlur = 5;
-                ctx.shadowOffsetX = 0;
-                ctx.shadowOffsetY = 0;
+                ctx.filter = 'drop-shadow(0 0 5px white)';
                 const logoWidth = 80;
                 const logoHeight = this.logoImage.height * (logoWidth / this.logoImage.width);
                 ctx.drawImage(this.logoImage, centerX - logoWidth / 2, centerY - logoHeight / 2, logoWidth, logoHeight);
@@ -1195,12 +1191,6 @@
             if (proj.type === 'ChickenLeg' || proj.type === 'CornCob') {
                 proj.vy += PROJECTILE_GRAVITY; proj.rotation += proj.rotationSpeed;
                 if (proj.vy < 0 && proj.currentSize < proj.maxSize) { proj.currentSize += proj.growthRate; proj.size.w = proj.currentSize * (proj.type === 'CornCob' ? 0.6 : 1.0); proj.size.h = proj.currentSize * (proj.type === 'CornCob' ? 1.2 : 1.5); }
-
-                // Removed bounce from top of screen for ChickenLeg and CornCob
-                // if (proj.y < 0 && proj.vy < 0) {
-                //     proj.y = 0;
-                //     proj.vy *= -0.3;
-                // }
 
                 const groundLevel = playableHeight - proj.size.h;
                 if (proj.y >= groundLevel - 5) { if (Math.abs(proj.vy) < 0.5) { if (proj.stuckFrames !== undefined) { proj.stuckFrames++; }} else { proj.stuckFrames = 0; } if (proj.y >= groundLevel && proj.removeAfterFrames === -1) { proj.removeAfterFrames = 3; } proj.y = Math.min(proj.y, groundLevel); } else { proj.stuckFrames = 0; }
