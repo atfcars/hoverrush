@@ -136,14 +136,29 @@
        height: 18px;
        background-color: #39ff14;
        color: white;
-       font-weight: bold;
-       font-size: 14px;
+       font-weight: 900;
+       font-size: 18px;
        text-align: center;
        line-height: 18px;
        border-radius: 2px;
        margin-right: 6px;
        font-family: monospace;
      }
+
+    .vertiport-icon {
+      display: inline-flex;
+      align-items: center;
+      margin-right: 6px;
+    }
+    .vertiport-icon .bar {
+      display: inline-block;
+      width: 3px;
+      height: 14px;
+      background: white;
+      margin: 0 2px;
+      opacity: 0.7;
+      box-shadow: 0 0 4px white;
+    }
 
     #startButton {
       display: flex;
@@ -343,7 +358,7 @@
 <h3>🟩 What to Grab:</h3>
 <ul style="text-align:left; padding-left: 0;">
 <li><span class="battery-icon">+</span>Floating batteries to recharge</li>
-<li>🔻🔻🔻 Enter recharge zones (auto land and refuel)</li>
+<li><span class="vertiport-icon"><span class="bar"></span><span class="bar"></span></span>Enter recharge zones (auto land and refuel)</li>
 </ul>
 <h3>🕹️ Controls:</h3>
 <ul style="text-align:left; padding-left: 0;">
