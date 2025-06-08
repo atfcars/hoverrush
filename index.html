@@ -145,35 +145,27 @@
        font-family: monospace;
      }
 
-    /* Vertiport Recharge Pillar Fix */
+    /* Vertiport Pillar Glow Fix */
     .vertiport-pillar-icon {
       display: inline-block;
-      vertical-align: middle;
       margin-right: 6px;
+      line-height: 1;
+      vertical-align: middle;
     }
 
     .pillar-line {
       display: block;
-      width: 12px;
-      height: 4px;
-      margin: 1px auto;
-      border-radius: 1px;
+      width: 14px;
+      height: 3px;
+      margin: 2px auto;
+      border-radius: 2px;
+      box-shadow: 0 0 3px #fff;
     }
 
-    .pillar-line.light {
-      background-color: #666;
-      opacity: 0.6;
-    }
+    .bar1 { background-color: #eee; }
+    .bar2 { background-color: #f5f5f5; }
+    .bar3 { background-color: #ffffff; }
 
-    .pillar-line.mid {
-      background-color: #aaa;
-      opacity: 0.8;
-    }
-
-    .pillar-line.bright {
-      background-color: #fff;
-      opacity: 1;
-    }
 
     #startButton {
       display: flex;
@@ -376,9 +368,9 @@
 <!-- Recharge Zone Pillar Icon Replacement -->
 <li>
   <span class="vertiport-pillar-icon">
-    <span class="pillar-line light"></span>
-    <span class="pillar-line mid"></span>
-    <span class="pillar-line bright"></span>
+    <span class="pillar-line bar1"></span>
+    <span class="pillar-line bar2"></span>
+    <span class="pillar-line bar3"></span>
   </span>
   Enter recharge zones (auto land and refuel)
 </li>
