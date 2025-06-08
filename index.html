@@ -130,10 +130,56 @@
     }
 
     .menu-icon {
+      display: inline-block;
       width: 18px;
-      height: auto;
-      vertical-align: middle;
+      height: 18px;
       margin-right: 6px;
+      vertical-align: middle;
+      position: relative;
+    }
+
+    /* Red "X" */
+    .red-x::before,
+    .red-x::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 3px;
+      background-color: red;
+      border-radius: 1px;
+      top: 50%;
+      left: 0;
+      transform-origin: center;
+    }
+    .red-x::before {
+      transform: rotate(45deg);
+    }
+    .red-x::after {
+      transform: rotate(-45deg);
+    }
+
+    /* Green Checkmark */
+    .green-check::before {
+      content: '';
+      position: absolute;
+      width: 10px;
+      height: 3px;
+      background-color: #39ff14;
+      transform: rotate(-45deg);
+      top: 60%;
+      left: 15%;
+      border-radius: 1px;
+    }
+    .green-check::after {
+      content: '';
+      position: absolute;
+      width: 5px;
+      height: 3px;
+      background-color: #39ff14;
+      transform: rotate(45deg);
+      top: 66%;
+      left: 40%;
+      border-radius: 1px;
     }
 
     /* Battery Icon Menu Patch */
@@ -367,9 +413,9 @@
 <li>🎈 Balloons rising from the streets</li>
 </ul>
 <li>💥 Hitting anything drains your battery.</li>
-<li><img src="X_BASE64_HERE" alt="X" class="menu-icon"> If your battery hits zero, it’s game over.</li>
+<li><span class="menu-icon red-x"></span> If your battery hits zero, it’s game over.</li>
 </ul>
-<h3><img src="CHECK_BASE64_HERE" alt="✓" class="menu-icon"> What to Grab:</h3>
+<h3><span class="menu-icon green-check"></span> What to Grab:</h3>
 <ul style="text-align:left; padding-left: 0;">
 <li><span class="battery-icon">+</span>Floating batteries to recharge</li>
 <!-- Recharge Zone Pillar Icon Replacement -->
