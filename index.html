@@ -129,6 +129,22 @@
         background: rgba(255,255,255,0.1);
     }
 
+    /* Battery Icon Menu Patch */
+    .battery-icon {
+       display: inline-block;
+       width: 18px;
+       height: 18px;
+       background-color: #39ff14;
+       color: white;
+       font-weight: bold;
+       font-size: 14px;
+       text-align: center;
+       line-height: 18px;
+       border-radius: 2px;
+       margin-right: 6px;
+       font-family: monospace;
+     }
+
     #startButton {
       display: flex;
       align-items: center;
@@ -326,8 +342,8 @@
 </ul>
 <h3>🟩 What to Grab:</h3>
 <ul style="text-align:left; padding-left: 0;">
-<li>🟢 Floating batteries to recharge</li>
-<li>🔋 Enter recharge zones (auto land and refuel)</li>
+<li><span class="battery-icon">+</span>Floating batteries to recharge</li>
+<li>🔻🔻🔻 Enter recharge zones (auto land and refuel)</li>
 </ul>
 <h3>🕹️ Controls:</h3>
 <ul style="text-align:left; padding-left: 0;">
@@ -862,7 +878,8 @@
     function playCollisionSound() { if (!audioInitialized) return; const now = audioCtx.currentTime; const noiseDur = 0.15; try { const noiseEnv = audioCtx.createGain(); noiseEnv.connect(audioCtx.destination); noiseEnv.gain.setValueAtTime(0.3, now); noiseEnv.gain.exponentialRampToValueAtTime(0.001, now + noiseDur); const noiseSrc = audioCtx.createBufferSource(); const bufferSize = audioCtx.sampleRate * noiseDur; const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate); const data = buffer.getChannelData(0); for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1; noiseSrc.buffer = buffer; noiseSrc.connect(noiseEnv); noiseSrc.start(now); noiseSrc.stop(now + noiseDur); } catch (e) { console.error("Error playing collision noise:", e); } playTone(987.77, 0.1, 'triangle', 0.25, 0.02); for(let i=0; i<3; i++) { playTone(2000, 0.03, 'noise', 0.08, 0.1 + i * 0.04); } }
     function playBatteryPickupSound() { playTone(329.63, 0.08, 'sine', 0.35, 0.0); playTone(392.00, 0.08, 'sine', 0.35, 0.08); playTone(523.25, 0.15, 'sine', 0.4, 0.16); }
     function playLowBatteryWarning() { if (!lowBatteryWarningPlayed) { playTone(880, 0.08, 'square', 0.25, 0); playTone(880, 0.08, 'square', 0.25, 0.15); lowBatteryWarningPlayed = true; setTimeout(() => { lowBatteryWarningPlayed = false; }, 5000); } }
-    function playBonusFlourish() { const baseFreq = 783.99; const vol = 0.30; playTone(baseFreq, 0.08, 'triangle', vol, 0.0); playTone(baseFreq * 1.25, 0.08, 'triangle', vol, 0.08); playTone(baseFreq * 1.5, 0.12, 'triangle', vol, 0.16); }
+    // Reduced Bonus Flourish Volume
+    function playBonusFlourish() { const baseFreq = 783.99; const vol = 0.12; playTone(baseFreq, 0.08, 'triangle', vol, 0.0); playTone(baseFreq * 1.25, 0.08, 'triangle', vol, 0.08); playTone(baseFreq * 1.5, 0.12, 'triangle', vol, 0.16); }
     function playEngineHum() { if (engineHumNodes || !audioInitialized || !audioCtx || audioCtx.state !== 'running') return; try { const baseFreq = 60; const humGain = audioCtx.createGain(); const panner = audioCtx.createStereoPanner(); const filter = audioCtx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.value = 5000; const humOsc = audioCtx.createOscillator(); humOsc.type = 'sawtooth'; humOsc.frequency.setValueAtTime(baseFreq, audioCtx.currentTime); const detuneOsc = audioCtx.createOscillator(); detuneOsc.frequency.value = 5; const detuneGain = audioCtx.createGain(); detuneGain.gain.value = 15; humGain.gain.value = 0.06; detuneOsc.connect(detuneGain).connect(humOsc.detune); humOsc.connect(filter).connect(panner).connect(humGain).connect(audioCtx.destination); humOsc.start(); detuneOsc.start(); engineHumNodes = { osc: humOsc, gain: humGain, panner: panner, filter: filter, detuneOsc: detuneOsc }; } catch (e) { console.error("Error starting engine hum:", e); engineHumNodes = null; } }
     function stopEngineHum() { if (!engineHumNodes) return; try { const now = audioCtx.currentTime; engineHumNodes.gain.gain.cancelScheduledValues(now); engineHumNodes.gain.gain.setTargetAtTime(0, now, 0.01); engineHumNodes.osc.stop(now + 0.05); if (engineHumNodes.detuneOsc) engineHumNodes.detuneOsc.stop(now + 0.05); } catch(e) {} engineHumNodes = null; }
     function modulateEngineHum(batteryPercent, vertDelta, horzDelta) { if (!engineHumNodes || !audioInitialized || !audioCtx || audioCtx.state !== 'running') return; try { const now = audioCtx.currentTime; const baseFreq = 60; const pitchRange = 20; const pitchMod = (vertDelta / MOVE_SPEED_Y) * pitchRange; engineHumNodes.osc.frequency.linearRampToValueAtTime(baseFreq + pitchMod, now + 0.1); let panValue = 0; if (keys['ArrowLeft'] || keys['a']) panValue = -0.6; if (keys['ArrowRight'] || keys['d']) panValue = 0.6; engineHumNodes.panner.pan.linearRampToValueAtTime(panValue, now + 0.05); const minVol = 0.05; const maxVol = 0.10; const targetVol = maxVol - (batteryPercent / 100) * (maxVol - minVol); engineHumNodes.gain.gain.linearRampToValueAtTime(targetVol, now + 0.2); const minFilterFreq = 800; const maxFilterFreq = 5000; const targetFilterFreq = (batteryPercent < 30) ? minFilterFreq + (batteryPercent/30) * (1500 - minFilterFreq) : maxFilterFreq; engineHumNodes.filter.frequency.linearRampToValueAtTime(targetFilterFreq, now + 0.3); } catch(e) { console.error("Error modulating engine hum:", e); stopEngineHum(); } }
@@ -1028,12 +1045,13 @@
         });
         blimpThemeNodes = [];
 
+        // Reduced Blimp Volume
         const arpSequence = [
-            { freq: 783.99, dur: 0.12, type: 'triangle', vol: 0.8 }, // G5
-            { freq: 1046.50, dur: 0.12, type: 'sine', vol: 0.7 },   // C6
-            { freq: 932.33, dur: 0.12, type: 'triangle', vol: 0.6 },// A#5/Bb5
-            { freq: 783.99, dur: 0.12, type: 'sine', vol: 0.7 },   // G5
-            { freq: 659.25, dur: 0.18, type: 'triangle', vol: 0.8 }, // E5 (longer hold)
+            { freq: 783.99, dur: 0.12, type: 'triangle', vol: 0.25 }, // G5
+            { freq: 1046.50, dur: 0.12, type: 'sine', vol: 0.25 },   // C6
+            { freq: 932.33, dur: 0.12, type: 'triangle', vol: 0.25 },// A#5/Bb5
+            { freq: 783.99, dur: 0.12, type: 'sine', vol: 0.25 },   // G5
+            { freq: 659.25, dur: 0.18, type: 'triangle', vol: 0.25 }, // E5 (longer hold)
         ];
         const shortPauseBetweenNotes = 0.04;
 
