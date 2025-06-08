@@ -35,59 +35,6 @@
       cursor: none;
     }
 
-    #blimp-logo {
-        position: absolute;
-        z-index: 4;
-        width: 80px;
-        height: auto;
-        opacity: 0.9;
-        filter: drop-shadow(0 0 5px white);
-        pointer-events: none;
-        transform: translate(-50%, -50%);
-    }
-
-    #blimp-banner-container {
-        position: absolute;
-        z-index: 4;
-        overflow: hidden;
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-        pointer-events: none;
-    }
-
-    #blimp-banner-text {
-        color: #39ff14;
-        font-family: 'Courier New', Courier, monospace;
-        font-weight: bold;
-        font-size: 24px;
-        white-space: nowrap;
-        animation: scroll-text 8s linear infinite;
-        will-change: transform;
-    }
-
-    @keyframes scroll-text {
-        from { transform: translateX(100%); }
-        to { transform: translateX(-100%); }
-    }
-
-    @media (max-width: 480px) {
-        #blimp-banner-text {
-            font-size: 28px;
-            animation-duration: 12s;
-        }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-        #blimp-banner-text {
-            animation: none;
-            transform: translateX(0);
-            text-align: center;
-            width: 100%;
-        }
-    }
-
-
     #start-screen {
       display: flex;
       flex-direction: column;
@@ -358,10 +305,6 @@
 <body>
 
 <canvas id="gameCanvas"></canvas>
-<img id="blimp-logo" class="logo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgdmlld0JveD0iMCAwIDgwIDgwIj48cGF0aCBkPSJNIDQwIDUgQyA1OS4zMyA1LCA3NSAyMC42NywgNzUgNDAgQyA3NSA1OS4zMywgNTkuMzMgNzUsIDQwIDc1IEMgMjAuNjcgNzUsIDUgNTkuMzMsIDUgNDAgQyA1IDIwLjY3LCAyMC42NyA1LCA0MCA1IHoiIGZpbGw9IiNmZjAiIHN0cm9rZT0iI2YwZiIgc3Ryb2tlLXdpZHRoPSIzIi8+PHRleHQgeD0iNTAlIiB5PSI1NSUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJDb3VyaWVyIE5ldywgbW9uc3BhY2UiIGZvbnQtc2l6ZT0iNDAiIGZpbGw9ImJsYWNrIiBmb250LXdlaWdodD0iYm9sZCI+QTwvdGV4dD48L3N2Zz4=" style="display: none;" alt="Blimp Logo">
-<div id="blimp-banner-container" style="display: none;">
-    <p id="blimp-banner-text">ALLTHINGSFLYINGCARS.com</p>
-</div>
 <img src="https://placehold.co/800x400/000000/FFFFFF/png?text=HoverRush" id="branding-watermark" alt="HoverRush Logo" style="display: none;" />
 
 <div id="start-screen">
@@ -442,8 +385,6 @@
     const touchRightButton = document.getElementById('touch-right');
     const brandingWatermark = document.getElementById('branding-watermark');
     const gameOverBranding = document.getElementById('game-over-branding');
-    const blimpLogo = document.getElementById('blimp-logo');
-    const blimpBannerContainer = document.getElementById('blimp-banner-container');
 
 
     // Game State
@@ -485,6 +426,9 @@
     const BLIMP_SCORE_INTERVAL_MIN = 3500;
     const BLIMP_SCORE_INTERVAL_MAX = 5000;
     const BLIMP_COLLISION_DAMAGE = 25;
+    const blimpLogoImage = new Image();
+    blimpLogoImage.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCI+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNDUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSI1Ii8+PHRleHQgeD0iNTAiIHk9IjYyIiBmb250LWZhbWlseT0iQ291cmllciwgbW9ub3NwYWNlIiBmb250LXNpemU9IjMwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSJ3aGl0ZSI+QVRGQzwvdGV4dD48L3N2Zz4=';
+
 
     // --- Blimp Theme Audio Variables ---
     let blimpThemeGainNode = null;
@@ -502,23 +446,26 @@
 
     // --- Blimp Class ---
     class Blimp {
-        constructor(canvas, playableHeight) {
+        constructor(canvas, playableHeight, logoImage) {
             this.canvas = canvas;
             this.playableHeight = playableHeight;
+            this.logoImage = logoImage;
             this.width = 300;
             this.height = 130;
             this.x = this.canvas.width;
             this.y = this.playableHeight * 0.1 + Math.random() * (this.playableHeight * 0.15);
             this.vx = -2.5 - Math.random() * 0.5;
-            this.bannerLogo = 'ATFCars Blimp'; // Placeholder text banner
+            this.bannerLogo = 'ALLTHINGSFLYINGCARS.com '; // Text for scrolling banner
             this.collisionDamage = BLIMP_COLLISION_DAMAGE;
             this.bannerWavePhase = Math.random() * Math.PI * 2;
             this.bannerWaveSpeed = 0.04 + Math.random() * 0.02;
-            this.bannerWaveAmplitude = 6 + Math.random() * 3; // Increased from 4-6 to 6-9
+            this.bannerWaveAmplitude = 6 + Math.random() * 3;
             this.windowPulsePhase = Math.random() * Math.PI * 2;
             this.windowPulseSpeed = 0.05 + Math.random() * 0.03;
             this.ribPhase = Math.random() * Math.PI * 2;
             this.ribSpeed = 0.02 + Math.random() * 0.01;
+            this.bannerScrollOffset = 0;
+            this.prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         }
 
         update() {
@@ -526,6 +473,13 @@
             this.bannerWavePhase += this.bannerWaveSpeed;
             this.windowPulsePhase += this.windowPulseSpeed;
             this.ribPhase += this.ribSpeed;
+
+            if (!this.prefersReducedMotion) {
+                const isSmallScreen = this.canvas.width <= 480;
+                // Slower speed for smaller screens to approximate the 14s duration request
+                const scrollSpeed = isSmallScreen ? 0.35 : 0.8;
+                this.bannerScrollOffset += scrollSpeed;
+            }
         }
 
         draw(ctx) {
@@ -533,10 +487,10 @@
             const centerY = this.y + this.height / 2;
 
             // Blimp Body (Yellow with Gradient)
-            const bodyGradient = ctx.createLinearGradient(centerX - this.width * 0.2, centerY - this.height * 0.3, centerX + this.width * 0.2, centerY + this.height * 0.3); // Top-left to bottom-right
-            bodyGradient.addColorStop(0, '#FFFDE7'); // Lighter yellow (almost white)
-            bodyGradient.addColorStop(0.5, '#FFDB58'); // Mustard Yellow
-            bodyGradient.addColorStop(1, '#B8860B');   // Darker GoldenRod
+            const bodyGradient = ctx.createLinearGradient(centerX - this.width * 0.2, centerY - this.height * 0.3, centerX + this.width * 0.2, centerY + this.height * 0.3);
+            bodyGradient.addColorStop(0, '#FFFDE7');
+            bodyGradient.addColorStop(0.5, '#FFDB58');
+            bodyGradient.addColorStop(1, '#B8860B');
             ctx.fillStyle = bodyGradient;
             ctx.beginPath();
             ctx.ellipse(centerX, centerY, this.width / 2, this.height / 2, 0, 0, Math.PI * 2);
@@ -558,18 +512,15 @@
             ctx.fill();
             ctx.restore();
 
-
             // Curved Rib Lines
-            ctx.strokeStyle = 'rgba(100, 80, 30, 0.35)'; // Darker, more subtle rib color
-            ctx.lineWidth = 2; // Slightly thicker ribs
+            ctx.strokeStyle = 'rgba(100, 80, 30, 0.35)';
+            ctx.lineWidth = 2;
             const numRibs = 6;
             for (let i = 1; i <= numRibs; i++) {
                 const ribProgress = i / (numRibs + 1);
                 const xOffset = (ribProgress - 0.5) * this.width * 0.9;
-                const yRadius = this.height / 2 * Math.sqrt(1 - Math.pow(xOffset / (this.width / 2 * 0.95), 2)); // Ensure ellipse bounds
-
-                const shimmer = Math.sin(this.ribPhase + i * 0.6) * 1.5; // Reduced shimmer
-
+                const yRadius = this.height / 2 * Math.sqrt(1 - Math.pow(xOffset / (this.width / 2 * 0.95), 2));
+                const shimmer = Math.sin(this.ribPhase + i * 0.6) * 1.5;
                 ctx.beginPath();
                 ctx.moveTo(centerX + xOffset, centerY - yRadius + shimmer);
                 ctx.quadraticCurveTo(centerX + xOffset + (Math.random()-0.5)*3 , centerY, centerX + xOffset, centerY + yRadius + shimmer);
@@ -582,7 +533,6 @@
             ctx.quadraticCurveTo(centerX - this.width * 0.52, centerY, centerX - this.width * 0.48, centerY + this.height * 0.2);
             ctx.stroke();
 
-
             // Main Body Outline
             ctx.strokeStyle = '#8B4513';
             ctx.lineWidth = 2.5;
@@ -590,24 +540,37 @@
             ctx.ellipse(centerX, centerY, this.width / 2, this.height / 2, 0, 0, Math.PI * 2);
             ctx.stroke();
 
+            // Placeholder Logo on Blimp Body
+            if (this.logoImage && this.logoImage.complete) {
+                ctx.save();
+                ctx.globalAlpha = 0.9;
+                ctx.shadowColor = 'white';
+                ctx.shadowBlur = 5;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 0;
+                const logoWidth = 80;
+                const logoHeight = this.logoImage.height * (logoWidth / this.logoImage.width);
+                ctx.drawImage(this.logoImage, centerX - logoWidth / 2, centerY - logoHeight / 2, logoWidth, logoHeight);
+                ctx.restore();
+            }
+
              // Gondola (Dark Gray with Shadow)
             const gondolaWidth = this.width * 0.3;
             const gondolaHeight = this.height * 0.25;
             const gondolaX = centerX - gondolaWidth / 2;
-            const gondolaY = centerY + this.height * 0.35; // Lowered slightly
+            const gondolaY = centerY + this.height * 0.35;
 
-            ctx.save(); // Save context for shadow
+            ctx.save();
             ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
             ctx.shadowBlur = 8;
             ctx.shadowOffsetX = 2;
             ctx.shadowOffsetY = 4;
-            ctx.fillStyle = '#555'; // Darker gondola
+            ctx.fillStyle = '#555';
             ctx.fillRect(gondolaX, gondolaY, gondolaWidth, gondolaHeight);
-            ctx.restore(); // Restore context to remove shadow for other elements
+            ctx.restore();
 
-            ctx.strokeStyle = '#333'; // Darker outline for gondola
+            ctx.strokeStyle = '#333';
             ctx.strokeRect(gondolaX, gondolaY, gondolaWidth, gondolaHeight);
-
 
             // Animated Gondola Windows
             const numWindows = 3;
@@ -616,28 +579,25 @@
             const windowSpacing = (gondolaWidth - (numWindows * windowWidth)) / (numWindows + 1);
             const windowBaseY = gondolaY + gondolaHeight * 0.25;
 
-            const pulseBrightness = 0.6 + Math.sin(this.windowPulsePhase) * 0.4; // Range 0.2 to 1.0
-            const windowGlowColor = `rgba(173, 216, 230, ${pulseBrightness * 0.7})`; // #aaddff with alpha
+            const pulseBrightness = 0.6 + Math.sin(this.windowPulsePhase) * 0.4;
+            const windowGlowColor = `rgba(173, 216, 230, ${pulseBrightness * 0.7})`;
             const windowCoreColor = `rgba(220, 240, 255, ${pulseBrightness})`;
 
             for (let i = 0; i < numWindows; i++) {
                 const currentWindowX = gondolaX + windowSpacing + (i * (windowWidth + windowSpacing));
-                // Draw glow first
                 ctx.fillStyle = windowGlowColor;
                 ctx.shadowColor = windowGlowColor;
-                ctx.shadowBlur = 6 * pulseBrightness; // Subtle glow
+                ctx.shadowBlur = 6 * pulseBrightness;
                 ctx.beginPath();
                 ctx.ellipse(currentWindowX + windowWidth/2, windowBaseY + windowHeight/2, windowWidth/2, windowHeight/2, 0, 0, Math.PI*2);
                 ctx.fill();
-                ctx.shadowBlur = 0; // Reset shadow for core window
+                ctx.shadowBlur = 0;
 
-                // Draw core window
                 ctx.fillStyle = windowCoreColor;
                  ctx.beginPath();
-                ctx.ellipse(currentWindowX + windowWidth/2, windowBaseY + windowHeight/2, windowWidth/2.5, windowHeight/2.5, 0, 0, Math.PI*2); // Slightly smaller core
+                ctx.ellipse(currentWindowX + windowWidth/2, windowBaseY + windowHeight/2, windowWidth/2.5, windowHeight/2.5, 0, 0, Math.PI*2);
                 ctx.fill();
             }
-
 
             // Tail Fins (Softer Orange with Shadow)
             ctx.save();
@@ -645,22 +605,19 @@
             ctx.shadowBlur = 5;
             ctx.shadowOffsetX = -2;
             ctx.shadowOffsetY = 2;
-            ctx.fillStyle = '#FF8C00'; // Softer Orange
+            ctx.fillStyle = '#FF8C00';
             const finBaseX = centerX + this.width * 0.35;
             const finTipX = centerX + this.width * 0.50;
             const finW = this.width * 0.15;
             const finH = this.height * 0.45;
 
-            // Top fin (remains)
             ctx.beginPath();
             ctx.moveTo(finBaseX - finW, centerY - this.height * 0.1);
             ctx.quadraticCurveTo(finBaseX + finW * 0.2, centerY - finH * 0.8, finTipX, centerY - finH/2);
             ctx.quadraticCurveTo(finBaseX + finW * 0.3, centerY, finBaseX, centerY + this.height * 0.1);
             ctx.closePath();
             ctx.fill();
-
             ctx.restore();
-
 
             // Horizontal Center Line (Reinforced)
             ctx.strokeStyle = '#A0522D';
@@ -670,22 +627,14 @@
             ctx.lineTo(centerX + this.width/2 * 0.7, centerY);
             ctx.stroke();
 
-            // Optional faint logo silhouette on body
-            ctx.fillStyle = 'rgba(100, 100, 100, 0.1)';
-            ctx.beginPath();
-            ctx.arc(centerX - this.width * 0.1, centerY, this.height * 0.2, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Banner (trailing to the right with wave effect)
-            const bannerHeight = 54;
+            // Banner (trailing with wave and scrolling text)
             const bannerWidth = 240;
+            const bannerHeight = 54;
             const bannerAttachX = centerX + this.width * 0.45;
             const bannerAttachY = centerY;
             const bannerStartX = this.x + this.width + 20;
             const bannerSegments = 10;
             const segmentWidth = bannerWidth / bannerSegments;
-
-            const perfNow = performance.now();
 
             const staticWaveOffsetYForAttach = Math.sin(this.bannerWavePhase) * this.bannerWaveAmplitude;
             const bannerBaseYForAttach = this.y + this.height / 2 - bannerHeight / 2 + staticWaveOffsetYForAttach;
@@ -700,22 +649,19 @@
             ctx.lineTo(bannerStartX, bannerBaseYForAttach + bannerHeight * 0.8);
             ctx.stroke();
 
+            ctx.save(); // Save before clipping for banner text
             ctx.fillStyle = '#FFF';
             ctx.strokeStyle = '#555';
             ctx.lineWidth = 1;
             ctx.beginPath();
             for (let i = 0; i <= bannerSegments; i++) {
-                const waveOffset = Math.sin(perfNow / 200 + i * 0.5) * this.bannerWaveAmplitude * (i / bannerSegments); // Amplitude increases towards end
+                const waveOffset = Math.sin(performance.now() / 200 + i * 0.5) * this.bannerWaveAmplitude * (i / bannerSegments);
                 const currentBannerX = bannerStartX + i * segmentWidth;
                 const currentBannerTopY = this.y + this.height / 2 - bannerHeight / 2 + waveOffset;
-                if (i === 0) {
-                    ctx.moveTo(currentBannerX, currentBannerTopY);
-                } else {
-                    ctx.lineTo(currentBannerX, currentBannerTopY);
-                }
+                if (i === 0) { ctx.moveTo(currentBannerX, currentBannerTopY); } else { ctx.lineTo(currentBannerX, currentBannerTopY); }
             }
             for (let i = bannerSegments; i >= 0; i--) {
-                 const waveOffset = Math.sin(perfNow / 200 + i * 0.5) * this.bannerWaveAmplitude * (i / bannerSegments);
+                 const waveOffset = Math.sin(performance.now() / 200 + i * 0.5) * this.bannerWaveAmplitude * (i / bannerSegments);
                  const currentBannerX = bannerStartX + i * segmentWidth;
                  const currentBannerBottomY = this.y + this.height / 2 + bannerHeight / 2 + waveOffset;
                  ctx.lineTo(currentBannerX, currentBannerBottomY);
@@ -723,16 +669,44 @@
             ctx.closePath();
             ctx.fill();
             ctx.stroke();
+            ctx.clip(); // Use the banner path as a clipping mask
+
+            // Scrolling Text Logic
+            const isSmallScreen = this.canvas.width <= 480;
+            const fontSize = isSmallScreen ? 16 : 14;
+            ctx.font = `bold ${fontSize}px 'Courier New', monospace`;
+            ctx.fillStyle = '#39ff14';
+            ctx.shadowColor = '#39ff14';
+            ctx.shadowBlur = 8;
+            ctx.textBaseline = 'middle';
+            const avgBannerY = this.y + this.height / 2;
+
+            if (this.prefersReducedMotion) {
+                ctx.textAlign = 'center';
+                ctx.fillText(this.bannerLogo.trim(), bannerStartX + bannerWidth / 2, avgBannerY);
+            } else {
+                ctx.textAlign = 'left';
+                const textMetrics = ctx.measureText(this.bannerLogo);
+                const textWidth = textMetrics.width;
+                const effectiveOffset = this.bannerScrollOffset % textWidth;
+                let textX = bannerStartX - effectiveOffset;
+                while (textX < bannerStartX + bannerWidth) {
+                    ctx.fillText(this.bannerLogo, textX, avgBannerY);
+                    textX += textWidth;
+                }
+            }
+            ctx.restore(); // Restore from clipping
+
+            // Reset text alignment and baseline for other drawings
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'alphabetic';
 
              // Animated Marker Lights
-            const blinkInterval = 1500; // ms
+            const blinkInterval = 1500;
             const blinkOn = (Math.floor(performance.now() / (blinkInterval / 2)) % 2 === 0);
 
             if (blinkOn) {
                 const lightRadius = Math.max(1.5, this.width * 0.006);
-
-                // Top Fin Tip Light (White)
-                // finTipX and finH are defined where the top fin is drawn
                 const topFinLightX = finTipX;
                 const topFinLightY = centerY - finH / 2;
                 ctx.fillStyle = 'white';
@@ -1350,36 +1324,9 @@
 
        if (blimp) {
             blimp.update();
-            
-            // Update HTML overlay elements for blimp
-            if (blimpLogo && blimpBannerContainer) {
-                blimpLogo.style.display = 'block';
-                blimpBannerContainer.style.display = 'flex';
-                
-                const centerX = blimp.x + blimp.width / 2;
-                const centerY = blimp.y + blimp.height / 2;
-                blimpLogo.style.left = `${centerX}px`;
-                blimpLogo.style.top = `${centerY}px`;
-
-                const bannerWidth = 240;
-                const bannerHeight = 54;
-                const bannerStartX = blimp.x + blimp.width + 20;
-                const avgBannerY = blimp.y + blimp.height / 2;
-                blimpBannerContainer.style.left = `${bannerStartX}px`;
-                blimpBannerContainer.style.top = `${avgBannerY - bannerHeight / 2}px`;
-                blimpBannerContainer.style.width = `${bannerWidth}px`;
-                blimpBannerContainer.style.height = `${bannerHeight}px`;
-            }
-
             if (blimp.x + blimp.width + 240 + 20 < 0) { // Check if blimp + banner are off-screen
                 blimp = null;
                 stopBlimpTheme();
-            }
-        } else {
-            // Hide HTML overlay elements when no blimp
-            if (blimpLogo && blimpBannerContainer) {
-                blimpLogo.style.display = 'none';
-                blimpBannerContainer.style.display = 'none';
             }
         }
 
@@ -1413,7 +1360,7 @@
 
         if (gameRunning && playerControlEnabled && !blimp) {
             if (score >= nextBlimpScoreTarget) {
-                blimp = new Blimp(gameCanvas, playableHeight);
+                blimp = new Blimp(gameCanvas, playableHeight, blimpLogoImage);
                 playBlimpTheme();
                 nextBlimpScoreTarget = score + BLIMP_SCORE_INTERVAL_MIN + Math.random() * (BLIMP_SCORE_INTERVAL_MAX - BLIMP_SCORE_INTERVAL_MIN);
             }
