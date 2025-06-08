@@ -461,8 +461,8 @@
             this.canvas = canvas;
             this.playableHeight = playableHeight;
             this.logoImage = logoImage;
-            this.width = 300;
-            this.height = 130;
+            this.width = options.large ? 350 : 300;
+            this.height = options.large ? 150 : 130;
             this.x = this.canvas.width + (options.offsetX || 0);
             this.y = (this.playableHeight * 0.1 + Math.random() * (this.playableHeight * 0.15)) + (options.offsetY || 0);
             this.vx = (-2.5 - Math.random() * 0.5) * speedMultiplier;
@@ -1198,13 +1198,14 @@
             x: Math.random() * gameCanvas.width * 0.8,
             y: gameCanvas.height + sizeH,
             vx: (Math.random() - 0.5) * 2,
-            vy: - (5 + Math.random() * 2),
+            vy: - (8 + Math.random() * 3), // Increased height
             size: { w: sizeW, h: sizeH },
             scale: 0.5,
             maxScale: 1.2,
             scaleRate: 0.005,
             fusePhase: 0,
-            gravity: 0.05
+            gravity: 0.05,
+            wigglePhase: Math.random() * Math.PI * 2 // HOT Dawg wiggle added
         });
     }
 
@@ -1215,6 +1216,11 @@
             dawg.y += dawg.vy;
             dawg.vy += dawg.gravity; // Arcing motion
             dawg.fusePhase += 0.5;
+            
+            // Wiggle logic
+            dawg.wigglePhase += 0.15;
+            dawg.x += Math.sin(dawg.wigglePhase) * 1.5;
+
             if (dawg.scale < dawg.maxScale) {
                 dawg.scale += dawg.scaleRate;
             }
@@ -1474,9 +1480,10 @@
        }
 
         if (gameRunning && playerControlEnabled && blimps.length === 0) {
+            // Double Blimp spawn logic
             if (score >= 14400 && !doubleBlimpsTriggered) {
-                spawnBlimp({ offsetY: 0 });
-                spawnBlimp({ offsetY: 150 });
+                spawnBlimp({ offsetX: 0, offsetY: 0, large: false });
+                spawnBlimp({ offsetX: 240, offsetY: 150, large: true });
                 doubleBlimpsTriggered = true;
             } else if (score >= nextBlimpScoreTarget) {
                 spawnBlimp();
