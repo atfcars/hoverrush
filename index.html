@@ -704,6 +704,14 @@
                 ctx.fill();
             }
 
+            // Horizontal Center Line (Reinforced)
+            ctx.strokeStyle = '#A0522D';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(centerX - this.width/2 * 0.75, centerY);
+            ctx.lineTo(centerX + this.width/2 * 0.7, centerY);
+            ctx.stroke();
+
             // Tail Fins (Softer Orange with Shadow)
             ctx.save();
             ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
@@ -724,20 +732,12 @@
             ctx.fill();
             ctx.restore();
 
-            // Horizontal Center Line (Reinforced)
-            ctx.strokeStyle = '#A0522D';
-            ctx.lineWidth = 1.5;
-            ctx.beginPath();
-            ctx.moveTo(centerX - this.width/2 * 0.75, centerY);
-            ctx.lineTo(centerX + this.width/2 * 0.7, centerY);
-            ctx.stroke();
-
             // Placeholder Logo on Blimp Body - DRAWN LAST TO BE ON TOP
             if (this.logoImage && this.logoImage.complete) {
                 ctx.save();
                 ctx.globalAlpha = 0.9;
-                ctx.filter = 'drop-shadow(0 0 5px white)';
-                const logoWidth = 80;
+                ctx.filter = 'drop-shadow(0 0 2px rgba(0,0,0,0.6))';
+                const logoWidth = 140;
                 const logoHeight = this.logoImage.height * (logoWidth / this.logoImage.width);
                 ctx.drawImage(this.logoImage, centerX - logoWidth / 2, centerY - logoHeight / 2, logoWidth, logoHeight);
                 ctx.restore();
@@ -789,7 +789,7 @@
 
             // Scrolling Text Logic
             const isSmallScreen = this.canvas.width <= 480;
-            const fontSize = isSmallScreen ? 16 : 18;
+            const fontSize = isSmallScreen ? 22 : 28;
             ctx.font = `bold ${fontSize}px 'Courier New', monospace`;
             ctx.fillStyle = '#39ff14';
             ctx.shadowColor = '#39ff14';
