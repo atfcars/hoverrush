@@ -1023,8 +1023,9 @@
 
     function playExplosionSound() {
         if (!audioInitialized) return;
+
         const now = audioCtx.currentTime;
-        const vol = 0.04; // Reduced volume
+        const vol = 0.04; // Overall base volume
         const duration = 0.8;
 
         // Low frequency thump
@@ -1041,6 +1042,7 @@
         }
         noiseSrc.buffer = buffer;
 
+        // Envelope for volume shaping
         const noiseEnv = audioCtx.createGain();
         noiseEnv.gain.setValueAtTime(0, now);
         noiseEnv.gain.linearRampToValueAtTime(vol, now + 0.01);
@@ -1050,20 +1052,28 @@
         const lowShelf = audioCtx.createBiquadFilter();
         lowShelf.type = 'lowshelf';
         lowShelf.frequency.value = 300;
-        lowShelf.gain.value = 12; // +12dB boost
+        lowShelf.gain.value = 10; // Slightly less bass boost
 
-        // Distortion
+        // Pre-distortion volume reducer
+        const preDistortionGain = audioCtx.createGain();
+        preDistortionGain.gain.value = 0.15; // 🔧 Adjust this to fine-tune perceived loudness
+
+        // Distortion with reduced intensity
         const distortion = audioCtx.createWaveShaper();
-        distortion.curve = makeDistortionCurve(80);
+        distortion.curve = makeDistortionCurve(40); // Was 80
         distortion.oversample = '4x';
 
-        // Connect nodes: noise -> envelope -> bass boost -> distortion -> destination
-        noiseSrc.connect(noiseEnv).connect(lowShelf).connect(distortion).connect(audioCtx.destination);
+        // Final routing
+        noiseSrc.connect(noiseEnv)
+                .connect(lowShelf)
+                .connect(preDistortionGain)
+                .connect(distortion)
+                .connect(audioCtx.destination);
 
-        // Also send the distorted sound to the reverb
+        // Reverb routing (quieter)
         if (reverbNode) {
             const reverbGain = audioCtx.createGain();
-            reverbGain.gain.value = 0.5; // A bit more reverb
+            reverbGain.gain.value = 0.2; // Lowered from 0.5
             distortion.connect(reverbGain).connect(reverbNode.input);
         }
 
