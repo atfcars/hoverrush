@@ -461,7 +461,7 @@
 <li>🐦 Birds doing wild loop-de-loops</li>
 <li>🎈 Balloons rising from the streets</li>
 </ul>
-<li><span class="hotdawg-icon"></span> …and watch out for those pesky HOT Dawgs!</li>
+<li><span class="hotdawg-icon"></span> HOT Dawgs: Exploding sausages that chase you through the sky!</li>
 <li>💥 Hitting anything drains your battery.</li>
 <li><span class="menu-icon red-x"></span> If your battery hits zero, it’s game over.</li>
 </ul>
@@ -1063,7 +1063,7 @@
     function playExplosionSound() {
         if (!audioInitialized) return;
         const now = audioCtx.currentTime;
-        const vol = 0.3; // Reduced volume
+        const vol = 0.225; // Reduced volume
         const duration = 0.8;
 
         // Low frequency thump
@@ -1866,7 +1866,7 @@
             attemptStartGame();
         } else {
              console.error(`AudioContext in unexpected state: ${audioCtx.state}. Cannot start.`);
-             alert(`Audio system error (State: ${audioCtx.state}). Please reload.`);
+             alert(`Audio system error (State: ${audioCtx?.state}). Please reload.`);
         }
     }
     startButton.addEventListener('click', handleStartOrReplay);
