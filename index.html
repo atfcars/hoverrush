@@ -158,47 +158,20 @@
       transform: rotate(-45deg);
     }
 
-    /* Green Checkmark */
-    .green-check::before {
-      content: '';
-      position: absolute;
-      width: 8px;
-      height: 3px;
-      background-color: #39ff14;
-      top: 55%;
-      left: 5%;
-      transform: rotate(45deg);
-      border-radius: 2px;
-      box-shadow: 0 0 2px #39ff14;
-    }
-    .green-check::after {
-      content: '';
-      position: absolute;
-      width: 14px;
-      height: 3px;
-      background-color: #39ff14;
-      top: 45%;
-      left: 20%;
-      transform: rotate(-45deg);
-      border-radius: 2px;
-      box-shadow: 0 0 2px #39ff14;
-    }
-
-    /* Battery Icon Menu Patch */
     .battery-icon {
-       display: inline-block;
-       width: 18px;
-       height: 18px;
-       background-color: #39ff14;
-       color: white;
-       font-weight: 900;
-       font-size: 18px;
-       text-align: center;
-       line-height: 18px;
-       border-radius: 2px;
-       margin-right: 6px;
-       font-family: monospace;
-     }
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      background-color: #39ff14;
+      color: white;
+      font-weight: bold;
+      font-size: 16px;
+      text-align: center;
+      line-height: 18px;
+      border-radius: 2px;
+      margin-right: 6px;
+      font-family: monospace;
+    }
 
     /* Vertiport Recharge Pillar Fix */
     .vertiport-pillar-icon {
@@ -484,7 +457,7 @@
 </ul>
 <h3>What to Grab:</h3>
 <ul style="text-align:left; padding-left: 0;">
-<li><span class="menu-icon green-check"></span> Floating batteries to recharge</li>
+<li><span class="battery-icon">+</span> Floating batteries to recharge</li>
 <!-- Recharge Zone Pillar Icon Replacement -->
 <li>
   <span class="vertiport-pillar-icon">
