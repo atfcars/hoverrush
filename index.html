@@ -1080,7 +1080,36 @@
         noiseSrc.start(now);
         noiseSrc.stop(now + duration);
     }
-    function playSurgeSound() { if (!audioInitialized) return; playTone(40, 1.0, 'sine', 0.05, 0, { rampTo: 0.005 }); }
+   function playSurgeSound() {
+       if (!audioInitialized) return;
+
+       const now = audioCtx.currentTime;
+
+       // Primary soft tone
+       playTone(180, 0.5, 'triangle', 0.015, now, { rampTo: 0.005 });
+
+       // Faint high harmonic shimmer
+       playTone(720, 0.3, 'sine', 0.005, now + 0.05, { rampTo: 0.002 });
+
+       // Optional faint white noise layer (for texture)
+       const bufferSize = audioCtx.sampleRate * 0.4;
+       const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+       const data = noiseBuffer.getChannelData(0);
+       for (let i = 0; i < bufferSize; i++) {
+           data[i] = (Math.random() * 2 - 1) * 0.05;
+       }
+
+       const noiseSource = audioCtx.createBufferSource();
+       noiseSource.buffer = noiseBuffer;
+
+       const gainNode = audioCtx.createGain();
+       gainNode.gain.setValueAtTime(0.01, now);
+       gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+
+       noiseSource.connect(gainNode).connect(audioCtx.destination);
+       noiseSource.start(now);
+       noiseSource.stop(now + 0.4);
+   }
 
     function scheduleMusicBlock() {
         if (!audioInitialized || !audioCtx || audioCtx.state !== 'running' || !musicGainNode) { console.warn("scheduleMusicBlock: Cannot schedule, audio not ready."); stopBackgroundMusic(); return; }
