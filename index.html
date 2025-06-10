@@ -1463,9 +1463,11 @@
         });
     }
 
+    let hasSpawnedEarlyTrigger = false; // Add this at the top-level script scope
+
     function updateBonuses() {
-        // Force ChargingTrigger to appear immediately at game start
-        if (frameCount === 1) {
+        // ✅ Force ChargingTrigger to spawn once after initial frames
+        if (!hasSpawnedEarlyTrigger && frameCount > 10) {
             bonuses.push({
                 type: 'ChargingTrigger',
                 x: gameCanvas.width + 100,
@@ -1473,6 +1475,7 @@
                 size: 30,
                 speed: currentScrollSpeed * BONUS_SPEED_MULTIPLIER
             });
+            hasSpawnedEarlyTrigger = true;
         }
 
         for (let i = bonuses.length - 1; i >= 0; i--) {
